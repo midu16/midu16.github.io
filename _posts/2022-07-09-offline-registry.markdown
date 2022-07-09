@@ -252,10 +252,10 @@ The following ansible tasks are preparing the environment from Step 1. to Step 6
 
 - name: Creating the working directory of the offline registry
   file:
-    path: "{{ item }}"
+    path: "{{item}}"
     state: directory
-    owner: "{{ ocp_username }}" 
-    group: "{{ ocp_group }}" 
+    owner: "{{ocp_username}}" 
+    group: "{{ocp_group}}" 
     mode: 0640
   loop:
      - "/apps/registry/auth"
