@@ -237,3 +237,88 @@ Step 15. Validating the mirroring
 [openshift-cli-linux]:   https://access.redhat.com/downloads/content/290
 [openshift-pull-secret]: https://console.redhat.com/openshift/install/pull-secret
 [podman-doc]: https://podman.io/getting-started/installation
+
+
+Automating the Offline registry creation with Ansible
+
+The following ansible tasks are preparing the environment from Step 1. to Step 6:
+
+{% highlight ruby %}
+---
+- name: Install required packages
+  ansible.builtin.dnf:
+    name: podman
+    state: latest
+
+- name: Creating the working directory of the offline registry
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ocp_username }}" 
+    group: "{{ ocp_group }}" 
+    mode: 0640
+  loop:
+     - "/apps/registry/auth"
+     - "/apps/registry/certs"
+     - "/apps/registry/data"
+
+- name: Add a user to a password file and ensure permissions are set
+  htpasswd:
+    path: /apps/registry/auth/htpasswd
+    name: "{{ registry_username }}"
+    password: "{{ registry_password }}"
+    owner: "{{ ocp_username }}"
+    group:  "{{ ocp_group }}"
+    mode: 0640
+
+- name: Generate an OpenSSL private key
+  openssl_privatekey:
+    path: "/apps/registry/certs/domain.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+    backup: yes
+- name: Generate an OpenSSL Certificate Signing Request with Subject information
+  openssl_csr:
+    path: "/apps/registry/certs/domain.csr"
+    privatekey_path: "/apps/registry/certs/domain.key"
+    country_name: "{{ country_name }}"
+    organization_name: "{{ organization_name }}"
+    email_address: "{{ email_address }}"
+    common_name: "{{ server_hostname }}"
+
+- name: Creating the user system directory of the offline registry
+  file:
+    path: "/home/{{ocp_username}}/.config/systemd/user/"
+    state: directory
+    owner: "{{ ocp_username }}" 
+    group: "{{ ocp_group }}" 
+    mode: 0640
+
+- name: Creating the registry container
+  podman_container:
+    name: ocpdiscon-registry
+    image: docker.io/library/registry:2.8.1
+    state: started
+    restart: yes
+    restart_policy: "no"
+    volume: 
+        - "/apps/registry/data:/var/lib/registry:z"
+        - "/apps/registry/auth:/auth:z"
+        - "/apps/registry/certs:/certs:z"
+    ports:
+        - "5000:5000"
+    env:
+        REGISTRY_AUTH: "htpasswd"
+        REGISTRY_AUTH_HTPASSWD_REALM: "Registry"
+        REGISTRY_HTTP_SECRET: "ALongRandomSecretForRegistry"
+        REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd" 
+        REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
+        REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
+        REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
+        REGISTRY_STORAGE_DELETE_ENABLED: "true" 
+    generate_systemd:
+        path: "/home/{{ocp_username}}/.config/systemd/user/"
+        restart_policy: always
+        time: 120
+        names: true
+{% endhighlight %} 
