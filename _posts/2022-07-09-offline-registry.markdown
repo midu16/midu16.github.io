@@ -246,7 +246,7 @@ The following ansible tasks are preparing the environment from Step 1. to Step 6
 {% highlight ruby %}
 ---
 - name: Install required packages
-  ansible.builtin.dnf:
+  dnf:
     name: podman
     state: latest
 
