@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Offline registry for must-gather for Openshift 4!"
+title:  "Gathering cluster data from an Offline OCP for Openshift 4!"
 date:   2022-07-10 12:30:29 +0200
 categories: openshift4
 ---
