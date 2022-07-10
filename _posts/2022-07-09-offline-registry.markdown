@@ -243,7 +243,7 @@ Automating the Offline registry creation with Ansible
 
 The following ansible tasks are preparing the environment from Step 1. to Step 6:
 
-{% highlight ruby %}
+{% highlight yaml %}
 ---
 - name: Install required packages
   dnf:
