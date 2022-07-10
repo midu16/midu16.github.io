@@ -181,7 +181,7 @@ Step 12. Login to the offline registry
 
 Step 13. Mirroring OCP container base images to the offline registry
 
-{% highlight ruby %}
+{% highlight bash %}
  export UPSTREAM_REPO=quay.io/openshift-release-dev/ocp-release@sha256:e9bcc5d74c4d6651f15601392e7eec52a9feacbf583ca5323ddeb9d3a878d75d
  export host_fqdn=$(hostname -f)
  export LOCAL_REG="${host_fqdn}:5000"
