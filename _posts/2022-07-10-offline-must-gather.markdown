@@ -4,7 +4,7 @@ title:  "Gathering cluster data from an Offline OCP for Openshift 4!"
 date:   2022-07-10 12:30:29 +0200
 categories: openshift4
 ---
-In the following post, we are going to talk about how to must-gather and ocs-must-gather into a offline Openshift 4 cluster.
+In the following post, we are going to talk about how to `must-gather` and `ocs-must-gather` into a offline Openshift 4 cluster.
 
 Prerequisites
 
@@ -13,7 +13,7 @@ Prerequisites
 - The host has already available the offline registry. For more details check the other post [Offline registry for Openshift 4][offline-registry]
 - The host has already available the oc-client-client
 
-Offiline mirror the must-gather and ocs-must-gather container base images
+Offiline mirror the `must-gather` and `ocs-must-gather` container base images
 
 Step 1. Installing `skopeo`
 
