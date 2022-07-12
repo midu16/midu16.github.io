@@ -16,7 +16,7 @@ Offiline registry
 Step 1. Installing `podman`
 
 {% highlight bash %}
- sudo dnf -y install podman 
+ sudo dnf -y install podman
 {% endhighlight %}
 
 For other type of Linux Operating System check the [Podman docs][podman-doc] for the right command.
@@ -87,8 +87,8 @@ Step 8. Manage the `ocpdiscon-registry` container with systemd
  cd ${HOME}/.config/systemd/user/
  podman generate systemd --new --files --name ocpdiscon-registry
  systemctl --user daemon-reload
- systemctl --user start ocpdiscon-registry.service
- systemctl --user is-active ocpdiscon-registry.service
+ systemctl --user start container-ocpdiscon-registry.service
+ systemctl --user is-active container-ocpdiscon-registry.service
  cd ${HOME}
 {% endhighlight %}
 
@@ -102,7 +102,7 @@ Go to the [Download Openshift CLI for linux][openshift-cli-linux] to download th
  cp ${HOME}/Downloads/oc-4.10.21-linux/kubectl /usr/local/bin/kubectl
 {% endhighlight %}
 
-Step 10. Download the `pull-secret` 
+Step 10. Download the `pull-secret`
 
 Go to the [Download Openshift pull-secret][openshift-pull-secret] to download the pull-secret file. Once you obtain the file check the following command to  
 
@@ -138,8 +138,8 @@ The following `/apps/registry/pull-secret.json` content would follow the followi
 Now we should add the section that describes the credentials to the offline registry:
 {% highlight json %}
 "auths": {
-    "<mirror_registry>": { 
-      "auth": "<credentials>", 
+    "<mirror_registry>": {
+      "auth": "<credentials>",
       "email": "you@example.com"
   },
 {% endhighlight %}
@@ -222,13 +222,13 @@ spec:
     - INBACRNRDL0100.offline.oxtechnix.lan:5000/ocp-release
     source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
 {% endhighlight %}
- 
+
 Save this information for later use. For more information you can check [Openshift Documentation][openshift-doc].
 
-Step 15. Validating the mirroring 
+Step 15. Validating the mirroring
 
 {% highlight bash %}
- curl --user <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog 
+ curl --user <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog
 {"repositories":["ocp-release"]}
 {% endhighlight %}
 
@@ -254,8 +254,8 @@ The following ansible tasks are preparing the environment from Step 1. to Step 6
   file:
     path: "{{item}}"
     state: directory
-    owner: "{{ocp_username}}" 
-    group: "{{ocp_group}}" 
+    owner: "{{ocp_username}}"
+    group: "{{ocp_group}}"
     mode: 0640
   loop:
      - "/apps/registry/auth"
@@ -290,8 +290,8 @@ The following ansible tasks are preparing the environment from Step 1. to Step 6
   file:
     path: "/home/{{ocp_username}}/.config/systemd/user/"
     state: directory
-    owner: "{{ ocp_username }}" 
-    group: "{{ ocp_group }}" 
+    owner: "{{ ocp_username }}"
+    group: "{{ ocp_group }}"
     mode: 0640
 
 - name: Creating the registry container
@@ -301,7 +301,7 @@ The following ansible tasks are preparing the environment from Step 1. to Step 6
     state: started
     restart: yes
     restart_policy: "no"
-    volume: 
+    volume:
         - "/apps/registry/data:/var/lib/registry:z"
         - "/apps/registry/auth:/auth:z"
         - "/apps/registry/certs:/certs:z"
@@ -311,14 +311,14 @@ The following ansible tasks are preparing the environment from Step 1. to Step 6
         REGISTRY_AUTH: "htpasswd"
         REGISTRY_AUTH_HTPASSWD_REALM: "Registry"
         REGISTRY_HTTP_SECRET: "ALongRandomSecretForRegistry"
-        REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd" 
+        REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
         REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
         REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
         REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
-        REGISTRY_STORAGE_DELETE_ENABLED: "true" 
+        REGISTRY_STORAGE_DELETE_ENABLED: "true"
     generate_systemd:
         path: "/home/{{ocp_username}}/.config/systemd/user/"
         restart_policy: always
         time: 120
         names: true
-{% endhighlight %} 
+{% endhighlight %}
