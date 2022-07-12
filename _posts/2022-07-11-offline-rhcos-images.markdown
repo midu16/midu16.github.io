@@ -88,6 +88,7 @@ Step 7. Systemd manage of `rhcos_image_cache`
  podman generate systemd --new --files --name rhcos_image_cache
  systemctl --user daemon-reload
  systemctl --user start container-rhcos_image_cache.service
+ systemctl --user enable container-rhcos_image_cache.service
  systemctl --user is-active container-rhcos_image_cache.service
  cd ${HOME}
 {% endhighlight %}

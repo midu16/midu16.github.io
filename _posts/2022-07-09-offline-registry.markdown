@@ -88,6 +88,7 @@ Step 8. Manage the `ocpdiscon-registry` container with systemd
  podman generate systemd --new --files --name ocpdiscon-registry
  systemctl --user daemon-reload
  systemctl --user start container-ocpdiscon-registry.service
+ systemctl --user enable container-ocpdiscon-registry.service
  systemctl --user is-active container-ocpdiscon-registry.service
  cd ${HOME}
 {% endhighlight %}
