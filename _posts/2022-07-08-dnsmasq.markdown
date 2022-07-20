@@ -1,0 +1,46 @@
+---
+layout: post
+title:  "Dnsmasq config example for OCP IPI for Openshift 4!"
+date:   2022-07-08 15:30:29 +0200
+categories: openshift4
+---
+In the following post, we are going to talk about how to set-up dnsmasq for OCP.
+
+How to install and configure the dnsmasq service for OCP
+
+Step 1. Installing the dnsmasq-service
+
+{% highlight bash %}
+ sudo dnf -y install dnsmasq
+{% endhighlight %}
+
+Step 2. Checking the dnsmasq-service
+
+{% highlight bash %}
+ sudo systemctl status systemd-resolved
+ sudo systemctl enable systemd-resolved
+{% endhighlight %}
+
+Step 3. Remove the symlinked created for `/etc/resolv.conf`
+
+{% highlight bash %}
+ sudo unlink /etc/resolv.conf
+{% endhighlight %}
+
+
+Step 4. Configuring the `/etc/dnsmasq.conf`
+
+A minimal configuration example is available under the `/etc/dnsmasq.conf`
+
+{% highlight bash %}
+  ls -l  /etc/dnsmasq.conf
+  -rw-r--r--. 1 root dnsmasq 27981 Jun 17 13:17 /etc/dnsmasq.conf
+{% endhighlight %}
+
+
+[openshift-doc]: https://docs.openshift.com/container-platform/4.8/installing/installing_bare_metal_ipi/ipi-install-overview.html
+[openshift-cli-linux]:   https://access.redhat.com/downloads/content/290
+[openshift-pull-secret]: https://console.redhat.com/openshift/install/pull-secret
+[podman-doc]: https://podman.io/getting-started/installation
+[must-gather-images]: https://docs.openshift.com/container-platform/4.7/support/gathering-cluster-data.html
+[offline-registry]: https://midu16.github.io/openshift4/2022/07/09/offline-registry.html

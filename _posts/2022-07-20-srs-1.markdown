@@ -1,182 +1,107 @@
 ---
 layout: post
-title:  "LTE-all-in-one on Raspberry PI 4B+!"
-date:   2022-07-20 12:32:29 +0200
-categories: LTE
+title:  "Creating an RHCOS images cache for Openshift 4!"
+date:   2022-07-11 12:32:29 +0200
+categories: openshift4
 ---
-In the following post, we are going to talk about how to deploy a fully LTE network on your Raspberry PI 4B+
+In the following post, we are going to talk about how to locally cash the RHCOS images for Openshift 4.
 
 Prerequisites
 
-- Raspberry PI 4B+ with minimum 4GBi RAM
-- The host should have internet connectivity on eth0
-- Prepare your MicroSD with Fedora 5.13.12-100.fc33.aarch64 from [Fedora Download][fedora-doc]
-
-Lets start the installation steps:
-
-Preparing the environment
-
-Step 1. Install upgrade the OS
+- Linux Operating System ( in the further steps example of this post, we are going to use Fedora Linux 36 (Workstation Edition) ).
+- The host should have internet connectivity
+- `openshift-baremetal-install-cli`:
 
 {% highlight bash %}
- sudo dnf upgrade
-{% endhighlight %}
-
-Step 2. Install the UHD Drivers for the USRP
-
-For more informations on how to install UHD Drivers on different types of OS check the [UHD Documentation][uhd-doc].
-
-{% highlight bash %}
- sudo yum install uhd uhd-devel
-{% endhighlight %}
-
-If the above command is not installing the packages its required to define the ettus.repo
-
-{% highlight bash %}
- sudo vi /etc/yum.repos.d/ettus.repo
-{% endhighlight %}
-
-Paste the following content in the files and save the file:
-{% highlight bash %}
- [ettus-uhd-stable-repo]
-  name=Ettus Research - UHD Stable $releasever-$basearchthon serial timeout
-  baseurl=http://files.ettus.com/binaries/uhd/repo/uhd/fedora/$releasever/$basearch
-  gpgcheck=0
-{% endhighlight %}
-
-Now to install the required binaries run the following command:
-{% highlight bash %}
- sudo yum --enablerepo='ettus-uhd-stable-repo' install uhd
-{% endhighlight %}
-
-Step 3. Verify that the UHD driver is working as expected
-
-Connect the USRP device to the Raspberry PI. Use the usb-3.0 cable or the ethernet cable and run the following command.
-
-{% highlight bash %}
-sudo uhd_find_devices
-{% endhighlight %}
-
-Make sure that you have the same or a similar output from the command.
-
-{% highlight bash %}
-[INFO] [UHD] linux; GNU C++ version 10.2.1 20200804 (Red Hat 10.2.1-2); Boost_107300; UHD_3.15.0.0
---------------------------------------------------
--- UHD Device 0
---------------------------------------------------
-Device Address:
-   serial: 315A8CF
-   name: B200mini
-   product: B200mini
-   type: b200
+ export VERSION=stable-4.8
+ export RELEASE_IMAGE=$(curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/release.txt | grep 'Pull From: quay.io' | awk -F ' ' '{print $3}')
+ export cmd=openshift-baremetal-install
+ export pullsecret_file=${HOME}/pull-secret.json
+ curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/openshift-client-linux.tar.gz | tar zxvf - oc
+ sudo cp oc /usr/local/bin
+ oc adm release extract --registry-config "${pullsecret_file}" --command=$cmd --to "${extract_dir}" ${RELEASE_IMAGE}
+ sudo cp openshift-baremetal-install /usr/local/bin
+ openshift-baremetal-install version
+openshift-baremetal-install 4.8.45
+built from commit b67c48b3ba135f2a02b791b6bc42ca6cf0780c88
+release image quay.io/openshift-release-dev/ocp-release@sha256:e9bcc5d74c4d6651f15601392e7eec52a9feacbf583ca5323ddeb9d3a878d75d
 {% endhighlight %}
 
 
-Step 4. Download the LTE binary components
+RHCOS cache images
 
-We are going to place all the binaries required for srs under the /usr/local/bin/
-
-{% highlight bash %}
- wget https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsenb
- wget https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc
- wget https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srslte_install_configs.sh
-{% endhighlight %}
-
-Move the files from the current directory under the /usr/local/bin/
+Step 1. Install podman
 
 {% highlight bash %}
- sudo mv srsenb /usr/local/bin/srsenb ; sudo chmod a+x /usr/local/bin/srsenb
- sudo mv srsepc /usr/local/bin/srsepc ; sudo chmod a+x /usr/local/bin/srsepc
- sudo mv srslte_install_configs.sh /usr/local/bin/srslte_install_configs.sh ; sudo chmod a+x /usr/local/bin/srslte_install_configs.sh
+ sudo dnf install -y podman
 {% endhighlight %}
 
-Step 5. Download the srs conf files
+Step 2. Open firewall
 
 {% highlight bash %}
- mkdir -p /etc/srslte/
- curl -o /etc/srslte/enb.conf https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/enb.conf
- curl -o /etc/srslte/epc.conf https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/epc.conf
- curl -o /etc/srslte/mbms.conf https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/mbms.conf
- curl -o /etc/srslte/rr.conf https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/rr.conf
- curl -o /etc/srslte/sib.conf https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/sib.conf
- curl -o /etc/srslte/user_db.csv https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/user_db.csv
- curl -o /etc/srslte/drb.conf https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/configs/drb.conf
- sudo chmod 775 /etc/srslte/*
+ sudo firewall-cmd --add-port=8080/tcp --zone=public --permanent
+ sudo firewall-cmd --reload
 {% endhighlight %}
 
-Step 6. Running the application
-
-Open two terminal connections to your Raspberry PI 4B+
-
-Terminal number 1:
+Step 3. Creating the RHCOS cache images directory
 
 {% highlight bash %}
- sudo srsepc
+ mkdir -p /apps/rhcos_image_cache
 {% endhighlight %}
-
-The command will generate the following output:
 
 {% highlight bash %}
-Built in Release mode using 20.10.1.
-
-
----  Software Radio Systems EPC  ---
-
-Reading configuration file /etc/srslte/epc.conf...
-HSS Initialized.
-Failed to open file "/tmp/epc.pcap" for writing
-MME S11 Initialized
-MME GTP-C Initialized
-MME Initialized. MCC: 0xf901, MNC: 0xff70
-SPGW GTP-U Initialized.
-SPGW S11 Initialized.
-SP-GW Initialized.
-Received S1 Setup Request.
-S1 Setup Request - eNB Name: srsenb01, eNB id: 0x19b
-S1 Setup Request - MCC:901, MNC:70
-S1 Setup Request - TAC 7, B-PLMN 0x9f107
-S1 Setup Request - Paging DRX v128
-Sending S1 Setup Response
+ sudo semanage fcontext -a -t httpd_sys_content_t "/apps/rhcos_image_cache(/.*)?"
+ sudo restorecon -Rv /apps/rhcos_image_cache/
+ Relabeled /apps/rhcos_image_cache from unconfined_u:object_r:unlabeled_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0
 {% endhighlight %}
 
-Terminal number 2:
+Step 4. Get the URI for the RHCOS image that the installation program will deploy on the bootstrap VM
 
 {% highlight bash %}
- srsenb
+ export RHCOS_QEMU_URI=$(/usr/local/bin/openshift-baremetal-install coreos print-stream-json | jq -r --arg ARCH "$(arch)" '.architectures[$ARCH].artifacts.qemu.formats["qcow2.gz"].disk.location')
 {% endhighlight %}
 
-
-The command will generate the following output:
+Step 5. Get the name of the image that the installation program will deploy on the bootstrap VM
 
 {% highlight bash %}
----  Software Radio Systems LTE eNodeB  ---
-Reading configuration file /etc/srslte/enb.conf...
-Built in Release mode using 20.10.1.
-/home/midu/Desktop/srsLTE-release_20_10_1/srsenb/src/enb_cfg_parser.cc.890: Force DL EARFCN for cell PCI=1 to 1934
-Opening 1 channels in RF device=UHD with args=default
-[INFO] [UHD] linux; GNU C++ version 10.2.1 20200804 (Red Hat 10.2.1-2); Boost_107300; UHD_3.15.0.0
-[INFO] [LOGGING] Fastpath logging disabled at runtime.
-Opening USRP channels=1, args: type=b200,master_clock_rate=23.04e6
-[INFO] [B200] Detected Device: B200mini
-[INFO] [B200] Operating over USB 3.
-[INFO] [B200] Initialize CODEC control...
-[INFO] [B200] Initialize Radio control...
-[INFO] [B200] Performing register loopback test...
-[INFO] [B200] Register loopback test passed
-[INFO] [B200] Asking for clock rate 23.040000 MHz...
-[INFO] [B200] Actually got clock rate 23.040000 MHz.
-Setting frequency: DL=1878.4 Mhz, UL=1783.4 MHz for cc_idx=0
-
-
-==== eNodeB started ===
-Type <t> to view trace
+ export export RHCOS_QEMU_NAME=${RHCOS_QEMU_URI##*/}
+ export RHCOS_QEMU_UNCOMPRESSED_SHA256=$(/usr/local/bin/openshift-baremetal-install coreos print-stream-json | jq -r --arg ARCH "$(arch)" '.architectures[$ARCH].artifacts.qemu.formats["qcow2.gz"].disk["uncompressed-sha256"]')
+ export RHCOS_OPENSTACK_URI=$(/usr/local/bin/openshift-baremetal-install coreos print-stream-json | jq -r --arg ARCH "$(arch)" '.architectures[$ARCH].artifacts.openstack.formats["qcow2.gz"].disk.location')
+ export RHCOS_OPENSTACK_NAME=${RHCOS_OPENSTACK_URI##*/}
+ export RHCOS_OPENSTACK_UNCOMPRESSED_SHA256=$(/usr/local/bin/openshift-baremetal-install coreos print-stream-json | jq -r --arg ARCH "$(arch)" '.architectures[$ARCH].artifacts.openstack.formats["qcow2.gz"].disk["uncompressed-sha256"]')
+ curl -L ${RHCOS_QEMU_URI} -o /apps/rhcos_image_cache/${RHCOS_QEMU_NAME}
+ curl -L ${RHCOS_OPENSTACK_URI} -o /apps/rhcos_image_cache/${RHCOS_OPENSTACK_NAME}
+ ls -Z /apps/rhcos_image_cache
 {% endhighlight %}
 
+Step 6. Create the pod:
 
-[fedora-doc]: https://docs.fedoraproject.org/en-US/quick-docs/raspberry-pi/
-[srs-doc]:   https://docs.srsran.com/en/latest/app_notes/source/pi4/source/index.html
-[uhd-doc]: https://files.ettus.com/manual/page_install.html
-[srsenb]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsenb
-[srsepc]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc
-[srsepc_if_masq.sh]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc_if_masq.sh
-[srslte_install_configs.sh]:https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srslte_install_configs.sh
+{% highlight bash %}
+ podman run -d --name rhcos_image_cache -v /apps/rhcos_image_cache:/var/www/html -p 8080:8080/tcp quay.io/centos7/httpd-24-centos7:latest
+{% endhighlight %}
+
+Step 7. Systemd manage of `rhcos_image_cache`
+
+{% highlight bash %}
+ mkdir -p ${HOME}/.config/systemd/user/
+ cd ${HOME}/.config/systemd/user/
+ podman generate systemd --new --files --name rhcos_image_cache
+ systemctl --user daemon-reload
+ systemctl --user start container-rhcos_image_cache.service
+ systemctl --user enable container-rhcos_image_cache.service
+ systemctl --user is-active container-rhcos_image_cache.service
+ cd ${HOME}
+{% endhighlight %}
+
+The above command creates a caching webserver with the name rhcos_image_cache, which serves the images for deployment. The first image ${RHCOS_PATH}${RHCOS_QEMU_URI}?sha256=${RHCOS_QEMU_SHA_UNCOMPRESSED} is the bootstrapOSImage and the second image ${RHCOS_PATH}${RHCOS_OPENSTACK_URI}?sha256=${RHCOS_OPENSTACK_SHA_COMPRESSED} is the clusterOSImage in the install-config.yaml file.
+
+Step 8. Generate the bootstrapOSImage and clusterOSImage configuration
+
+This step will be detail on the next post, for which we will overview the creation of `install-config.yaml` file.
+For more details you can check the official [Openshift Documentation][openshift-doc]
+
+[openshift-doc]: https://docs.openshift.com/container-platform/4.9/installing/installing_bare_metal_ipi/ipi-install-installation-workflow.html
+[openshift-cli-linux]:   https://access.redhat.com/downloads/content/290
+[openshift-pull-secret]: https://console.redhat.com/openshift/install/pull-secret
+[podman-doc]: https://podman.io/getting-started/installation
+[offline-registry]: https://midu16.github.io/openshift4/2022/07/09/offline-registry.html
