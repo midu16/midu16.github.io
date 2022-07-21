@@ -11,6 +11,8 @@ Prerequisites
 - Raspberry PI 4B+ with minimum 4GBi RAM
 - The host should have internet connectivity on eth0
 - Prepare your MicroSD with Fedora 5.13.12-100.fc33.aarch64 from [Fedora Download][fedora-doc]
+- UHD USRP B200 for more information you can check [UHD USRP B Series][usrp-doc-b]
+- UHD USRP N3000 for more information you can check [UHD USRP N Series][usrp-doc-n]
 
 Lets start the installation steps:
 
@@ -19,7 +21,7 @@ Preparing the environment
 Step 1. Install upgrade the OS
 
 {% highlight bash %}
- sudo dnf upgrade
+ sudo dnf upgrade -y
 {% endhighlight %}
 
 Step 2. Install the UHD Drivers for the USRP
@@ -27,7 +29,7 @@ Step 2. Install the UHD Drivers for the USRP
 For more informations on how to install UHD Drivers on different types of OS check the [UHD Documentation][uhd-doc].
 
 {% highlight bash %}
- sudo yum install uhd uhd-devel
+ sudo yum install uhd uhd-devel -y 
 {% endhighlight %}
 
 If the above command is not installing the packages its required to define the ettus.repo
@@ -51,7 +53,7 @@ Now to install the required binaries run the following command:
 
 Step 3. Verify that the UHD driver is working as expected
 
-Connect the USRP device to the Raspberry PI. Use the usb-3.0 cable or the ethernet cable and run the following command.
+Connect the USRP device to the Raspberry PI. In this example we are going to use a USRP B200mini for SDR component.Use the usb-3.0 cable or the ethernet cable and run the following command.
 
 {% highlight bash %}
 sudo uhd_find_devices
@@ -188,3 +190,5 @@ Type <t> to view trace
 [srsepc]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc
 [srsepc_if_masq.sh]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc_if_masq.sh
 [srslte_install_configs.sh]:https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srslte_install_configs.sh
+[usrp-doc-b]: https://www.ettus.com/product-categories/usrp-bus-series/
+[usrp-doc-n]: https://www.ettus.com/product-categories/usrp-networked-series/
