@@ -44,7 +44,24 @@ Note, that the <username> and <password> should be replaced with the values you 
 Step 5. Creating the offline self-signed certificate.
 
 {% highlight bash %}
- openssl req -newkey rsa:4096 -nodes -sha256 -keyout /apps/registry/certs/domain.key -x509 -days 356 -out /apps/registry/certs/domain.crt -addext "subjectAltName = INBACRNRDL0100.offline.oxtechnix.lan"
+ host_fqdn=$( hostname --long )
+cert_c="<Country Name>"   # Country Name (C, 2 letter code)
+cert_s="<State>"          # Certificate State (S)
+cert_l="<Locality>"       # Certificate Locality (L)
+cert_o="<Organization>"   # Certificate Organization (O)
+cert_ou="<Org Unit>"      # Certificate Organizational Unit (OU)
+cert_cn="${host_fqdn}"    # Certificate Common Name (CN)
+
+openssl req \
+    -newkey rsa:4096 \
+    -nodes \
+    -sha256 \
+    -keyout /apps/registry/certs/domain.key \
+    -x509 \
+    -days 365 \
+    -out /apps/registry/certs/domain.crt \
+    -addext "subjectAltName = DNS:${host_fqdn}" \
+    -subj "/C=${cert_c}/ST=${cert_s}/L=${cert_l}/O=${cert_o}/OU=${cert_ou}/CN=${cert_cn}"
  sudo cp /apps/registry/certs/domain.crt /etc/pki/ca-trust/source/anchors/
  sudo update-ca-trust
 {% endhighlight %}
