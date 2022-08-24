@@ -584,7 +584,27 @@ mirror:
 			  minVersion: '4.10.0-20220610417'
 			  maxVersion: '4.10.0-20223160637'
 			  channels:
-			    - name: 'stable'
+			    - name: '4.10'
+			- name: kubernetes-nmstate-operator
+			  minVersion: '4.10.0-20220815043'
+			  maxVersion: '4.10.0-20220815043'
+			  channels:
+			    - name: '4.10'
+			- name: metallb-operator
+			  minVersion: '4.10.0-202208150436'
+			  maxVersion: '4.10.0-202208150436'
+			  channels:
+			    - name: '4.10'
+			- name: mcg-operator
+			  minVersion: 'v4.10.5'
+			  maxVersion: 'v4.10.5'
+			  channels:
+			    - name: 'stable-4.10'
+			- name: odf-operator
+			  minVersion: 'v4.10.5'
+			  maxVersion: 'v4.10.5'
+			  channels:
+			    - name: 'stable-4.10'
 {% endhighlight %}
 
 Downloading the container based images to the .tar file:
@@ -611,6 +631,8 @@ oc-mirror --from ./archive docker://${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}
 
 Step 5. Mirroring tools comparison 
 
+In the initial phase we are going to consider the mirroring size .tar file for each tool.
+
 - oc-cli mirroring:
 
 Once the mirror has finished, the size of the tar file for the operator list used in the example above:
@@ -620,3 +642,4 @@ du -h INBACRNRDL0100.offline.oxtechnix.lan.tar.gz
 {% endhighlight %}
 
 - oc-mirror-cli mirroring:
+
