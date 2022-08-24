@@ -584,17 +584,17 @@ mirror:
 			  minVersion: '4.10.0-20220610417'
 			  maxVersion: '4.10.0-20223160637'
 			  channels:
-			    - name: '4.10'
+			    - name: 'stable'
 			- name: kubernetes-nmstate-operator
 			  minVersion: '4.10.0-20220815043'
 			  maxVersion: '4.10.0-20220815043'
 			  channels:
-			    - name: '4.10'
+			    - name: 'stable'
 			- name: metallb-operator
 			  minVersion: '4.10.0-202208150436'
 			  maxVersion: '4.10.0-202208150436'
 			  channels:
-			    - name: '4.10'
+			    - name: 'stable'
 			- name: mcg-operator
 			  minVersion: 'v4.10.5'
 			  maxVersion: 'v4.10.5'
@@ -642,4 +642,5 @@ du -h INBACRNRDL0100.offline.oxtechnix.lan.tar.gz
 {% endhighlight %}
 
 - oc-mirror-cli mirroring:
+
 
