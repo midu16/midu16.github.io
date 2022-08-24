@@ -426,7 +426,14 @@ using index path mapping: /database/index.db:/tmp/953794212
 wrote database to /tmp/953794212
 using database at: /tmp/953794212/index.db
 ...
+Some part of the output has been removed in order to keep only the valueble information
+...
+info: Mirroring completed in 1h48m37.78s (1.733MB/s)
+wrote mirroring manifests to manifests-redhat-operator-index-1661341299
 
+To upload local images to a registry, run:
+
+	oc adm catalog mirror file://local/index/olm-mirror/redhat-operator-index:v4.10 REGISTRY/REPOSITORY
 {% endhighlight %}
 
 Creating the archive of the container based images already downloaded localy:
@@ -604,3 +611,12 @@ oc-mirror --from ./archive docker://${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}
 
 Step 5. Mirroring tools comparison 
 
+- oc-cli mirroring:
+
+Once the mirror has finished, the size of the tar file for the operator list used in the example above:
+{% highlight bash %}
+du -h INBACRNRDL0100.offline.oxtechnix.lan.tar.gz 
+	29G	INBACRNRDL0100.offline.oxtechnix.lan.tar.gz
+{% endhighlight %}
+
+- oc-mirror-cli mirroring:
