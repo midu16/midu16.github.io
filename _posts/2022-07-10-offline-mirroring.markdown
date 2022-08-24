@@ -89,14 +89,16 @@ In the end the `pull-secret.json` should follow the following template:
 Step 3. Login to the offline registry
 
 {% highlight bash %}
- podman login --authfile pull-secret.json -u <username> -p <password> INBACRNRDL0100.offline.oxtechnix.lan:5000
- Login Succeeded!
+podman login --authfile pull-secret.json -u <username> -p <password> INBACRNRDL0100.offline.oxtechnix.lan:5000
+  Login Succeeded!
 {% endhighlight %}
 
 Step 4. Login to the `registry.redhat.io`
 
 {% highlight bash %}
-
+podman login registry.redhat.io --authfile pull-secret.json 
+  Authenticating with existing credentials for registry.redhat.io
+  Existing credentials are valid. Already logged in to registry.redhat.io
 {% endhighlight %}
 
 

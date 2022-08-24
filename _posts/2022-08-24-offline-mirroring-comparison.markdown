@@ -353,3 +353,16 @@ grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/ListP
 
 Step 4 Mirroring a specific list of container based images operator:
 
+For the future comparission between the tools, we are going to consider the following list of operators:
+	- local-storage-operator
+	- odf-operator
+	- mcg-operator
+	- metallb-operator
+	- kubernetes-nmstate-operator
+
+- oc-cli mirroring process:
+
+Make sure you are checking the following [What to configure pull-secret file][offline-mirroring]
+
+
+[offline-mirroring]: https://midu16.github.io/openshift4/2022/07/10/offline-mirroring.html
