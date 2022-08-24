@@ -480,6 +480,12 @@ Make sure you are checking the following [What to configure for pull-secret file
 
 [offline-mirroring]: https://midu16.github.io/openshift4/2022/07/10/offline-mirroring.html
 
+Once the pull-secret file is properly configured, you will need to:
+{% highlight bash %}
+mkdir -p ${HOME}/.docker/
+cp pull-secret.json ${HOME}/.docker/config.json
+{% endhighlight %}
+
 We are going to split the action of mirroring in two parts:
  - Connected Host, where the host can reach the internet 
  - Offline Host, where the host doesnt reach the internet BUT has a connection to an SFTP server.
@@ -610,7 +616,42 @@ mirror:
 Downloading the container based images to the .tar file:
 {% highlight bash %}
 oc-mirror --config imageset-config.yaml file://archive
+	Found: archive/oc-mirror-workspace/src/publish
+	Found: archive/oc-mirror-workspace/src/v2
+	Found: archive/oc-mirror-workspace/src/charts
+	Found: archive/oc-mirror-workspace/src/release-signatures
+	backend is not configured in imageset-config.yaml, using stateless mode
+	backend is not configured in imageset-config.yaml, using stateless mode
+	No metadata detected, creating new workspace
+	WARN[0076] DEPRECATION NOTICE:
+	Sqlite-based catalogs and their related subcommands are deprecated. Support for
+	them will be removed in a future release. Please migrate your catalog workflows
+	to the new file-based catalog format. 
+	wrote mirroring manifests to archive/oc-mirror-workspace/operators.1661356546/manifests-redhat-operator-index
+
+	To upload local images to a registry, run:
+
+		oc adm catalog mirror file://redhat/redhat-operator-index:v4.10 REGISTRY/REPOSITORY
+
+	...
+	info: Mirroring completed in 26m26.56s (16.54MB/s)
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000000.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000001.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000002.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000003.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000004.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000005.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000006.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000007.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000008.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000009.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000010.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000011.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000012.tar
+	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000013.tar
 {% endhighlight %}
+
+By setting the `archieveSize: 2`, this will create a number of .tar files which limits the size to 2GiB.
 
 At this state you need to move the .tar.gz file to the Offline Host.
 
@@ -642,5 +683,33 @@ du -h INBACRNRDL0100.offline.oxtechnix.lan.tar.gz
 {% endhighlight %}
 
 - oc-mirror-cli mirroring:
+{% highlight bash %}
+ls -l 
+total 26643192
+-rw-rw-r--. 1 midu midu 2053686272 Aug 24 18:26 mirror_seq1_000000.tar
+-rw-rw-r--. 1 midu midu 2126430208 Aug 24 18:26 mirror_seq1_000001.tar
+-rw-rw-r--. 1 midu midu 2066301440 Aug 24 18:26 mirror_seq1_000002.tar
+-rw-rw-r--. 1 midu midu 2107577856 Aug 24 18:26 mirror_seq1_000003.tar
+-rw-rw-r--. 1 midu midu 2141018112 Aug 24 18:27 mirror_seq1_000004.tar
+-rw-rw-r--. 1 midu midu 2123763712 Aug 24 18:27 mirror_seq1_000005.tar
+-rw-rw-r--. 1 midu midu 2128370688 Aug 24 18:28 mirror_seq1_000006.tar
+-rw-rw-r--. 1 midu midu 2050847232 Aug 24 18:28 mirror_seq1_000007.tar
+-rw-rw-r--. 1 midu midu 1871073792 Aug 24 18:28 mirror_seq1_000008.tar
+-rw-rw-r--. 1 midu midu 2075569664 Aug 24 18:28 mirror_seq1_000009.tar
+-rw-rw-r--. 1 midu midu 2147634176 Aug 24 18:29 mirror_seq1_000010.tar
+-rw-rw-r--. 1 midu midu 2085707776 Aug 24 18:31 mirror_seq1_000011.tar
+-rw-rw-r--. 1 midu midu 2138003456 Aug 24 18:32 mirror_seq1_000012.tar
+-rw-rw-r--. 1 midu midu  166561280 Aug 24 18:32 mirror_seq1_000013.tar
+drwxrwxr-x. 2 midu midu       4096 Aug 24 18:32 oc-mirror-workspace
+du -h 
+4.0K	./oc-mirror-workspace
+26G	.
+{% endhighlight %}
 
+In order to describe the content of the mirror_seq1_000000.tar 
+{% highlight bash %}
+oc-mirror describe mirror_seq1_000000.tar
+{% endhighlight %}
+
+As a conclusion, we can observe a 3GB difference between the size of the same container base images mirrored locally with the `oc-mirror`and `oc-cli`. This is a storage optimization of 10.35% in the benefit of the usage of `oc-mirror` cli.
 
