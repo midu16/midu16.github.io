@@ -362,7 +362,79 @@ For the future comparission between the tools, we are going to consider the foll
 
 - oc-cli mirroring process:
 
-Make sure you are checking the following [What to configure pull-secret file][offline-mirroring]
-
+Make sure you are checking the following [What to configure for pull-secret file][offline-mirroring]
 
 [offline-mirroring]: https://midu16.github.io/openshift4/2022/07/10/offline-mirroring.html
+
+We are going to split the action of mirroring in two parts:
+ - Connected Host, where the host can reach the internet 
+ - Offline Host, where the host doesnt reach the internet BUT has a connection to an SFTP server.
+
+- Connected Host actions:
+
+{% highlight bash %}
+export VERSION=stable-4.10
+curl -s https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/opm-linux.tar.gz  | tar zxvf - opm-linux
+sudo cp opm-linux /usr/local/bin
+opm version
+	Version: version.Version{OpmVersion:"69bb8fe0a", GitCommit:"69bb8fe0ac3a93472b5aace0df7722c4eaf23b92",BuildDate:"2022-07-29T20:18:10Z", GoOs:"linux", GoArch:"amd64"}
+{% endhighlight %}
+
+Once opm-cli is made available to the host, you can proceed with creating the [Offline registrz on the Connected Host][offline-registry]
+
+[offline-registry]: https://midu16.github.io/openshift4/2022/07/09/offline-registry.html
+
+{% highlight bash %}
+export REGISTRY_NAME=INBACRNRDL0100.offline.oxtechnix.lan
+export PULL_SECRET_FILE=./pull-secret.json
+export REG_USER_PASSWD=$(cat ${PULL_SECRET_FILE} |jq .auths.\"${REGISTRY_NAME}:5000\".auth -r|base64 -d)
+export REG_USER=$(echo ${REG_USER_PASSWD}|cut -d ":" -f 1)
+export REG_PASSWORD=$(echo ${REG_USER_PASSWD}|cut -d ":" -f 2)
+export RH_USER_PASSWD=$(cat ${PULL_SECRET_FILE}|jq .auths.\"registry.redhat.io\".auth -r|base64 -d)
+export OLM_PKGS="local-storage-operator,odf-operator,mcg-operator,metallb-operator,kubernetes-nmstate-operator"
+export OCP_VERSION=v4.10
+export REGISTRY_NAMESPACE=olm-mirror
+{% endhighlight %}
+
+Start the container base image prune
+
+{% highlight bash %}
+opm index prune -f registry.redhat.io/redhat/redhat-operator-index:${OCP_VERSION} -p ${OLM_PKGS} -t ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION}
+{% endhighlight %}
+
+Pushing the pruned container based images to the local registry:
+
+{% highlight bash %}
+podman push ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION} 
+{% endhighlight %}
+
+Downloading the container base images from the local registry localy:
+
+{% highlight bash %}
+oc adm catalog mirror ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION} file://local/index -a ${PULL_SECRET_FILE} --insecure
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! DEPRECATION NOTICE:
+!!   Sqlite-based catalogs are deprecated. Support for them will be removed in a
+!!   future release. Please migrate your catalog workflows to the new file-based
+!!   catalog format.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+src image has index label for database path: /database/index.db
+using index path mapping: /database/index.db:/tmp/953794212
+wrote database to /tmp/953794212
+using database at: /tmp/953794212/index.db
+...
+
+{% endhighlight %}
+
+Creating the archive of the container based images already downloaded localy:
+
+{% highlight bash %}
+tar czf ${REGISTRY_NAME}.tar.gz v2/
+{% endhighlight %}
+
+At this state you need to move the .tar.gz file to the Offline Host.
+
+- Offline Host actions:
+

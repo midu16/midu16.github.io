@@ -161,6 +161,8 @@ Now we should add the section that describes the credentials to the offline regi
       "email": "you@example.com"
   },
 {% endhighlight %}
+Replace the <credentials> with the output from the following command `echo -n '<user_name>:<password>' | base64 -w0`.
+
 In the end the `pull-secret.json` should follow the following template:
 {% highlight json %}
 {
