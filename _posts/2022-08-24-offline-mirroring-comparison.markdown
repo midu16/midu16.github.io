@@ -380,13 +380,14 @@ opm version
 	Version: version.Version{OpmVersion:"69bb8fe0a", GitCommit:"69bb8fe0ac3a93472b5aace0df7722c4eaf23b92",BuildDate:"2022-07-29T20:18:10Z", GoOs:"linux", GoArch:"amd64"}
 {% endhighlight %}
 
-Once opm-cli is made available to the host, you can proceed with creating the [Offline registrz on the Connected Host][offline-registry]
+Once opm-cli is made available to the host, you can proceed with creating the [Offline registry on the Connected Host][offline-registry]
 
 [offline-registry]: https://midu16.github.io/openshift4/2022/07/09/offline-registry.html
 
+Exporting the global variables:
 {% highlight bash %}
 export REGISTRY_NAME=INBACRNRDL0100.offline.oxtechnix.lan
-export PULL_SECRET_FILE=./pull-secret.json
+export PULL_SECRET_FILE=$(pwd)/pull-secret.json
 export REG_USER_PASSWD=$(cat ${PULL_SECRET_FILE} |jq .auths.\"${REGISTRY_NAME}:5000\".auth -r|base64 -d)
 export REG_USER=$(echo ${REG_USER_PASSWD}|cut -d ":" -f 1)
 export REG_PASSWORD=$(echo ${REG_USER_PASSWD}|cut -d ":" -f 2)
@@ -437,4 +438,32 @@ tar czf ${REGISTRY_NAME}.tar.gz v2/
 At this state you need to move the .tar.gz file to the Offline Host.
 
 - Offline Host actions:
+
+After transfering the container base images from the Connected Host to the Offline Host, can proceed with creating the [Offline registry on the Connected Host][offline-registry]
+
+[offline-registry]: https://midu16.github.io/openshift4/2022/07/09/offline-registry.html
+
+Exporting the global variables:
+{% highlight bash %}
+export REGISTRY_NAME=INBACRNRDL0100.offline.oxtechnix.lan
+export PULL_SECRET_FILE=$(pwd)/pull-secret.json
+export REG_USER_PASSWD=$(cat ${PULL_SECRET_FILE} |jq .auths.\"${REGISTRY_NAME}:5000\".auth -r|base64 -d)
+export REG_USER=$(echo ${REG_USER_PASSWD}|cut -d ":" -f 1)
+export REG_PASSWORD=$(echo ${REG_USER_PASSWD}|cut -d ":" -f 2)
+export RH_USER_PASSWD=$(cat ${PULL_SECRET_FILE}|jq .auths.\"registry.redhat.io\".auth -r|base64 -d)
+export OLM_PKGS="local-storage-operator,odf-operator,mcg-operator,metallb-operator,kubernetes-nmstate-operator"
+export OCP_VERSION=v4.10
+export REGISTRY_NAMESPACE=olm-mirror
+{% endhighlight %}
+
+Decompress the .tar.gz file that contains the mirrored container based images:
+{% highlight bash %}
+mkdir ${HOME}/registry-workingdirector; cd ${HOME}/registry-workingdirector
+tar xvfz ${REGISTRY_NAMESPACE}.tar.gz -C ${HOME}/registry-workingdirector
+{% endhighlight %}
+
+Uploading the container based images to the Offline Host local registry:
+{% highlight bash %}
+oc adm catalog mirror file://local/index/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION} ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE} -a ${PULL_SECRET_FILE} --insecure
+{% endhighlight %}
 
