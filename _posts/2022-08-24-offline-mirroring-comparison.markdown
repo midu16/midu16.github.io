@@ -351,7 +351,7 @@ grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/ListP
 }
 {% endhighlight %}
 
-Step 4 Mirroring a specific list of container based images operator:
+Step 4. Mirroring a specific list of container based images operator:
 
 For the future comparission between the tools, we are going to consider the following list of operators:
 	- local-storage-operator
@@ -466,4 +466,141 @@ Uploading the container based images to the Offline Host local registry:
 {% highlight bash %}
 oc adm catalog mirror file://local/index/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION} ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE} -a ${PULL_SECRET_FILE} --insecure
 {% endhighlight %}
+
+- oc-mirror-cli process:
+
+Make sure you are checking the following [What to configure for pull-secret file][offline-mirroring]
+
+[offline-mirroring]: https://midu16.github.io/openshift4/2022/07/10/offline-mirroring.html
+
+We are going to split the action of mirroring in two parts:
+ - Connected Host, where the host can reach the internet 
+ - Offline Host, where the host doesnt reach the internet BUT has a connection to an SFTP server.
+
+- Connected Host actions:
+
+Determine the container based images version:
+
+{% highlight bash %}
+grpcurl -plaintext -d '{"name":"odf-operator"}' $(hostname -f):50051 api.Registry/GetPackage
+	{
+	"name": "odf-operator",
+	"channels": [
+		{
+		"name": "stable-4.10",
+		"csvName": "odf-operator.v4.10.5"
+		},
+		{
+		"name": "stable-4.9",
+		"csvName": "odf-operator.v4.9.10"
+		}
+	],
+	"defaultChannelName": "stable-4.10"
+	}
+grpcurl -plaintext -d '{"name":"local-storage-operator"}' $(hostname -f):50051 api.Registry/GetPackage
+	{
+	"name": "local-storage-operator",
+	"channels": [
+		{
+		"name": "4.10",
+		"csvName": "local-storage-operator.4.10.0-202208150436"
+		},
+		{
+		"name": "stable",
+		"csvName": "local-storage-operator.4.10.0-202208150436"
+		}
+	],
+	"defaultChannelName": "stable"
+	}
+grpcurl -plaintext -d '{"name":"mcg-operator"}' $(hostname -f):50051 api.Registry/GetPackage
+	{
+	"name": "mcg-operator",
+	"channels": [
+		{
+		"name": "stable-4.10",
+		"csvName": "mcg-operator.v4.10.5"
+		},
+		{
+		"name": "stable-4.9",
+		"csvName": "mcg-operator.v4.9.10"
+		}
+	],
+	"defaultChannelName": "stable-4.10"
+	}
+grpcurl -plaintext -d '{"name":"metallb-operator"}' $(hostname -f):50051 api.Registry/GetPackage
+	{
+	"name": "metallb-operator",
+	"channels": [
+		{
+		"name": "4.10",
+		"csvName": "metallb-operator.4.10.0-202208150436"
+		},
+		{
+		"name": "stable",
+		"csvName": "metallb-operator.4.10.0-202208150436"
+		}
+	],
+	"defaultChannelName": "stable"
+	}
+grpcurl -plaintext -d '{"name":"kubernetes-nmstate-operator"}' $(hostname -f):50051 api.Registry/GetPackage
+	{
+	"name": "kubernetes-nmstate-operator",
+	"channels": [
+		{
+		"name": "4.10",
+		"csvName": "kubernetes-nmstate-operator.4.10.0-202208150436"
+		},
+		{
+		"name": "stable",
+		"csvName": "kubernetes-nmstate-operator.4.10.0-202208150436"
+		}
+	],
+	"defaultChannelName": "stable"
+	}
+{% endhighlight %}
+
+Creating the imageset-config.yaml file used by oc-mirror:
+
+{% highlight yaml %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+archieveSize: 2
+mirror:
+	operators:
+		- registry.redhat.io/redhat/redhat-operator-index:v4.10
+		  targetName: 'olm-mirror'
+		  targetTag: v4.10
+		  full: true
+		  packages:
+		  	- name: local-storage-operator
+			  minVersion: '4.10.0-20220610417'
+			  maxVersion: '4.10.0-20223160637'
+			  channels:
+			    - name: 'stable'
+{% endhighlight %}
+
+Downloading the container based images to the .tar file:
+{% highlight bash %}
+oc-mirror --config imageset-config.yaml file://archive
+{% endhighlight %}
+
+At this state you need to move the .tar.gz file to the Offline Host.
+
+- Offline Host actions:
+
+Make sure that the binary oc-mirror is also available on the Offline Host.
+
+Exporting the global variables:
+{% highlight bash %}
+export REGISTRY_NAME=INBACRNRDL0100.offline.oxtechnix.lan
+export REGISTRY_NAMESPACE=olm-mirror
+{% endhighlight %}
+
+Upload the container base images to the Offline Host registry:
+{% highlight bash %}
+oc-mirror --from ./archive docker://${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}
+{% endhighlight %}
+
+Step 5. Mirroring tools comparison 
 
