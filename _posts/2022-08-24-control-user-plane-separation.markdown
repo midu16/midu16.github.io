@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Control Plane - User Plane separation for Openshift 4!"
-date:   2022-08-24 12:30:29 +0200
+date:   2022-08-24 10:00:29 +0200
 categories: openshift4
 ---
 In the following post, we are going to talk on how to create a Control and User Plane separation on Openshift 4 using physical different Network Cards on the hosts.
