@@ -617,8 +617,11 @@ mirror:
 {% endhighlight %}
 
 Downloading the container based images to the .tar file:
+<details>
+<summary>{% highlight bash %}
+oc-mirror --config imageset-config.yaml file://archive<summary>
+<br>
 {% highlight bash %}
-oc-mirror --config imageset-config.yaml file://archive
 	Found: archive/oc-mirror-workspace/src/publish
 	Found: archive/oc-mirror-workspace/src/v2
 	Found: archive/oc-mirror-workspace/src/charts
@@ -653,6 +656,7 @@ oc-mirror --config imageset-config.yaml file://archive
 	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000012.tar
 	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000013.tar
 {% endhighlight %}
+</details>
 
 By setting the `archieveSize: 2`, this will create a number of .tar files which limits the size to 2GiB.
 
