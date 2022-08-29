@@ -725,15 +725,127 @@ Once the container based images are mirrored to the BastionHost offline registry
 
 Checking the content of the `BastionHost` Offline registry content after mirroring upload:
 
+<details>
+<summary>{% highlight bash %}curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq . {% endhighlight %}</summary>
+<br>
 {% highlight bash %}
-curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq .
+{
+  "repositories": [
+    "olm-mirror/local-index-olm-mirror-redhat-operator-index",
+    "olm-mirror/odf4-mcg-core-rhel8",
+    "olm-mirror/odf4-mcg-operator-bundle",
+    "olm-mirror/odf4-mcg-rhel8-operator",
+    "olm-mirror/odf4-odf-console-rhel8",
+    "olm-mirror/odf4-odf-operator-bundle",
+    "olm-mirror/odf4-odf-rhel8-operator",
+    "olm-mirror/openshift4-frr-rhel8",
+    "olm-mirror/openshift4-kubernetes-nmstate-operator-bundle",
+    "olm-mirror/openshift4-kubernetes-nmstate-rhel8-operator",
+    "olm-mirror/openshift4-metallb-operator-bundle",
+    "olm-mirror/openshift4-metallb-rhel8",
+    "olm-mirror/openshift4-metallb-rhel8-operator",
+    "olm-mirror/openshift4-ose-kube-rbac-proxy",
+    "olm-mirror/openshift4-ose-kubernetes-nmstate-handler-rhel8",
+    "olm-mirror/openshift4-ose-local-storage-diskmaker",
+    "olm-mirror/openshift4-ose-local-storage-operator",
+    "olm-mirror/openshift4-ose-local-storage-operator-bundle",
+    "olm-mirror/rhel8-postgresql-12",
+  ]
+}
 {% endhighlight %}
+</details>
 
 Once the mirroring upload has finished, you can use the ICSP (ImageContentSourcePolicy) and CatalogSource files.
 
 An successful mirror upload will terminate with the following message:
+{% highlight bash %}
+info: Mirroring completed in 18m55.19s (27.74MB/s)
+no digest mapping available for file://local/index/olm-mirror/redhat-operator-index:v4.10, skip writing to ImageContentSourcePolicy
+wrote mirroring manifests to manifests-index/olm-mirror/redhat-operator-index-1661786638
+deleted dir /tmp/3222302677
+{% endhighlight %}
+
+The content of the `ImageContentSourcePolicy.yaml`:
+{% highlight bash %}
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: index-olm-mirror-redhat-operator-index-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/odf4-odf-rhel8-operator
+    source: local/index/olm-mirror/redhat-operator-index/odf4/odf-rhel8-operator
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/odf4-mcg-core-rhel8
+    source: local/index/olm-mirror/redhat-operator-index/odf4/mcg-core-rhel8
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-metallb-rhel8
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/metallb-rhel8
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-ose-kubernetes-nmstate-handler-rhel8
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/ose-kubernetes-nmstate-handler-rhel8
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/odf4-odf-console-rhel8
+    source: local/index/olm-mirror/redhat-operator-index/odf4/odf-console-rhel8
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-metallb-rhel8-operator
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/metallb-rhel8-operator
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-ose-kube-rbac-proxy
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/ose-kube-rbac-proxy
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-ose-local-storage-operator-bundle
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/ose-local-storage-operator-bundle
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-kubernetes-nmstate-operator-bundle
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/kubernetes-nmstate-operator-bundle
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-ose-local-storage-diskmaker
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/ose-local-storage-diskmaker
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-frr-rhel8
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/frr-rhel8
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-metallb-operator-bundle
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/metallb-operator-bundle
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/odf4-mcg-operator-bundle
+    source: local/index/olm-mirror/redhat-operator-index/odf4/mcg-operator-bundle
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-kubernetes-nmstate-rhel8-operator
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/kubernetes-nmstate-rhel8-operator
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4-ose-local-storage-operator
+    source: local/index/olm-mirror/redhat-operator-index/openshift4/ose-local-storage-operator
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/odf4-mcg-rhel8-operator
+    source: local/index/olm-mirror/redhat-operator-index/odf4/mcg-rhel8-operator
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/rhel8-postgresql-12
+    source: local/index/olm-mirror/redhat-operator-index/rhel8/postgresql-12
+  - mirrors:
+    - INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/odf4-odf-operator-bundle
+    source: local/index/olm-mirror/redhat-operator-index/odf4/odf-operator-bundle
+{% endhighlight %}
+
+NOTE: One of the aspect that should be changed for the `ImageContentSourcePolicy.yaml` is the source path. The `local/index/olm-mirror/redhat-operator-index`should be replace with the `registry.redhat.io/redhat/redhat-operator-index`. 
 
 
+The content of the `CatalogSource.yaml`:
+{% highlight bash %}
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: index/olm-mirror/redhat-operator-index
+  namespace: openshift-marketplace
+spec:
+  image: INBACRNRDL0100.offline.oxtechnix.lan:5000/olm-mirror/local-index-olm-mirror-redhat-operator-index:v4.10
+  sourceType: grpc
+{% endhighlight %}
 
 - oc-mirror-cli upload the container based images : 
 
@@ -840,6 +952,12 @@ spec:
   image: inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat/rh-index:v1-test
   sourceType: grpc
 {% endhighlight %}
+
+Differences between `oc-cli`and `oc-mirror-cli` of the container base images upload: 
+	For the `oc-cli` container based images all images are uploaded to the `olm-mirror` namespace of the offline registry.
+	For the `oc-mirror-cli` container based images are uploaded to the `olm-mirror`namespace and inside this namespace has been defined other sub-namespaces `odf4`, `openshift4`, `redhat` and `rhel8`.
+	The `ICSP.yaml` file generated using the `oc-mirror-cli` its generating a more dynamic content for which no update is required. 
+
 
 Step 7. How to backtrack the content of .tar file container base images content
 
