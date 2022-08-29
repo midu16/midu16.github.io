@@ -65,9 +65,10 @@ grpcurl -plaintext -d '{"name":"local-storage-operator"}' INBACRNRDL0100.offline
 {% endhighlight %}
 
 - The full list of operators supported by the redhat-operator-index:
-<details open>
+<details>
 <summary>grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/ListPackages</summary>
 <br>
+{% highlight bash %}
 {
   "name": "3scale-operator"
 }
@@ -350,6 +351,7 @@ grpcurl -plaintext -d '{"name":"local-storage-operator"}' INBACRNRDL0100.offline
 {
   "name": "windows-machine-config-operator"
 }
+{% endhighlight %}
 </details>
 
 Step 4. Mirroring a specific list of container based images operator:
