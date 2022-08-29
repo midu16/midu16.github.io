@@ -46,6 +46,10 @@ Step 3. Usage of the redhat-operator-index container api
 
 - List a specific operator by filtering on the name:
 
+To download the `grpcurl`, you will need to download the binary from [grpcurl binary release][grpcurl-release].
+
+[grpcurl-release]: https://github.com/fullstorydev/grpcurl/releases
+
 {% highlight bash %}
 grpcurl -plaintext -d '{"name":"local-storage-operator"}' INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/GetPackage
 {
