@@ -798,6 +798,8 @@ Writing CatalogSource manifests to oc-mirror-workspace/results-1661760261
 Writing ICSP manifests to oc-mirror-workspace/results-1661760261
 {% endhighlight %}
 
+NOTE: Please, note that the DNS server should resolve `inbacrnrdl0100.offline.oxtechnix.lan` and `INBACRNRDL0100.offline.oxtechnix.lan`.
+ 
 The content of the `ImageContentSourcePolicy.yaml`:
 {% highlight bash %}
 ---
