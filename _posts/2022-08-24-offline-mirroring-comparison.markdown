@@ -739,8 +739,10 @@ An successful mirror upload will terminate with the following message:
 
 Checking the content of the `BastionHost` Offline registry content after mirror upload:
 
+<details>
+<summary>{% highlight bash %}curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq . {% endhighlight %}</summary>
+<br>
 {% highlight bash %}
-curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq 
 {
   "repositories": [
     "olm-mirror/odf4/cephcsi-rhel8",
@@ -781,6 +783,7 @@ curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.la
   ]
 }
 {% endhighlight %}
+</details>
 
 Once the mirroring upload has finished, you can use the ICSP (ImageContentSourcePolicy) and CatalogSource files.
 
@@ -843,9 +846,6 @@ Step 7. How to backtrack the content of .tar file container base images content
 In the following subchapter we will try to compare the how to backtrack the image content of the .tar files using the two different cli's.
 
 - oc-mirror-cli:
-{% highlight bash %}
-
-{% endhighlight %}
 
 <details>
 <summary>{% highlight bash %}oc-mirror describe mirror_seq1_000000.tar{% endhighlight %}</summary>
