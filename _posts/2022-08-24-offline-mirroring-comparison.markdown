@@ -618,8 +618,7 @@ mirror:
 
 Downloading the container based images to the .tar file:
 <details>
-<summary>{% highlight bash %}
-oc-mirror --config imageset-config.yaml file://archive{% endhighlight %}<summary>
+<summary>{% highlight bash %}oc-mirror --config imageset-config.yaml file://archive{% endhighlight %}<summary>
 <br>
 {% highlight bash %}
 	Found: archive/oc-mirror-workspace/src/publish
