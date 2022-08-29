@@ -953,9 +953,12 @@ spec:
   sourceType: grpc
 {% endhighlight %}
 
-Differences between `oc-cli`and `oc-mirror-cli` of the container base images upload: 
+Differences between `oc-cli`and `oc-mirror-cli` of the container base images upload:
+
 	For the `oc-cli` container based images all images are uploaded to the `olm-mirror` namespace of the offline registry.
+
 	For the `oc-mirror-cli` container based images are uploaded to the `olm-mirror`namespace and inside this namespace has been defined other sub-namespaces `odf4`, `openshift4`, `redhat` and `rhel8`.
+
 	The `ICSP.yaml` file generated using the `oc-mirror-cli` its generating a more dynamic content for which no update is required. 
 
 
