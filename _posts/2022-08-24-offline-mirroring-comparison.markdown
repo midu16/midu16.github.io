@@ -66,7 +66,7 @@ grpcurl -plaintext -d '{"name":"local-storage-operator"}' INBACRNRDL0100.offline
 
 - The full list of operators supported by the redhat-operator-index:
 <details>
-<summary>grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/ListPackages</summary>
+<summary>{% highlight bash %}grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/ListPackages{% endhighlight %}</summary>
 <br>
 {% highlight bash %}
 {
