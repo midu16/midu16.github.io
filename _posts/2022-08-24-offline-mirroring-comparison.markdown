@@ -742,8 +742,7 @@ Checking the content of the `BastionHost` Offline registry content after mirror 
 
 <details>
 <summary>{% highlight bash %}curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq .{% endhighlight %}<summary>
-<br>
-{% highlight bash %}
+<br>{% highlight bash %}
 {
   "repositories": [
     "olm-mirror/odf4/cephcsi-rhel8",
@@ -783,8 +782,7 @@ Checking the content of the `BastionHost` Offline registry content after mirror 
     "olm-mirror/rhel8/postgresql-12",
   ]
 }
-{% endhighlight %}
-</details>
+{% endhighlight %}</details>
 
 Once the mirroring upload has finished, you can use the ICSP (ImageContentSourcePolicy) and CatalogSource files.
 
@@ -840,3 +838,4 @@ spec:
   sourceType: grpc
 {% endhighlight %}
 
+Step 7. How to backtrack the content of .tar file container base images content
