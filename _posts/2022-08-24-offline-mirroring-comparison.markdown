@@ -14827,3 +14827,4 @@ Step 8. Automating the process with Ansible
 One alternative to automate the mirroring process is to use the following [playbook][oc-mirror-ansible].
 
 [oc-mirror-ansible]: https://galaxy.ansible.com/jharmison_redhat/oc_mirror_e2e
+[oc-documentation]: https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-disconnected.html
