@@ -14819,3 +14819,11 @@ In the following subchapter we will try to compare the how to backtrack the imag
 }
 {% endhighlight %}
 </details>
+
+
+
+Step 8. Automating the process with Ansible 
+
+One alternative to automate the mirroring process is to use the following [playbook][oc-mirror-ansible].
+
+[oc-mirror-ansible]: https://galaxy.ansible.com/jharmison_redhat/oc_mirror_e2e
