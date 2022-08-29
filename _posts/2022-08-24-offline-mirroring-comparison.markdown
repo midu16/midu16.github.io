@@ -619,7 +619,7 @@ mirror:
 Downloading the container based images to the .tar file:
 <details>
 <summary>{% highlight bash %}
-oc-mirror --config imageset-config.yaml file://archive<summary>
+oc-mirror --config imageset-config.yaml file://archive{% endhighlight %}<summary>
 <br>
 {% highlight bash %}
 	Found: archive/oc-mirror-workspace/src/publish
@@ -719,4 +719,114 @@ oc-mirror describe mirror_seq1_000000.tar
 {% endhighlight %}
 
 As a conclusion, we can observe a 3GB difference between the size of the same container base images mirrored locally with the `oc-mirror`and `oc-cli`. This is a storage optimization of 10.35% in the benefit of the usage of `oc-mirror` cli.
+
+Step 6. How to use the container based images to your OCPv.4.10 cluster
+
+Once the container based images are mirrored to the BastionHost offline registry, there is still required to perform a couple of steps until the OCPv4.10 cluster is able to make use of them, therefore in this subchapter we will going to focus on what is required to do and how it differentiates from the `oc-mirror` and `oc` cli.
+
+- oc-cli upload the container based images : 
+
+- oc-mirror-cli upload the container based images : 
+
+Checking the content of the `BastionHost` Offline registry content after mirror upload:
+
+<details>
+<summary>{% highlight bash %}curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq .{% endhighlight %}<summary>
+<br>
+{% highlight bash %}
+{
+  "repositories": [
+    "olm-mirror/odf4/cephcsi-rhel8",
+    "olm-mirror/odf4/mcg-core-rhel8",
+    "olm-mirror/odf4/mcg-operator-bundle",
+    "olm-mirror/odf4/mcg-rhel8-operator",
+    "olm-mirror/odf4/ocs-must-gather-rhel8",
+    "olm-mirror/odf4/ocs-operator-bundle",
+    "olm-mirror/odf4/ocs-rhel8-operator",
+    "olm-mirror/odf4/odf-console-rhel8",
+    "olm-mirror/odf4/odf-csi-addons-operator-bundle",
+    "olm-mirror/odf4/odf-csi-addons-rhel8-operator",
+    "olm-mirror/odf4/odf-csi-addons-sidecar-rhel8",
+    "olm-mirror/odf4/odf-operator-bundle",
+    "olm-mirror/odf4/odf-rhel8-operator",
+    "olm-mirror/odf4/rook-ceph-rhel8-operator",
+    "olm-mirror/odf4/volume-replication-rhel8-operator",
+    "olm-mirror/openshift4/frr-rhel8",
+    "olm-mirror/openshift4/kubernetes-nmstate-operator-bundle",
+    "olm-mirror/openshift4/kubernetes-nmstate-rhel8-operator",
+    "olm-mirror/openshift4/metallb-operator-bundle",
+    "olm-mirror/openshift4/metallb-rhel8",
+    "olm-mirror/openshift4/metallb-rhel8-operator",
+    "olm-mirror/openshift4/ose-csi-external-attacher",
+    "olm-mirror/openshift4/ose-csi-external-provisioner",
+    "olm-mirror/openshift4/ose-csi-external-resizer",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter",
+    "olm-mirror/openshift4/ose-csi-node-driver-registrar",
+    "olm-mirror/openshift4/ose-kube-rbac-proxy",
+    "olm-mirror/openshift4/ose-kubernetes-nmstate-handler-rhel8",
+    "olm-mirror/openshift4/ose-local-storage-diskmaker",
+    "olm-mirror/openshift4/ose-local-storage-operator",
+    "olm-mirror/openshift4/ose-local-storage-operator-bundle",
+    "olm-mirror/redhat/rh-index",
+    "olm-mirror/redhat-operator-index",
+    "olm-mirror/rhceph/rhceph-5-rhel8",
+    "olm-mirror/rhel8/postgresql-12",
+  ]
+}
+{% endhighlight %}
+</details>
+
+Once the mirroring upload has finished, you can use the ICSP (ImageContentSourcePolicy) and CatalogSource files.
+
+An successful mirror upload will terminate with the following message:
+{% highlight bash %}
+info: Planning completed in 10ms
+sha256:33d5a81a5f78a4a63c1fd4c7bad0b0ec82beef5b847025ae1d097248a59705d2 inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/odf4/odf-csi-addons-operator-bundle:fbc9d4f0
+info: Mirroring completed in 830ms (16.76kB/s)
+Wrote release signatures to oc-mirror-workspace/results-1661760261
+Rendering catalog image "inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat/rh-index:v1-test" with file-based catalog 
+Writing image mapping to oc-mirror-workspace/results-1661760261/mapping.txt
+Writing CatalogSource manifests to oc-mirror-workspace/results-1661760261
+Writing ICSP manifests to oc-mirror-workspace/results-1661760261
+{% endhighlight %}
+
+The content of the `ImageContentSourcePolicy.yaml`:
+{% highlight bash %}
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/odf4
+    source: registry.redhat.io/odf4
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/rhceph
+    source: registry.redhat.io/rhceph
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/rhel8
+    source: registry.redhat.io/rhel8
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat
+    source: registry.redhat.io/redhat
+{% endhighlight %}
+
+The content of the `CatalogSource.yaml`:
+{% highlight bash %}
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: rh-index
+  namespace: openshift-marketplace
+spec:
+  image: inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat/rh-index:v1-test
+  sourceType: grpc
+{% endhighlight %}
 
