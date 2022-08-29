@@ -725,22 +725,18 @@ Once the container based images are mirrored to the BastionHost offline registry
 
 Checking the content of the `BastionHost` Offline registry content after mirroring upload:
 
-<details>
-<summary>{% highlight bash %}curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq .{% endhighlight %}<summary>
-<br>
 {% highlight bash %}
-
+curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq .
 {% endhighlight %}
-</details>
+
 
 
 - oc-mirror-cli upload the container based images : 
 
 Checking the content of the `BastionHost` Offline registry content after mirror upload:
 
-<details>
-<summary>{% highlight bash %}curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq .{% endhighlight %}<summary>
-<br>{% highlight bash %}
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog | jq 
 {
   "repositories": [
     "olm-mirror/odf4/cephcsi-rhel8",
@@ -780,7 +776,7 @@ Checking the content of the `BastionHost` Offline registry content after mirror 
     "olm-mirror/rhel8/postgresql-12",
   ]
 }
-{% endhighlight %}</details>
+{% endhighlight %}
 
 Once the mirroring upload has finished, you can use the ICSP (ImageContentSourcePolicy) and CatalogSource files.
 
