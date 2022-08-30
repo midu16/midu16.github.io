@@ -4,7 +4,7 @@ title:  "ETCD cluster benchmark for Openshift 4!"
 date:   2022-08-30 10:10:29 +0200
 categories: openshift4
 ---
-In the following post, we are going to talk on how to perform a set of benchmark tests on the ETCD cluster of Openshift 4.
+In the following post, we are going to talk on how to perform a set of benchmark tests on the ETCD cluster of Openshift 4 with root disk over SAN.
 
 Prerequisites
 
