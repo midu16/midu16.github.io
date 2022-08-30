@@ -14,6 +14,8 @@ Using the `etcdctl check perf` tool:
 
 Step 1. Testing the ETCD
 
+Before performing any ETCD benchmark testings please collect [oc must-gather][oc-must-gather] logs.
+
 {% highlight bash %}
 export ETCD_POD=$(oc -n openshift-etcd get pods -l app=etcd -o name | head -1)
 {% endhighlight %}
@@ -107,6 +109,14 @@ Step 3. Testing the ETCD with kube-burner
 
 In this point we are going to extend the benchmark tool described on the Step 1 for the ETCD cluster on OCPv4.X.
 
+Before performing any ETCD benchmark testings please collect [oc must-gather][oc-must-gather] logs.
+
+Run the must-gather through the etcd.sh:
+{% highlight bash %}
+alias etcdcheck='podman run --privileged --volume /$(pwd):/test quay.io/peterducai/openshift-etcd-suite:latest etcd '
+etcdcheck /test/<path to must-gather>
+{% endhighlight %}
+
 {% highlight bash %}
 curl -L -O https://github.com/cloud-bulldozer/kube-burner/releases/download/v0.15.5/kube-burner-0.15.5-Linux-x86_64.tar.gz
 tar xvfz kube-burner-0.15.5-Linux-x86_64.tar.gz
@@ -170,4 +180,22 @@ Open a new terminal and run the following commands:
 while true; do oc get configmap -n stage-1 | wc -l; done
 {% endhighlight %}
 
+Once those steps are finished and all the data has been collected, try to perform a [oc must-gather][oc-must-gather] logs collection.
+
+Run the must-gather through the etcd.sh:
+{% highlight bash %}
+alias etcdcheck='podman run --privileged --volume /$(pwd):/test quay.io/peterducai/openshift-etcd-suite:latest etcd '
+etcdcheck /test/<path to must-gather>
+{% endhighlight %}
+
+For more informations on the [etcd.sh][etcd-sh].
+
 [fedora-doc]: https://docs.fedoraproject.org/en-US/quick-docs/raspberry-pi/
+[oc-must-gather]: https://midu16.github.io/openshift4/2022/07/10/offline-must-gather.html
+
+[etcd-sh]: https://github.com/peterducai/openshift-etcd-suite
+
+Run the fio_suite:
+{% highlight bash %}
+podman run --privileged --volume /$(pwd):/test quay.io/peterducai/openshift-etcd-suite:latest fio
+{% endhighlight %}
