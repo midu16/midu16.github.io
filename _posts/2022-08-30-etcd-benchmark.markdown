@@ -12,7 +12,7 @@ Prerequisites
 
 Using the `etcdctl check perf` tool:
 
-Step 1. testing the ETCD
+Step 1. Testing the ETCD
 
 {% highlight bash %}
 export ETCD_POD=$(oc -n openshift-etcd get pods -l app=etcd -o name | head -1)
@@ -103,12 +103,71 @@ Step 2. The benchmark threshold results set by the upstream community
 | Standard deviation | > 100 ms  |
 
 
+Step 3. Testing the ETCD with kube-burner
+
+In this point we are going to extend the benchmark tool described on the Step 1 for the ETCD cluster on OCPv4.X.
+
+{% highlight bash %}
+curl -L -O https://github.com/cloud-bulldozer/kube-burner/releases/download/v0.15.5/kube-burner-0.15.5-Linux-x86_64.tar.gz
+tar xvfz kube-burner-0.15.5-Linux-x86_64.tar.gz
+sudo mv kube-burner /usr/local/bin/
+curl -L -O https://github.com/cloud-bulldozer/cluster-perf-ci/archive/refs/heads/master.zip
+cd cluster-perf-ci/
+{% endhighlight %}
+
+At this point we will need to tune the workload file `configmap-scale.yaml` as described below:
+
+{% highlight yaml %}
+---
+global:
+  writeToFile: false
+  requestTimeout: 15s
+  indexerConfig:
+    enabled: false
+    esServers: ["https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com"]
+    defaultIndex: ripsaw-kube-burner
+    type: elastic
+
+jobs:
+  - name: stage-1
+    namespace: stage-1
+    jobIterations: 1
+    qps: 200
+    burst: 200
+    namespacedIterations: false
+    podWait: false
+    verifyObjects: false
+    objects:
+    - objectTemplate: "templates/configmap-scale/configmap.yml"
+      #replicas: 20000
+      replicas: 50000
+      inputVars:
+        # Data lenght is in bytes, 2000000 = 2MiB
+        #data_length: 10000
+        data_length: 10000
+
+  - name: delete-stage-1
+    waitForDeletion: true
+    jobType: delete
+    objects:
+    - kind: Namespace
+      labelSelector: {kube-burner-job: stage-1}
+{% endhighlight %}
+
+Running the `kube-kurner` service in a dedicated terminal:
+
+{% highlight bash %}
+oc project default
+oc create sa kubeburner
+oc adm policy add-cluster-role-to-user cluster-admin -z kubeburner
+export TOKEN=$(oc sa get-token kubeburner)
+kube-burner init -c configmap-scale.yml -t ${TOKEN} --uuid $(uuidgen)
+{% endhighlight %}
+
+Open a new terminal and run the following commands:
+
+{% highlight bash %}
+while true; do oc get configmap -n stage-1 | wc -l; done
+{% endhighlight %}
+
 [fedora-doc]: https://docs.fedoraproject.org/en-US/quick-docs/raspberry-pi/
-[srs-doc]:   https://docs.srsran.com/en/latest/app_notes/source/pi4/source/index.html
-[uhd-doc]: https://files.ettus.com/manual/page_install.html
-[srsenb]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsenb
-[srsepc]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc
-[srsepc_if_masq.sh]: https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srsepc_if_masq.sh
-[srslte_install_configs.sh]:https://github.com/midu16/midu16.github.io/blob/main/assets/binaries/srs/aarch64/srslte_install_configs.sh
-[usrp-doc-b]: https://www.ettus.com/product-categories/usrp-bus-series/
-[usrp-doc-n]: https://www.ettus.com/product-categories/usrp-networked-series/
