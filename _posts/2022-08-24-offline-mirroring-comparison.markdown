@@ -29,6 +29,8 @@ curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/oc-mi
 sudo cp oc-mirror /usr/local/bin
 {% endhighlight %}
 
+Note:  The `oc-mirror` its Technical Preview on `stable-4.10` channel and on `stable-4.11` channel its General Available.
+
 Step 2. Creating the redhat-operator-index container 
 
 {% highlight bash %}
