@@ -622,6 +622,8 @@ mirror:
 			    - name: 'stable-4.10'
 {% endhighlight %}
 
+To check the [Image set configuration parameters][oc-documentation] for more details.
+
 Downloading the container based images to the .tar file:
 
 {% highlight bash %}
