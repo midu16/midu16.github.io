@@ -587,7 +587,7 @@ Creating the imageset-config.yaml file used by oc-mirror:
 ---
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
-archieveSize: 2
+archiveSize: 2
 mirror:
 	operators:
 		- registry.redhat.io/redhat/redhat-operator-index:v4.10
@@ -661,7 +661,7 @@ oc-mirror --config imageset-config.yaml file://archive
 	Creating archive /apps/offline-registry/working-dor/archive/mirror_seq1_000013.tar
 {% endhighlight %}
 
-By setting the `archieveSize: 2`, this will create a number of .tar files which limits the size to 2GiB.
+By setting the `archiveSize: 2`, this will create a number of .tar files which limits the size to 2GiB.
 
 At this state you need to move the .tar.gz file to the Offline Host.
 
