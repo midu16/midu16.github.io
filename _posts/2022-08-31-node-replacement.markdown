@@ -129,6 +129,15 @@ spec:
   online: true
 {% endhighlight %}
 
+
+NOTE: In the above example, the the Hardware type its very important:
+ - for DELL servers on the `address` its used `idrac-virtualmedia://ip_address_of_the_bmh_interface/redfish/v1/Systems/System.Embedded.1`
+ - for HPE servers on the `address` its used `redfish-virtualmedia://ip_address_of_the_bmh_interface/redfish/v1/Systems/1`
+
+[bmh-documentation]: https://docs.openshift.com/container-platform/4.10/installing/installing_bare_metal_ipi/ipi-install-installation-workflow.html#bmc-addressing-for-hpe-ilo_ipi-install-installation-workflow
+
+For more information on its available on [Redhat official documentation page][bmh-documentation].
+
 Apply the objects for each nodes:
 
 {% highlight bash %}
