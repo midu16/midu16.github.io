@@ -1,0 +1,68 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: Machine
+metadata:
+  annotations:
+    machine.openshift.io/instance-state: externally provisioned
+    metal3.io/BareMetalHost: openshift-machine-api/hub-node2
+  creationTimestamp: "2022-09-01T07:58:04Z"
+  finalizers:
+  - machine.machine.openshift.io
+  generateName: cu-compact-1-xqbj7-worker-0-
+  generation: 3
+  labels:
+    machine.openshift.io/cluster-api-cluster: cu-compact-1-xqbj7
+    machine.openshift.io/cluster-api-machine-role: worker
+    machine.openshift.io/cluster-api-machine-type: worker
+    machine.openshift.io/cluster-api-machineset: cu-compact-1-xqbj7-worker-0
+  name: cu-compact-1-xqbj7-worker-0-tqwvw
+  namespace: openshift-machine-api
+  ownerReferences:
+  - apiVersion: machine.openshift.io/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: MachineSet
+    name: cu-compact-1-xqbj7-worker-0
+    uid: 0d615599-c5b6-4a64-89e6-30eb3a89fbb3
+  resourceVersion: "427961"
+  uid: c29cc74d-cd96-4df5-a720-476b292f2f9b
+spec:
+  metadata: {}
+  providerID: baremetalhost:///openshift-machine-api/hub-node2/d45887c6-d337-4438-ae2f-4b7b82af6f09
+  providerSpec:
+    value:
+      apiVersion: baremetal.cluster.k8s.io/v1alpha1
+      customDeploy:
+        method: install_coreos
+      hostSelector: {}
+      image:
+        checksum: ""
+        url: ""
+      kind: BareMetalMachineProviderSpec
+      metadata:
+        creationTimestamp: null
+      userData:
+        name: worker-user-data-managed
+status:
+  addresses:
+  - address: ""
+    type: InternalIP
+  - address: ""
+    type: InternalIP
+  - address: ""
+    type: InternalIP
+  - address: 192.168.34.32
+    type: InternalIP
+  - address: ""
+    type: InternalIP
+  - address: ""
+    type: InternalIP
+  conditions:
+  - lastTransitionTime: "2022-09-01T08:02:03Z"
+    status: "True"
+    type: InstanceExists
+  lastUpdated: "2022-09-01T08:11:23Z"
+  nodeRef:
+    kind: Node
+    name: hub-node2
+    uid: 1e14031a-dfac-4f92-9973-ab901671c4ff
+  phase: Running
