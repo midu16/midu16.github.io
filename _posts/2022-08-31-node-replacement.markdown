@@ -324,3 +324,77 @@ etcd-peer-kni1-master-2.cloud.lab.eng.bos.redhat.com              kubernetes.io/
 etcd-serving-kni1-master-2.cloud.lab.eng.bos.redhat.com           kubernetes.io/tls                     2      81m                                                                                                
 etcd-serving-metrics-kni1-master-2.cloud.lab.eng.bos.redhat.com   kubernetes.io/tls                     2      81m   
 {% endhighlight %}
+
+
+Force the etcd redeployment:
+{% highlight bash %}
+oc patch etcd cluster -p='{"spec": {"forceRedeploymentReason": "single-master-recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge 
+{% endhighlight %}
+
+Step 5. Removing the unhealthy control-node 
+
+{% highlight bash %}
+oc get clusteroperator baremetal                                                                                      
+NAME        VERSION   AVAILABLE   PROGRESSING   DEGRADED   SINCE   MESSAGE
+baremetal   4.10.25   True        False         False      7h24m   
+{% endhighlight %}
+
+Check the BareMetalHost object:
+{% highlight bash %}
+oc get bmh -n openshift-machine-api 
+{% endhighlight %}
+
+Remove the old BareMetalHost:
+{% highlight bash %}
+oc delete bmh -n openshift-machine-api kni1-master-2
+{% endhighlight %}
+
+Remove the old Machine objects:
+{% highlight bash %}
+oc delete machine -n openshift-machine-api kni1-master-2
+{% endhighlight %}
+
+Check the Machine objects status:
+{% highlight bash %}
+oc get machine -n openshift-machine-api 
+Error from server (InternalError): an error on the server ("") has prevented the request from succeeding (get machines.machine.openshift.io) 
+{% endhighlight %}
+
+NOTE: You should wait for 5-10 minutes until the cluster is transioning to a more stable state to proceed further.
+
+Create the new BareMetalHost object and the secret to store the BMC credentials:
+{% highlight bash %}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kni1-master-2  
+  namespace: openshift-machine-api
+data:
+  username: "cm9vdA=="
+  password: "MTAwTWdtdC0="
+type: Opaque
+---
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  name: kni1-master-2 
+  namespace: openshift-machine-api
+spec:
+  automatedCleaningMode: disabled
+  bootMACAddress: ec:f4:bb:ed:6f:e8
+  rootDeviceHint:
+    deviceName: "/dev/sdb"
+  bmc:
+    address: idrac-virtualmedia+https://10.19.136.24/redfish/v1/Systems/System.Embedded.1
+    credentialsName: kni1-master-2 -> match
+    disableCertificateVerification: true
+  online: true
+{% endhighlight %}
+
+Applying the BareMetalHost object:
+{% highlight bash %}
+oc create -f new-master-bmh.yaml
+secret/kni1-master-2 created
+baremetalhost.metal3.io/kni1-master-2 created
+{% endhighlight %}
