@@ -96,8 +96,160 @@ clusterconfigs/
 
 Note: If you already have a deployed cluster, BUT you want to enable the ovs local-gw mode on it, you can use the below command:
 
-
 {% highlight bash %}
  oc patch network.operator cluster -p '{"spec":{"defaultNetwork":{"ovnKubernetesConfig":{"gatewayConfig":{"routingViaHost": true}}}}}' --type=merge
 {% endhighlight %}
 
+Once the installation is finished, the cluster status should be as displayed below:
+
+{% highlight bash %}
+oc get nodes
+NAME         STATUS   ROLES    AGE     VERSION
+cu-master1   Ready    master   38m     v1.23.5+012e945
+cu-master2   Ready    master   37m     v1.23.5+012e945
+cu-master3   Ready    master   37m     v1.23.5+012e945
+hub-node1    Ready    worker   9m41s   v1.23.5+012e945
+hub-node2    Ready    worker   3m1s    v1.23.5+012e945
+hub-node3    Ready    worker   4m10s   v1.23.5+012e945
+{% endhighlight %}
+
+
+Step 2. Day 2 operations
+
+Install the NMStateOperator:
+
+{% highlight bash %}
+cat << EOF | oc apply -f -
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+   labels:
+     kubernetes.io/metadata.name: openshift-nmstate
+     name: openshift-nmstate
+   name: openshift-nmstate
+ spec:
+   finalizers:
+   - kubernetes
+ EOF
+namespace/openshift-nmstate created
+{% endhighlight %}
+
+{% highlight bash %}
+cat << EOF | oc apply -f -
+ apiVersion: operators.coreos.com/v1
+ kind: OperatorGroup
+ metadata:
+   annotations:
+     olm.providedAPIs: NMState.v1.nmstate.io
+   generateName: openshift-nmstate-
+   name: openshift-nmstate-tn6k8
+   namespace: openshift-nmstate
+ spec:
+   targetNamespaces:
+   - openshift-nmstate
+ EOF
+operatorgroup.operators.coreos.com/openshift-nmstate-tn6k8 created
+{% endhighlight %}
+
+{% highlight bash %}
+cat << EOF| oc apply -f -
+ apiVersion: operators.coreos.com/v1alpha1
+ kind: Subscription
+ metadata:
+   labels:
+     operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
+   name: kubernetes-nmstate-operator
+   namespace: openshift-nmstate
+ spec:
+   channel: stable
+   installPlanApproval: Automatic
+   name: kubernetes-nmstate-operator
+   source: redhat-operators
+   sourceNamespace: openshift-marketplace
+ EOF
+subscription.operators.coreos.com/kubernetes-nmstate-operator created
+{% endhighlight %}
+
+{% highlight bash %}
+cat << EOF | oc apply -f -
+ apiVersion: nmstate.io/v1
+ kind: NMState
+ metadata:
+   name: nmstate
+ EOF
+nmstate.nmstate.io/nmstate created
+{% endhighlight %}
+
+Validating that the installation has succeeded:
+
+{% highlight bash %}
+oc get clusterserviceversion -n openshift-nmstate -o custom-columns=Name:.metadata.name,Phase:.status.phase
+Name                                              Phase
+kubernetes-nmstate-operator.4.10.0-202207291908   Succeeded
+{% endhighlight %}
+
+Check [more documentation on NMStateOperator for Openshiftv4.10][nmstateoperator-documentation].
+
+[nmstateoperator-documentation]: https://docs.openshift.com/container-platform/4.10/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html
+
+Make sure that all the available worker nodes has the same NIC installed:
+{% highlight bash %}
+ssh core@hub-node1 "ifconfig ens7f0"
+ens7f0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether 04:3f:72:f0:15:3a  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+{% endhighlight %}
+
+{% highlight bash %}
+ssh core@hub-node2 "ifconfig ens7f0"
+ens7f0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        ether 04:3f:72:f0:15:32  txqueuelen 1000  (Ethernet)
+        RX packets 21896  bytes 4478396 (4.2 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 4672  bytes 797924 (779.2 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+{% endhighlight %}
+
+{% highlight bash %}
+ssh core@hub-node3 "ifconfig ens7f0"
+ens7f0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        ether 04:3f:72:f0:15:3e  txqueuelen 1000  (Ethernet)
+        RX packets 21917  bytes 4478172 (4.2 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 4646  bytes 794340 (775.7 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+{% endhighlight %}
+
+Now that we confirmed we have the same NIC available on all the worker nodes, we will proceed in configuring the interface by using the NMStateOperator:
+
+{% highlight bash %}
+---
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br-ex-ens7f0-policy-<node_hostname>
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: <node_hostname>
+  desiredState:
+    interfaces:
+      - name: br-ex-ens7f0
+        description: Linux bridge with ens7f0 as a port
+        type: linux-bridge
+        state: up
+        ipv4:
+          address:
+          - ip: 192.168.111.X
+            prefix-length: 24
+          enabled: true
+        bridge:
+          options:
+            stp:
+              enabled: false
+          port:
+            - name: ens7f0
+        mtu: 1400
+{% endhighlight %}
