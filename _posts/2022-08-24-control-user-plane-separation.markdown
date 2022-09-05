@@ -466,6 +466,7 @@ Step 3. Applying the MachineConfig
 
 In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`.
 
+![OCP flow Architecture](/assets/images/cu-separation.png)
 
 
 
