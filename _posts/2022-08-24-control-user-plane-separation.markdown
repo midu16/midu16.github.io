@@ -411,3 +411,8 @@ The nopreempt strategy does not move master from the lower priority VIP on the h
 NOTE : If you are using OpenShift Container Platform health checks, the nature of IP failover and groups means that all instances in the group are not checked. For that reason, the [Kubernetes health checks must be used to ensure that services are live][K8s-health-checks].
 
 [K8s-health-checks]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+
+Step 3. Workflow architecture
+
+![OCP IPI Workflow Architecture](/assets/images/NetworkSegregation.drawio.png)
