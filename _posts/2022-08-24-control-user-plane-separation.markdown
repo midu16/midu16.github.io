@@ -416,3 +416,5 @@ NOTE : If you are using OpenShift Container Platform health checks, the nature o
 Step 3. Workflow architecture
 
 ![OCP IPI Workflow Architecture](/assets/images/NetworkSegregation.drawio.png)
+
+Once the `Step 2` it has been finished, you should have the above workflow architecture implemented.
