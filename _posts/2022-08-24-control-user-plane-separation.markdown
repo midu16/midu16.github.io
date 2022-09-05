@@ -259,6 +259,7 @@ spec:
 Configuring IP failover for the additional interface OCPv4.10
 
 For more documentation on [COnfiguring IP failover for additional interface OCPv4.10][vip-failover]
+
 [vip-failover]: https://docs.openshift.com/container-platform/4.10/networking/configuring-ipfailover.html
 
 Create an IP failover service account:
