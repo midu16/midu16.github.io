@@ -256,7 +256,7 @@ spec:
 
 [OVNKubernetes-documentation]: https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/networking/multiple-networks
 
-Configuring IP failover for the additional OCPv4.10
+Configuring IP failover for the additional interface OCPv4.10
 
 For more documentation on [COnfiguring IP failover for additional interface OCPv4.10][vip-failover]
 [vip-failover]: https://docs.openshift.com/container-platform/4.10/networking/configuring-ipfailover.html
@@ -343,7 +343,12 @@ spec:
           value: "INPUT"
         #- name: OPENSHIFT_HA_NOTIFY_SCRIPT
         #  value: /etc/keepalive/mynotifyscript.sh
-        - name: OPENSHIFT_HA_CHECK_SCRIPT
+        - name: OPENSHIFT_HA
+
+When a Virtual IP (VIP) on a node leaves the fault state by passing the check script, the VIP on the node enters the backup state if it has lower priority than the VIP on the node that is currently in the master state. However, if the VIP on the node that is leaving fault state has a higher priority, the preemption strategy determines its role in the cluster.
+
+The nopreempt strategy does not move master from the lower priority VIP on the host to the higher priority VIP on the host. With preempt_delay 300, the default, Keepalived waits the specified 300 seconds and moves master to the higher priority VIP on the host.
+_CHECK_SCRIPT
           value: "/etc/keepalive/mycheckscript.sh"
         - name: OPENSHIFT_HA_PREEMPTION
           value: "preempt_delay 300"
@@ -374,3 +379,29 @@ spec:
       imagePullSecrets:
         - name: openshift-pull-secret
 {% endhighlight %}
+
+Configuring check and notify scripts
+
+Keepalived monitors the health of the application by periodically running an optional user supplied check script. For example, the script can test a web server by issuing a request and verifying the response.
+
+When a check script is not provided, a simple default script is run that tests the TCP connection. This default test is suppressed when the monitor port is 0.
+
+- `mycheckscript.sh`:
+{% highlight bash %}
+#!/bin/bash
+    # Whatever tests are needed
+    # E.g., send request and verify response
+exit 0
+{% endhighlight %}
+
+- Create the config map:
+
+{% highlight bash %}
+oc create configmap mycustomcheck --from-file=mycheckscript.sh
+{% endhighlight %}
+
+Configuring VRRP preemption
+
+When a Virtual IP (VIP) on a node leaves the fault state by passing the check script, the VIP on the node enters the backup state if it has lower priority than the VIP on the node that is currently in the master state. However, if the VIP on the node that is leaving fault state has a higher priority, the preemption strategy determines its role in the cluster.
+
+The nopreempt strategy does not move master from the lower priority VIP on the host to the higher priority VIP on the host. With preempt_delay 300, the default, Keepalived waits the specified 300 seconds and moves master to the higher priority VIP on the host.
