@@ -469,6 +469,7 @@ In this step, we are going to apply the Machineconfig.yaml file to configure on 
 ![OCP flow Architecture](/assets/images/cu-separation.png)
 
 
+By applying the routing config, we are going to send specific traffic from the pods in charge of the `NorthBound` processing and the traffic from the pods in charge of the `SouthBound` processing to the corespoding interface. This will allow the `UserPlane` traffic from the pods hoasted on the worker nodes from the worker nodes through a dedicated interface withouth applying any rules at this moment. Any traffic rules can be applied on the edge switch.
 
 Step 4. Workflow architecture
 
