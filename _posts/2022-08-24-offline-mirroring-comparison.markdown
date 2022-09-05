@@ -14832,3 +14832,9 @@ One alternative to automate the mirroring process is to use the following [playb
 
 [oc-mirror-ansible]: https://galaxy.ansible.com/jharmison_redhat/oc_mirror_e2e
 [oc-documentation]: https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-disconnected.html
+
+
+Step 9. Preparing the Offline registry for OCP upgrade 
+
+In this step we are going to discuss on how to prepare the Offline registry for OCP upgrade. The highlight in this step will be the process on how to use the `oc adm catalog mirror` and `oc-mirror` cli to prepare the required `container base images` for minor or major OCP upgrade.
+
