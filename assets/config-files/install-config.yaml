@@ -1,0 +1,93 @@
+---
+apiVersion: v1
+baseDomain: nokia5g.redhat.lab
+metadata:
+  name: cu-compact-1
+networking:
+  networkType: OVNKubernetes
+  machineNetwork:
+  - cidr: 192.168.34.0/25
+  clusterNetwork:
+  - cidr: 10.132.0.0/14
+    hostPrefix: 23
+  serviceNetwork:
+  - 172.30.0.0/16
+compute:
+- name: worker
+  replicas: 3
+controlPlane:
+  name: master
+  replicas: 3
+  platform:
+    baremetal: {}
+platform:
+  baremetal:
+    bootstrapOSImage: http://192.168.34.20:9090/rhcos-410.84.202205191234-0-qemu.x86_64.qcow2.gz?sha256=b8c16f94141c797a388ce50cff98c7c899b29dff7c3777a617fe5f9991078e5a
+    clusterOSImage: http://192.168.34.20:9090/rhcos-410.84.202205191234-0-openstack.x86_64.qcow2.gz?sha256=15380a3debd92ccf466d98084938229133078c5634e4f926ed150a0c9f699375
+    apiVIP: 192.168.34.60
+    ingressVIP: 192.168.34.61
+    provisioningNetwork: "Disabled"
+    externalBridge: baremetal
+    hosts:
+      - name: cu-master1.cu-compact-1.nokia5g.redhat.lab
+        role: master
+        bmc:
+          address: idrac-virtualmedia://192.168.34.230/redfish/v1/Systems/System.Embedded.1
+          username: root
+          password: calvin
+          disableCertificateVerification: True
+        bootMACAddress: B4:96:91:BE:B0:14
+        rootDeviceHints:
+         deviceName: "/dev/sdb"
+      - name: cu-master2.cu-compact-1.nokia5g.redhat.lab
+        role: master
+        bmc:
+          address: idrac-virtualmedia://192.168.34.231/redfish/v1/Systems/System.Embedded.1
+          username: root
+          password: calvin
+          disableCertificateVerification: True
+        bootMACAddress: B4:96:91:BE:BB:20
+        rootDeviceHints:
+         deviceName: "/dev/sdb"
+      - name: cu-master3.cu-compact-1.nokia5g.redhat.lab
+        role: master
+        bmc:
+          address: idrac-virtualmedia://192.168.34.232/redfish/v1/Systems/System.Embedded.1
+          username: root
+          password: calvin
+          disableCertificateVerification: True
+        bootMACAddress: B4:96:91:BE:B2:D4
+        rootDeviceHints:
+         deviceName: "/dev/sdb"
+      - name: hub-node1.cu-compact-1.nokia5g.redhat.lab
+        role: worker
+        bmc:
+          address: idrac-virtualmedia://192.168.34.241/redfish/v1/Systems/System.Embedded.1
+          username: root
+          password: calvin
+          disableCertificateVerification: True
+        bootMACAddress: B4:96:91:BA:B4:0D
+        rootDeviceHints:
+         deviceName: "/dev/sdb"
+      - name: hub-node2.cu-compact-1.nokia5g.redhat.lab
+        role: worker
+        bmc:
+          address: idrac-virtualmedia://192.168.34.242/redfish/v1/Systems/System.Embedded.1
+          username: root
+          password: calvin
+          disableCertificateVerification: True
+        bootMACAddress: B4:96:91:BA:B5:45
+        rootDeviceHints:
+         deviceName: "/dev/sdb"
+      - name: hub-node3.cu-compact-1.nokia5g.redhat.lab
+        role: worker
+        bmc:
+          address: idrac-virtualmedia://192.168.34.243/redfish/v1/Systems/System.Embedded.1
+          username: root
+          password: calvin
+          disableCertificateVerification: True
+        bootMACAddress: B4:96:91:BA:AF:E9
+        rootDeviceHints:
+         deviceName: "/dev/sdb"
+pullSecret: '{"auths":{"cloud.openshift.com":{"auth":"<>","email":"midu@redhat.com"},"quay.io":{"auth":"<>","email":"midu@redhat.com"},"registry.connect.redhat.com":{"auth":"<>","email":"midu@redhat.com"},"registry.redhat.io":{"auth":"<>","email":"midu@redhat.com"}}}'
+sshKey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBTyHeuQMSFT6Rd2BCkQquTeS+3Pw2d2HaAJdN3+mBr1 kni@services'
