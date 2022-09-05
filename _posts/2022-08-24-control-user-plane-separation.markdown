@@ -462,9 +462,15 @@ NOTE : If you are using OpenShift Container Platform health checks, the nature o
 
 [K8s-health-checks]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 
+Step 3. Applying the MachineConfig 
 
-Step 3. Workflow architecture
+In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`.
+
+
+
+
+Step 4. Workflow architecture
 
 ![OCP IPI Workflow Architecture](/assets/images/NetworkSegregation.drawio.png)
 
-Once the `Step 2` it has been finished, you should have the above workflow architecture implemented.
+Once the `Step 2` it has been finished, you should have the above workflow architecture implemented. 
