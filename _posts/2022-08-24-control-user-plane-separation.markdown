@@ -240,9 +240,10 @@ The IP assigment for each Worker node for `ens7f1` interface:
 | hub-node2  | ens7f1    | 10.10.10.3            | 255.255.255.0 |
 | hub-node3  | ens7f1    | 10.10.10.4            | 255.255.255.0 |
 
-
 Now that we confirmed we have the same NIC available on all the worker nodes, we will proceed in configuring the interface by using the NMStateOperator:
 
+- `ens7f0`:
+  
 {% highlight bash %}
 ---
 apiVersion: nmstate.io/v1
@@ -269,6 +270,37 @@ spec:
               enabled: false
           port:
             - name: ens7f0
+        mtu: 1400
+{% endhighlight %}
+
+- `ens7f1`: 
+
+{% highlight bash %}
+---
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br-ex-ens7f1-policy-<node_hostname>
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: <node_hostname>
+  desiredState:
+    interfaces:
+      - name: br-ex-ens7f1
+        description: Linux bridge with ens7f1 as a port
+        type: linux-bridge
+        state: up
+        ipv4:
+          address:
+          - ip: 10.10.10.X
+            prefix-length: 24
+          enabled: true
+        bridge:
+          options:
+            stp:
+              enabled: false
+          port:
+            - name: ens7f1
         mtu: 1400
 {% endhighlight %}
 
