@@ -23,7 +23,7 @@ email: idumihai16@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Militating for tech openness with tutorials and demo's.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "midu16.com" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  midu16
 
 # Build settings
