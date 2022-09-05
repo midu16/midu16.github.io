@@ -255,3 +255,122 @@ spec:
 {% endhighlight %}
 
 [OVNKubernetes-documentation]: https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/networking/multiple-networks
+
+Configuring IP failover for the additional OCPv4.10
+
+For more documentation on [COnfiguring IP failover for additional interface OCPv4.10][vip-failover]
+[vip-failover]: https://docs.openshift.com/container-platform/4.10/networking/configuring-ipfailover.html
+
+Create an IP failover service account:
+{% highlight bash %}
+oc create sa ipfailover
+{% endhighlight %}
+
+Update security context constraints for `hostNetwork`:
+{% highlight bash %}
+oc adm policy add-scc-to-user privileged -z ipfailover
+oc adm policy add-scc-to-user hostnetwork -z ipfailover
+{% endhighlight %}
+
+Create a deployment yaml file to configure IP:
+{% highlight yaml %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nb-ipfailover-keepalived
+  labels:
+    ipfailover: nb-openshift
+spec:
+  strategy:
+    type: Recreate
+  replicas: 2
+  selector:
+    matchLabels:
+      ipfailover: nb-openshift
+  template:
+    metadata:
+      labels:
+        ipfailover: nb-openshift
+    spec:
+      serviceAccountName: ipfailover
+      privileged: true
+      hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+      containers:
+      - name: openshift-ipfailover
+        image: quay.io/openshift/origin-keepalived-ipfailover
+        ports:
+        - containerPort: 63000
+          hostPort: 63000
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+        - name: host-slash
+          mountPath: /host
+          readOnly: true
+          mountPropagation: HostToContainer
+        - name: etc-sysconfig
+          mountPath: /etc/sysconfig
+          readOnly: true
+        - name: config-volume
+          mountPath: /etc/keepalive
+        env:
+        - name: OPENSHIFT_HA_CONFIG_NAME
+          value: "ipfailover"
+        - name: OPENSHIFT_HA_VIRTUAL_IPS
+          value: "192.168.111.1"
+        - name: OPENSHIFT_HA_VIP_GROUPS
+          value: "10"
+        - name: OPENSHIFT_HA_NETWORK_INTERFACE
+          value: "ens7f0" #The host interface to assign the VIPs
+        - name: OPENSHIFT_HA_MONITOR_PORT
+          value: "30060"
+        - name: OPENSHIFT_HA_VRRP_ID_OFFSET
+          value: "0"
+        - name: OPENSHIFT_HA_REPLICA_COUNT
+          value: "2" #Must match the number of replicas in the deployment
+        - name: OPENSHIFT_HA_USE_UNICAST
+          value: "false"
+        #- name: OPENSHIFT_HA_UNICAST_PEERS
+          #value: "10.0.148.40,10.0.160.234,10.0.199.110"
+        - name: OPENSHIFT_HA_IPTABLES_CHAIN
+          value: "INPUT"
+        #- name: OPENSHIFT_HA_NOTIFY_SCRIPT
+        #  value: /etc/keepalive/mynotifyscript.sh
+        - name: OPENSHIFT_HA_CHECK_SCRIPT
+          value: "/etc/keepalive/mycheckscript.sh"
+        - name: OPENSHIFT_HA_PREEMPTION
+          value: "preempt_delay 300"
+        - name: OPENSHIFT_HA_CHECK_INTERVAL
+          value: "2"
+        livenessProbe:
+          initialDelaySeconds: 10
+          exec:
+            command:
+            - pgrep
+            - keepalived
+      volumes:
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: host-slash
+        hostPath:
+          path: /
+      - name: etc-sysconfig
+        hostPath:
+          path: /etc/sysconfig
+      # config-volume contains the check script
+      # created with `oc create configmap keepalived-checkscript --from-file=mycheckscript.sh`
+      - configMap:
+          defaultMode: 0755
+          name: keepalived-checkscript
+        name: config-volume
+      imagePullSecrets:
+        - name: openshift-pull-secret
+{% endhighlight %}
