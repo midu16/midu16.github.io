@@ -223,6 +223,24 @@ ens7f0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 {% endhighlight %}
 
+
+The IP assigment for each Worker node for `ens7f0` interface:
+
+| Hostname   | Interface | IP Address Allocation | Netmask       |
+| ---------- | --------- | --------------------- | ------------- |
+| hub-node1  | ens7f0    | 192.168.111.2         | 255.255.255.0 |
+| hub-node2  | ens7f0    | 192.168.111.3         | 255.255.255.0 |
+| hub-node3  | ens7f0    | 192.168.111.4         | 255.255.255.0 |
+
+The IP assigment for each Worker node for `ens7f1` interface:
+
+| Hostname   | Interface | IP Address Allocation | Netmask       |
+| ---------- | --------- | --------------------- | ------------- |
+| hub-node1  | ens7f1    | 10.10.10.2            | 255.255.255.0 |
+| hub-node2  | ens7f1    | 10.10.10.3            | 255.255.255.0 |
+| hub-node3  | ens7f1    | 10.10.10.4            | 255.255.255.0 |
+
+
 Now that we confirmed we have the same NIC available on all the worker nodes, we will proceed in configuring the interface by using the NMStateOperator:
 
 {% highlight bash %}
