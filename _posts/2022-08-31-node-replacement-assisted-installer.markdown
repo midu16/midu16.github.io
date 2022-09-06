@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Node replacement on Openshift 4!"
+title:  "Control Node replacement on Openshift 4 using AssistedInstaller!"
 date:   2022-09-06 10:10:29 +0200
 categories: openshift4
 ---
