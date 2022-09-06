@@ -384,6 +384,7 @@ Step 5. Reinstall of the removed node
 
 In this step, we are covering the use-case in which the removed node its required to be re-installed, this might be the case in the scenario of a total failure of the root disk of the server or the exposed LUN from the Network-Storage its lost.
 Before proceeding on the removed node, we should download the [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download]. Which will have to be booted to the server virtual-console.
+
 [rhcos-download]: https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/
 
 - Upload the downloaded [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download] to the controller node that you want to add to the cluster virtual-console server:
