@@ -616,8 +616,8 @@ status:
 {% highlight bash %}
 NAME         STATUS   ROLES    AGE     VERSION
 cu-master1   Ready    master   9h      v1.23.5+012e945
-cu-master2   Ready    master   4h29m   v1.23.5+012e945
-cu-master3   Ready    master   9h      v1.23.5+012e945
+cu-master2   Ready    master   9h      v1.23.5+012e945
+cu-master3   Ready    master   4h29m   v1.23.5+012e945
 hub-node1    Ready    worker   9h      v1.23.5+012e945
 hub-node2    Ready    worker   9h      v1.23.5+012e945
 hub-node3    Ready    worker   9h      v1.23.5+012e945
