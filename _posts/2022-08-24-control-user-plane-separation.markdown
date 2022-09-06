@@ -243,7 +243,7 @@ The IP assigment for each Worker node for `ens7f1` interface:
 Now that we confirmed we have the same NIC available on all the worker nodes, we will proceed in configuring the interface by using the NMStateOperator:
 
 - `ens7f0`:
-  
+
 {% highlight bash %}
 ---
 apiVersion: nmstate.io/v1
@@ -273,7 +273,7 @@ spec:
         mtu: 1400
 {% endhighlight %}
 
-- `ens7f1`: 
+- `ens7f1`:
 
 {% highlight bash %}
 ---
@@ -462,17 +462,76 @@ NOTE : If you are using OpenShift Container Platform health checks, the nature o
 
 [K8s-health-checks]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 
-Step 3. Applying the MachineConfig 
+Step 3. Applying the MachineConfig
 
 In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`.
 
 ![OCP flow Architecture](/assets/images/cu-separation.png)
 
 
-By applying the routing config, we are going to send specific traffic from the pods in charge of the `NorthBound` processing and the traffic from the pods in charge of the `SouthBound` processing to the corespoding interface. This will allow the `UserPlane` traffic from the pods hoasted on the worker nodes from the worker nodes through a dedicated interface withouth applying any rules at this moment. Any traffic rules can be applied on the edge switch.
+By applying the routing config, we are going to send specific traffic from the pods in charge of the `NorthBound` processing and the traffic from the pods in charge of the `SouthBound` processing to the corresponding interface. This will allow the `UserPlane` traffic from the pods hoasted on the worker nodes from the worker nodes through a dedicated interface withouth applying any rules at this moment. Any traffic rules can be applied on the edge switch.
+
+- `NorthBound routing config`:
+{% highlight bash %}
+iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f0 -j ACCEPT
+iptables -A FORWARD -i br-ex-ens7f0 -o ovn-k8s-mp0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -j MASQUERADE
+{% endhighlight %}
+
+- `SouthBound routing config`:
+{% highlight bash %}
+iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f1 -j ACCEPT
+iptables -A FORWARD -i br-ex-ens7f1 -o ovn-k8s-mp0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -t nat -A POSTROUTING -o br-ex-ens7f1 -j MASQUERADE
+{% endhighlight %}
+
+- MachineConfig for NorthBound config:
+{% highlight yaml %}
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 16-worker-iptables
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.2.0
+    networkd: {}
+    passwd: {}
+    systemd:
+      units:
+        - name: set-iptables-config.service
+          enabled: true
+          contents: |
+            [Unit]
+            Description=Set Iptables Config.
+            Before=NetworkManager.service etc-NetworkManager-systemConnectionsMerged.mount
+            After=systemd-tmpfiles-setup.service
+
+            [Service]
+            Type=oneshot
+            Environment="EXIT_IFACE='br-ex-ens7f0'"
+            ExecStart=/usr/local/bin/set_iptables_config.sh
+
+            [Install]
+            WantedBy=multi-user.target
+    storage:
+      files:
+        - filesystem: root
+          mode: 493
+          path: /usr/local/bin/set_iptables_config.sh
+          contents:
+            source: data:;base64,IyEvdXNyL2Jpbi9lbnYgYmFzaAoKc2V0IC14ZQoKRVhJVF9JRkFDRT0ke0VYSVRfSUZBQ0U6LSIifQoKaXB0YWJsZXMgLUEgRk9SV0FSRCAtaSBvdm4tazhzLW1wMCAtbyAke0VYSVRfSUZBQ0V9IC1qIEFDQ0VQVAppcHRhYmxlcyAtQSBGT1JXQVJEIC1pICR7RVhJVF9JRkFDRX0gIC0wIG92bi1rOHMtbXAwIC1tIHN0YXRlIC0tc3RhdGUgRVNUQUJMSVNIRUQsUkVMQVRFRCAtaiBBQ0NFUFQ=
+            {% endhighlight %}
 
 Step 4. Workflow architecture
 
 ![OCP IPI Workflow Architecture](/assets/images/NetworkSegregation.drawio.png)
 
-Once the `Step 2` it has been finished, you should have the above workflow architecture implemented. 
+Once the `Step 2` it has been finished, you should have the above workflow architecture implemented.
