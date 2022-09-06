@@ -528,7 +528,7 @@ spec:
           path: /usr/local/bin/set_iptables_config.sh
           contents:
             source: data:;base64,IyEvdXNyL2Jpbi9lbnYgYmFzaAoKc2V0IC14ZQoKRVhJVF9JRkFDRT0ke0VYSVRfSUZBQ0U6LSIifQoKaXB0YWJsZXMgLUEgRk9SV0FSRCAtaSBvdm4tazhzLW1wMCAtbyAke0VYSVRfSUZBQ0V9IC1qIEFDQ0VQVAppcHRhYmxlcyAtQSBGT1JXQVJEIC1pICR7RVhJVF9JRkFDRX0gIC0wIG92bi1rOHMtbXAwIC1tIHN0YXRlIC0tc3RhdGUgRVNUQUJMSVNIRUQsUkVMQVRFRCAtaiBBQ0NFUFQ=
-            {% endhighlight %}
+{% endhighlight %}
 
 Step 4. Workflow architecture
 
