@@ -354,8 +354,8 @@ Check the Machine Object:
 oc get machines -n openshift-machine-api -o wide
 NAME                                 PHASE         TYPE   REGION   ZONE   AGE     NODE         PROVIDERID                                                                               STATE
 nokia-example-tz69q-master-0         Running                              9h      cu-master1   baremetalhost:///openshift-machine-api/cu-master1/c643004b-3646-4eae-8798-346754947a0c   unmanaged
-nokia-example-tz69q-master-1         Provisioned                          3h33m                baremetalhost:///openshift-machine-api/cu-master2/9c8f87a3-108a-4af7-9b0d-adbc122bf616   unmanaged
-nokia-example-tz69q-master-2         Running                              9h      cu-master3   baremetalhost:///openshift-machine-api/cu-master3/2c6847d7-cd20-47dd-9023-020c60a8ba59   unmanaged
+nokia-example-tz69q-master-1         Running                              9h      cu-master2   baremetalhost:///openshift-machine-api/cu-master2/9c8f87a3-108a-4af7-9b0d-adbc122bf616   unmanaged
+nokia-example-tz69q-master-2         Provisioned                          3h33m   cu-master3   baremetalhost:///openshift-machine-api/cu-master3/2c6847d7-cd20-47dd-9023-020c60a8ba59   unmanaged
 nokia-example-tz69q-worker-0-94mj7   Running                              8h      hub-node1    baremetalhost:///openshift-machine-api/hub-node1/41f80b41-c858-4297-94df-d42a127a93ad    unmanaged
 nokia-example-tz69q-worker-0-h754z   Running                              8h      hub-node2    baremetalhost:///openshift-machine-api/hub-node2/d8efe54b-b0f4-4a7a-9292-faa3109c25be    unmanaged
 nokia-example-tz69q-worker-0-njjpv   Running                              8h      hub-node3    baremetalhost:///openshift-machine-api/hub-node3/c712a6a8-2945-40dd-902c-232a44d00999    unmanaged
@@ -383,7 +383,7 @@ NOTE: You should wait for 5-10 minutes until the cluster is transioning to a mor
 Step 5.1. Reinstall of the removed node
 
 In this step, we are covering the use-case in which the removed node its required to be re-installed, this might be the case in the scenario of a total failure of the root disk of the server or the exposed LUN from the Network-Storage its lost.
-Before proceeding on the removed node, we should download the [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download]. Which will have to be booted to the server virtual-console.
+Before proceeding on the removed node, we should download the [rhcos-4.10.26-x86_64-live.x86_64.iso][rhcos-4.10.26-download]. Which will have to be booted to the server virtual-console.
 
 [rhcos-4.10.16-download]: https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/
 [rhcos-4.10.26-download]: https://rhcos.mirror.openshift.com/art/storage/releases/rhcos-4.10/410.84.202208030316-0/x86_64/rhcos-410.84.202208030316-0-live.x86_64.iso
