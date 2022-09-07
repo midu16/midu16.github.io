@@ -406,7 +406,7 @@ Creating the `rhcos_image_cache` directory to save [rhcos-4.10.16-x86_64-live.x8
  Relabeled /apps/rhcos_image_cache from unconfined_u:object_r:unlabeled_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0
 {% endhighlight %}
 
-Downloading the image to the image:
+Downloading the image to the openshift image mirror:
 {% highlight bash %}
 curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/rhcos-4.10.16-x86_64-live.x86_64.iso --output /apps/rhcos_image_cache/rhcos-4.10.16-x86_64-live.x86_64.iso
 {% endhighlight %}
@@ -501,6 +501,181 @@ NOTE: This proses will take some time until its finished, once this its finished
 Step 5.2. Reinstall of the removed node by building the `RHCOS`
 
 [sysconfig-network-config]: https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/
+
+In the `Step5.1 ` we introduced the procedure of reinstalling of the removed node in a more decoupled procedure way. The purpose of the `Step5.2` its to centralized all the customisations pre-mounting the iso to the virtual-console of the server.
+
+- On the ProvisioningNode we will need to create the directory for each OCP node:
+{% highlight bash %}
+mkdir -p /apps/rhcos_image_cache/{cu-master1,cu-master2,cu-master3,hub-node1,hub-node2,hub-node3}
+{% endhighlight %}
+
+{% highlight bash %}
+ sudo semanage fcontext -a -t httpd_sys_content_t "/apps/rhcos_image_cache(/.*)?"
+ sudo restorecon -Rv /apps/rhcos_image_cache/
+ Relabeled /apps/rhcos_image_cache from unconfined_u:object_r:unlabeled_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0
+{% endhighlight %}
+
+- Downloading the image to the openshift image mirror:
+{% highlight bash %}
+curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/rhcos-4.10.16-x86_64-live.x86_64.iso --output /apps/rhcos_image_cache/rhcos-4.10.16-x86_64-live.x86_64.iso
+{% endhighlight %}
+
+- Directory structure:
+{% highlight bash %}
+tree /apps/rhcos_image_cache/
+/apps/rhcos_image_cache/
+├── cu-master1
+│   ├── custom.ign
+│   ├── network.ign
+│   └── network.bu
+├── cu-master2
+│   ├── custom.ign
+│   ├── network.ign
+│   └── network.bu
+├── cu-master3
+│   ├── custom.ign
+│   ├── network.ign
+│   └── network.bu
+├── hub-node1
+│   ├── custom.ign
+│   ├── network.ign
+│   └── network.bu
+├── hub-node2
+│   ├── custom.ign
+│   ├── network.ign
+│   └── network.bu
+├── hub-node3
+│   ├── custom.ign
+│   ├── network.ign
+│   └── network.bu
+└── rhcos-4.10.16-x86_64-live.x86_64.iso
+{% endhighlight %}
+
+Each of the node hostname directory will contain the speicifc `custom.ign` with the specific configuration.
+
+- Building the static networking config:
+
+This is the butane file example , `network.bu`, for static network configuration:
+{% highlight bash %}
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/NetworkManager/system-connections/eno12399.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          id=eno12399
+          type=ethernet
+          interface-name=eno12399
+          [ipv4]
+          address1=192.168.43.53/25,192.168.43.1
+          dns=8.8.8.8;
+          dns-search=
+          may-fail=false
+          method=manual
+{% endhighlight %}
+
+For more information on [butane file][butane-network-config].
+
+[butane-network-config]: https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/
+
+[generate-ignition]: https://docs.fedoraproject.org/en-US/fedora-coreos/producing-ign/
+
+- Generating the ignition files from the butane file from previous stage:
+{% highlight bash %}
+podman run --rm --tty --interactive     --volume ${PWD}:/pwd:z --workdir /pwd     quay.io/coreos/butane:release         --pretty --strict --raw /apps/rhcos_image_cache/cu-master3/network.bu > /apps/rhcos_image_cache/cu-master3/network.ign
+{% endhighlight %}
+
+There are multiple alternatives on [how to generate the ignition files from the butane file][generate-ignition].
+
+Once the ignition file its generated for the static network config `network.ign`, we can update the main ignition file `custom.ign`.
+
+The content of the `custom.ign` should follow the output:
+{% highlight json %}
+{
+   "ignition":{
+      "config":{
+         "merge":[
+            {
+               "source":"https://192.168.34.41:22623/config/master",
+               "verification":{
+
+               }
+            }
+         ],
+         "replace":{
+            "verification":{
+
+            }
+         }
+      },
+      "proxy":{
+
+      },
+      "security":{
+         "tls":{
+            "certificateAuthorities":[
+               {
+                  "source":"data:text/plain;charset=utf-8;base64,LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFRENDQWZpZ0F3SUJBZ0lJTCtRc09UelZJSzB3RFFZSktvWklodmNOQVFFTEJRQXdKakVTTUJBR0ExVUUKQ3hNSmIzQmxibk5vYVdaME1SQXdEZ1lEVlFRREV3ZHliMjkwTFdOaE1CNFhEVEl5TURrd05qRXhNVGswTVZvWApEVE15TURrd016RXhNVGswTVZvd0pqRVNNQkFHQTFVRUN4TUpiM0JsYm5Ob2FXWjBNUkF3RGdZRFZRUURFd2R5CmIyOTBMV05oTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFvTHRUS0hqZG5IY3cKNVpjdmw4OEczK0N5OTZSWUpDNFVZVlNkTUl2bzVad0dvc1dMdVJSSUJnRTVWcm96WVo0Q1REREltY1MvOENyQwp5TTdoZ0U1N2JxS09Od0dXWWF4TUIvK1Mvb2NrZU1lcG1uQ3JLODRCQjhySzR2ZmYwam8wR2ZBTm84bGJDZjFaCmlFMi9NL0RBcjBtdlk3OHM3elU0MkVMSDdwRndsY1VOUWg3RW1yaVJPK09ERjVRdCtURGp6TzRLQ2wzYVpKUzcKNnlDdXBsTlVLUHhKTlM1Q2t0T1B5NndYaVRoZW92Rm5heU1qNmdnVE43QzdLSFFVcDc3RFpWaWt4ZWtxSGswUwpVK0xhdTdaMXUxOHA5eFh6dXgyV3FqRXFwNXpjcWtiblAyY1MxRlZqSkk1R2Q0TXNRRjlZWnVZNEl2OGp5QUwzClV5emh1cGdTcFFJREFRQUJvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3RHdZRFZSMFRBUUgvQkFVd0F3RUIKL3pBZEJnTlZIUTRFRmdRVWtiaE1aZGVBSmpvVjJjV0F3dFh1ZTYvUTkvTXdEUVlKS29aSWh2Y05BUUVMQlFBRApnZ0VCQUJHc2xHdnBBWmwzbCtIQTFvclFhUWdZZ1VpQ2NldHkzS1lEUXN4c2YrTUNTWWRKYnptQllBaGNBZHFyCnJYckxWMXhKeWZZbmlUdjBZTHRweVFUUTlFajZBc1dCak9odXovbnV0MFY0d0lZSEJwRUF3MGtzL1ZxbUIvbDUKc09DeDB0Wi9HSERtcys0SEM2VS9wd2o4TUNYcjd0VWZXRExtdnd0NGFFZ1F3MWtGeG9xOTVSVThkWFowM1pGSgpJUWZHemNEOUNXUEJxcmNUcWVWbXA2T1plM2ppSjBZUCtOZDVJTWFHQTFIY2JYTjJsdTllUVZ1a2E2Q3NwT1JNCmZGeVlrZk05Z0VmQlJHemZzWjM4eFFERVZObU91K1VLTVdMOG1rcHVGQTEyZGw0bVhrTWZrT3doZkxTcXVlRGsKNldEWlNBVStzZlppbVZ3aTVTYnphbU5MMWljPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
+                  "verification":{
+
+                  }
+               }
+            ]
+         }
+      },
+      "timeouts":{
+
+      },
+      "version":"3.3.0"
+   },
+   "passwd":{
+         "users": [
+          {
+           "groups": [
+             "sudo"
+           ],
+           "name": "core",
+           "passwordHash": "$6$ZKfqCkKlptWXhMuD$qzmD0C11Ym21rOCUMptWW/rze065E/.wccbuetSNfBjcLO0rPptN20n3xZwGnnouE8Zx.Gy2z1oZbBgOa9khA/",
+           "sshAuthorizedKeys": [
+             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBTyHeuQMSFT6Rd2BCkQquTeS+3Pw2d2HaAJdN3+mBr1 kni@services"
+           ]
+     }
+   ]
+   },
+   "storage":{
+      "files":[
+         {
+            "path":"/etc/hostname",
+            "contents":{
+               "source":"data:,cu-master3"
+            },
+            "mode":420
+         },
+         {
+            "path": "/etc/NetworkManager/system-connections/eno12399.nmconnection",
+            "contents": {
+               "compression": "gzip",
+               "source": "data:;base64,H4sIAAAAAAAC/0yKz8rDIBAH7/ssX/wwf0pC2ScJOSz6CxF0DWoLefvSXlrmNMOsLqvCtZB1o+AZmm0/LAu16wSjHSiKRkEbyi4OnUrC91rD+Rw3Eu8LarVsl97Y22zGwUzDfz/9/QRLXivP5sP9LV2FFHcwJbm6XULkXWIFJbQje06iD4n0CgAA///Ec2TKowAAAA=="
+            },
+            "mode": 384
+      }
+      ]
+   },
+   "systemd":{
+
+   }
+}
+{% endhighlight %}
+
+- Building the customized image for each node:
+{% highlight bash %}
+podman run --privileged -v /apps/rhcos_image_cache/:/data quay.io/coreos/coreos-installer:release iso ignition embed /apps/rhcos-4.10.16-x86_64-live.x86_64.iso -f -i /data/cu-master3/custom.ign -o /data/cu-master3/rhcos-4.10.16-cu-master3.iso
+{% endhighlight %}
+
+This command will provide the `rhcos-4.10.16-cu-master3.iso` in the `/data/cu-master3/`.
 
 Step 6. Approving the new node certificates
 
