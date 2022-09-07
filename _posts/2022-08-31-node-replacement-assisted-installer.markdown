@@ -14,7 +14,7 @@ Prerequisites
 
 Step 1. How to change the state of the nodes after the Assisted Installer finished
 
-Those operations are required to be performed as a day2 to bring the BareMetalHost object status of each nodes of the OCPv4.10 cluster from `unmanaged` to `externally provisioned`.
+Those operations are required to be performed as a DAY2Operation to bring the BareMetalHost object status of each nodes of the OCPv4.10 cluster from `unmanaged` to `externally provisioned`. This section has been added here with the purpose of highlighting that in case one of the controller node its required to be replaced soon after the OCP cluster installation ended, you will need to consider this step.
 
 To highlight this, we are going to use a compact cluster (3 control nodes + 0 worker nodes).
 
@@ -385,9 +385,10 @@ Step 5.1. Reinstall of the removed node
 In this step, we are covering the use-case in which the removed node its required to be re-installed, this might be the case in the scenario of a total failure of the root disk of the server or the exposed LUN from the Network-Storage its lost.
 Before proceeding on the removed node, we should download the [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download]. Which will have to be booted to the server virtual-console.
 
-[rhcos-download]: https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/
+[rhcos-4.10.16-download]: https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/
+[rhcos-4.10.26-download]: https://rhcos.mirror.openshift.com/art/storage/releases/rhcos-4.10/410.84.202208030316-0/x86_64/rhcos-410.84.202208030316-0-live.x86_64.iso
 
-- Upload the downloaded [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download] to the controller node that you want to add to the cluster virtual-console server:
+- Upload the downloaded [rhcos-4.10.26-x86_64-live.x86_64.iso][rhcos-4.10.26-download] to the controller node that you want to add to the cluster virtual-console server:
 
 Open the used port on Bastion Host to be used by the service:
 {% highlight bash %}
@@ -395,7 +396,7 @@ Open the used port on Bastion Host to be used by the service:
  sudo firewall-cmd --reload
 {% endhighlight %}
 
-Creating the `rhcos_image_cache` directory to save [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download] and `master.ign`:
+Creating the `rhcos_image_cache` directory to save [rhcos-4.10.26-x86_64-live.x86_64.iso][rhcos-4.10.26-download] and `master.ign`:
 {% highlight bash %}
  mkdir -p /apps/rhcos_image_cache
 {% endhighlight %}
@@ -408,7 +409,7 @@ Creating the `rhcos_image_cache` directory to save [rhcos-4.10.16-x86_64-live.x8
 
 Downloading the image to the openshift image mirror:
 {% highlight bash %}
-curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/rhcos-4.10.16-x86_64-live.x86_64.iso --output /apps/rhcos_image_cache/rhcos-4.10.16-x86_64-live.x86_64.iso
+curl https://rhcos.mirror.openshift.com/art/storage/releases/rhcos-4.10/410.84.202208030316-0/x86_64/rhcos-410.84.202208030316-0-live.x86_64.iso --output /apps/rhcos_image_cache/rhcos-4.10.26-x86_64-live.x86_64.iso
 {% endhighlight %}
 
 Export the ignition data from the cluster:
@@ -517,7 +518,7 @@ mkdir -p /apps/rhcos_image_cache/{cu-master1,cu-master2,cu-master3,hub-node1,hub
 
 - Downloading the image to the openshift image mirror:
 {% highlight bash %}
-curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.10/4.10.16/rhcos-4.10.16-x86_64-live.x86_64.iso --output /apps/rhcos_image_cache/rhcos-4.10.16-x86_64-live.x86_64.iso
+curl https://rhcos.mirror.openshift.com/art/storage/releases/rhcos-4.10/410.84.202208030316-0/x86_64/rhcos-410.84.202208030316-0-live.x86_64.iso--output /apps/rhcos_image_cache/rhcos-4.10.26-x86_64-live.x86_64.iso
 {% endhighlight %}
 
 - Directory structure:
@@ -548,7 +549,7 @@ tree /apps/rhcos_image_cache/
 │   ├── custom.ign
 │   ├── network.ign
 │   └── network.bu
-└── rhcos-4.10.16-x86_64-live.x86_64.iso
+└── rhcos-4.10.26-x86_64-live.x86_64.iso
 {% endhighlight %}
 
 Each of the node hostname directory will contain the speicifc `custom.ign` with the specific configuration.
@@ -585,7 +586,7 @@ For more information on [butane file][butane-network-config].
 
 - Generating the ignition files from the butane file from previous stage:
 {% highlight bash %}
-podman run --rm --tty --interactive     --volume ${PWD}:/pwd:z --workdir /pwd     quay.io/coreos/butane:release         --pretty --strict --raw /apps/rhcos_image_cache/cu-master3/network.bu > /apps/rhcos_image_cache/cu-master3/network.ign
+podman run --rm --tty --interactive --volume ${PWD}:/pwd:z --workdir /pwd  quay.io/coreos/butane:release --pretty --strict --raw /apps/rhcos_image_cache/cu-master3/network.bu > /apps/rhcos_image_cache/cu-master3/network.ign
 {% endhighlight %}
 
 There are multiple alternatives on [how to generate the ignition files from the butane file][generate-ignition].
@@ -672,10 +673,10 @@ The content of the `custom.ign` should follow the output:
 
 - Building the customized image for each node:
 {% highlight bash %}
-podman run --privileged -v /apps/rhcos_image_cache/:/data quay.io/coreos/coreos-installer:release iso ignition embed /apps/rhcos-4.10.16-x86_64-live.x86_64.iso -f -i /data/cu-master3/custom.ign -o /data/cu-master3/rhcos-4.10.16-cu-master3.iso
+podman run --privileged -v /apps/rhcos_image_cache/:/data quay.io/coreos/coreos-installer:release iso ignition embed /apps/rhcos-4.10.26-x86_64-live.x86_64.iso -f -i /data/cu-master3/custom.ign -o /data/cu-master3/rhcos-4.10.26-cu-master3.iso
 {% endhighlight %}
 
-This command will provide the `rhcos-4.10.16-cu-master3.iso` in the `/data/cu-master3/`, use the image resulted to mount to the virtualmedia of the server and boot using `Virtual CD/DVD/ISO`.
+This command will provide the `rhcos-4.10.26-cu-master3.iso` in the `/data/cu-master3/`, use the image resulted to mount to the virtualmedia of the server and boot using `Virtual CD/DVD/ISO`.
 
 NOTE: You can use the command from `Step 5.1. Reinstall of the removed node` where we are creating a container that exposes the files for fruther use from the Bastion Host.
 To achieve this, you can run the following command:
@@ -736,7 +737,7 @@ spec:
   consumerRef:
     apiVersion: machine.openshift.io/v1beta1
     kind: Machine
-    name: cu-compact-1-7znk2-master-2
+    name: cu-compact-1-7znk2-master-3
     namespace: openshift-machine-api
   customDeploy:
     method: install_coreos
