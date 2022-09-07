@@ -483,11 +483,11 @@ Running the podman service that is exposing the files for further use:
 
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
 {% highlight bash %}
-nmcli connection show
+sudo nmcli connection show
 sudo nmcli con mod "eno12399" ipv4.addresses "192.168.34.53/25"
 sudo nmcli con mod "eno12399" ipv4.method manual
-nmcli con mod "eno12399" ipv4.gateway 192.168.34.1
-nmcli con mod "eno12399" ipv4.dns 192.168.34.20
+sudo nmcli con mod "eno12399" ipv4.gateway 192.168.34.1
+sudo nmcli con mod "eno12399" ipv4.dns 192.168.34.20
 sudo nmcli con up "eno12399"
 {% endhighlight %}
 
@@ -682,6 +682,12 @@ To achieve this, you can run the following command:
 {% highlight bash %}
 podman run -d --name rhcos_image_cache -v /apps/rhcos_image_cache:/var/www/html -p 9092:8080/tcp quay.io/centos7/httpd-24-centos7:latest
 {% endhighlight %}
+
+Once the newly added control plane node it has booted with the .iso image, you will be able to ssh into the node by using the `coreos` user and the sshkey stored into the Bastion Host. Once login to the newly added control plane node, you can run the following command to start the RHCOS installation:
+{% highlight bash %}
+sudo coreos-installer install /dev/sdb --copy-network
+{% endhighlight %}
+
 
 Step 6. Approving the new node certificates
 
