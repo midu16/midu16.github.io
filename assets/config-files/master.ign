@@ -1,0 +1,66 @@
+{
+   "ignition":{
+      "config":{
+         "merge":[
+            {
+               "source":"https://192.168.34.41:22623/config/master",
+               "verification":{
+
+               }
+            }
+         ],
+         "replace":{
+            "verification":{
+
+            }
+         }
+      },
+      "proxy":{
+
+      },
+      "security":{
+         "tls":{
+            "certificateAuthorities":[
+               {
+                  "source":"data:text/plain;charset=utf-8;base64,LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFRENDQWZpZ0F3SUJBZ0lJTCtRc09UelZJSzB3RFFZSktvWklodmNOQVFFTEJRQXdKakVTTUJBR0ExVUUKQ3hNSmIzQmxibk5vYVdaME1SQXdEZ1lEVlFRREV3ZHliMjkwTFdOaE1CNFhEVEl5TURrd05qRXhNVGswTVZvWApEVE15TURrd016RXhNVGswTVZvd0pqRVNNQkFHQTFVRUN4TUpiM0JsYm5Ob2FXWjBNUkF3RGdZRFZRUURFd2R5CmIyOTBMV05oTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFvTHRUS0hqZG5IY3cKNVpjdmw4OEczK0N5OTZSWUpDNFVZVlNkTUl2bzVad0dvc1dMdVJSSUJnRTVWcm96WVo0Q1REREltY1MvOENyQwp5TTdoZ0U1N2JxS09Od0dXWWF4TUIvK1Mvb2NrZU1lcG1uQ3JLODRCQjhySzR2ZmYwam8wR2ZBTm84bGJDZjFaCmlFMi9NL0RBcjBtdlk3OHM3elU0MkVMSDdwRndsY1VOUWg3RW1yaVJPK09ERjVRdCtURGp6TzRLQ2wzYVpKUzcKNnlDdXBsTlVLUHhKTlM1Q2t0T1B5NndYaVRoZW92Rm5heU1qNmdnVE43QzdLSFFVcDc3RFpWaWt4ZWtxSGswUwpVK0xhdTdaMXUxOHA5eFh6dXgyV3FqRXFwNXpjcWtiblAyY1MxRlZqSkk1R2Q0TXNRRjlZWnVZNEl2OGp5QUwzClV5emh1cGdTcFFJREFRQUJvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3RHdZRFZSMFRBUUgvQkFVd0F3RUIKL3pBZEJnTlZIUTRFRmdRVWtiaE1aZGVBSmpvVjJjV0F3dFh1ZTYvUTkvTXdEUVlKS29aSWh2Y05BUUVMQlFBRApnZ0VCQUJHc2xHdnBBWmwzbCtIQTFvclFhUWdZZ1VpQ2NldHkzS1lEUXN4c2YrTUNTWWRKYnptQllBaGNBZHFyCnJYckxWMXhKeWZZbmlUdjBZTHRweVFUUTlFajZBc1dCak9odXovbnV0MFY0d0lZSEJwRUF3MGtzL1ZxbUIvbDUKc09DeDB0Wi9HSERtcys0SEM2VS9wd2o4TUNYcjd0VWZXRExtdnd0NGFFZ1F3MWtGeG9xOTVSVThkWFowM1pGSgpJUWZHemNEOUNXUEJxcmNUcWVWbXA2T1plM2ppSjBZUCtOZDVJTWFHQTFIY2JYTjJsdTllUVZ1a2E2Q3NwT1JNCmZGeVlrZk05Z0VmQlJHemZzWjM4eFFERVZObU91K1VLTVdMOG1rcHVGQTEyZGw0bVhrTWZrT3doZkxTcXVlRGsKNldEWlNBVStzZlppbVZ3aTVTYnphbU5MMWljPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
+                  "verification":{
+
+                  }
+               }
+            ]
+         }
+      },
+      "timeouts":{
+
+      },
+      "version":"3.2.0"
+   },
+   "passwd":{
+         "users": [
+          {
+           "groups": [
+             "sudo"
+           ],
+           "name": "core",
+           "passwordHash": "$6$ZKfqCkKlptWXhMuD$qzmD0C11Ym21rOCUMptWW/rze065E/.wccbuetSNfBjcLO0rPptN20n3xZwGnnouE8Zx.Gy2z1oZbBgOa9khA/",
+           "sshAuthorizedKeys": [
+             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBTyHeuQMSFT6Rd2BCkQquTeS+3Pw2d2HaAJdN3+mBr1 kni@services"
+           ]
+     }
+   ]
+   },
+   "storage":{
+      "files":[
+         {
+            "path":"/etc/hostname",
+            "contents":{
+               "source":"data:,cu-master3"
+            },
+            "mode":420
+         }
+      ]
+   },
+   "systemd":{
+
+   }
+}

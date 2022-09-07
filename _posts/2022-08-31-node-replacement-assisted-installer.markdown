@@ -148,7 +148,7 @@ baremetalhost.metal3.io/cu-masterX configured
 {% endhighlight %}
 
 - Verify that the secrets associated to each node has been created:
-  
+
 {% highlight bash %}
 oc get secrets -n openshift-machine-api
 NAME                                              TYPE                                  DATA   AGE
@@ -203,7 +203,7 @@ sh-4.4# /bin/bash
 [systemd]
 Failed Units: 1
   NetworkManager-wait-online.service
-[root@kni1-master-0 /]# 
+[root@kni1-master-0 /]#
 {% endhighlight %}
 
 At this point we can run the back-up script available on the node:
@@ -269,7 +269,7 @@ Already on project "openshift-etcd" on server "https://api.kni1.cloud.lab.eng.bo
 {% highlight bash %}
 oc rsh etcd-kni1-master-0.cloud.lab.eng.bos.redhat.com                                                                
 Defaulted container "etcdctl" out of: etcdctl, etcd, etcd-metrics, etcd-health-monitor, setup (init), etcd-ensure-env-vars (init), etcd-resources-copy (init)                                                     
-sh-4.4# 
+sh-4.4#
 {% endhighlight %}
 
 Check the ETCD member list:
@@ -282,7 +282,7 @@ sh-4.4# etcdctl member list -w table
 | a863d615322849cb | started | kni1-master-1.cloud.lab.eng.bos.redhat.com | https://10.19.138.12:2380 | https://10.19.138.12:2379 |      false |                                                                  
 | c05aa2adbc319032 | started | kni1-master-2.cloud.lab.eng.bos.redhat.com | https://10.19.138.13:2380 | https://10.19.138.13:2379 |      false |                                                                  
 +------------------+---------+--------------------------------------------+---------------------------+---------------------------+------------+                                                                  
-sh-4.4# 
+sh-4.4#
 {% endhighlight %}
 
 Take note of the ID and the name of the unhealthy etcd member, because those values are needed later in the procedure.
@@ -326,10 +326,10 @@ etcd-serving-metrics-kni1-master-2.cloud.lab.eng.bos.redhat.com   kubernetes.io/
 
 Force the etcd redeployment:
 {% highlight bash %}
-oc patch etcd cluster -p='{"spec": {"forceRedeploymentReason": "single-master-recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge 
+oc patch etcd cluster -p='{"spec": {"forceRedeploymentReason": "single-master-recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge
 {% endhighlight %}
 
-Step 4. Removing the unhealthy control-node 
+Step 4. Removing the unhealthy control-node
 
 {% highlight bash %}
 oc get clusteroperator baremetal                                                                                      
@@ -342,8 +342,8 @@ Check the BareMetalHost object:
 oc get bmh -n openshift-machine-api
 NAME         STATE       CONSUMER                             ONLINE   ERROR   AGE
 cu-master1   unmanaged   example-tz69q-master-0         true             9h
-cu-master2   unmanaged   example-tz69q-master-1         true             3h30m
-cu-master3   unmanaged   example-tz69q-master-2         true             9h
+cu-master2   unmanaged   example-tz69q-master-1         true             9h
+cu-master3   unmanaged   example-tz69q-master-2         true             3h30m
 hub-node1    unmanaged   example-tz69q-worker-0-94mj7   true             9h
 hub-node2    unmanaged   example-tz69q-worker-0-h754z   true             9h
 hub-node3    unmanaged   example-tz69q-worker-0-njjpv   true             9h
@@ -374,13 +374,13 @@ oc delete machine -n openshift-machine-api kni1-master-2
 
 Check the Machine objects status:
 {% highlight bash %}
-oc get machine -n openshift-machine-api 
-Error from server (InternalError): an error on the server ("") has prevented the request from succeeding (get machines.machine.openshift.io) 
+oc get machine -n openshift-machine-api
+Error from server (InternalError): an error on the server ("") has prevented the request from succeeding (get machines.machine.openshift.io)
 {% endhighlight %}
 
 NOTE: You should wait for 5-10 minutes until the cluster is transioning to a more stable state to proceed further.
 
-Step 5. Reinstall of the removed node
+Step 5.1. Reinstall of the removed node
 
 In this step, we are covering the use-case in which the removed node its required to be re-installed, this might be the case in the scenario of a total failure of the root disk of the server or the exposed LUN from the Network-Storage its lost.
 Before proceeding on the removed node, we should download the [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download]. Which will have to be booted to the server virtual-console.
@@ -425,18 +425,18 @@ The content of the `master.ign` should follow the output:
             {
                "source":"https://192.168.34.41:22623/config/master",
                "verification":{
-                  
+
                }
             }
          ],
          "replace":{
             "verification":{
-               
+
             }
          }
       },
       "proxy":{
-         
+
       },
       "security":{
          "tls":{
@@ -444,19 +444,19 @@ The content of the `master.ign` should follow the output:
                {
                   "source":"data:text/plain;charset=utf-8;base64,LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFRENDQWZpZ0F3SUJBZ0lJTCtRc09UelZJSzB3RFFZSktvWklodmNOQVFFTEJRQXdKakVTTUJBR0ExVUUKQ3hNSmIzQmxibk5vYVdaME1SQXdEZ1lEVlFRREV3ZHliMjkwTFdOaE1CNFhEVEl5TURrd05qRXhNVGswTVZvWApEVE15TURrd016RXhNVGswTVZvd0pqRVNNQkFHQTFVRUN4TUpiM0JsYm5Ob2FXWjBNUkF3RGdZRFZRUURFd2R5CmIyOTBMV05oTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFvTHRUS0hqZG5IY3cKNVpjdmw4OEczK0N5OTZSWUpDNFVZVlNkTUl2bzVad0dvc1dMdVJSSUJnRTVWcm96WVo0Q1REREltY1MvOENyQwp5TTdoZ0U1N2JxS09Od0dXWWF4TUIvK1Mvb2NrZU1lcG1uQ3JLODRCQjhySzR2ZmYwam8wR2ZBTm84bGJDZjFaCmlFMi9NL0RBcjBtdlk3OHM3elU0MkVMSDdwRndsY1VOUWg3RW1yaVJPK09ERjVRdCtURGp6TzRLQ2wzYVpKUzcKNnlDdXBsTlVLUHhKTlM1Q2t0T1B5NndYaVRoZW92Rm5heU1qNmdnVE43QzdLSFFVcDc3RFpWaWt4ZWtxSGswUwpVK0xhdTdaMXUxOHA5eFh6dXgyV3FqRXFwNXpjcWtiblAyY1MxRlZqSkk1R2Q0TXNRRjlZWnVZNEl2OGp5QUwzClV5emh1cGdTcFFJREFRQUJvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3RHdZRFZSMFRBUUgvQkFVd0F3RUIKL3pBZEJnTlZIUTRFRmdRVWtiaE1aZGVBSmpvVjJjV0F3dFh1ZTYvUTkvTXdEUVlKS29aSWh2Y05BUUVMQlFBRApnZ0VCQUJHc2xHdnBBWmwzbCtIQTFvclFhUWdZZ1VpQ2NldHkzS1lEUXN4c2YrTUNTWWRKYnptQllBaGNBZHFyCnJYckxWMXhKeWZZbmlUdjBZTHRweVFUUTlFajZBc1dCak9odXovbnV0MFY0d0lZSEJwRUF3MGtzL1ZxbUIvbDUKc09DeDB0Wi9HSERtcys0SEM2VS9wd2o4TUNYcjd0VWZXRExtdnd0NGFFZ1F3MWtGeG9xOTVSVThkWFowM1pGSgpJUWZHemNEOUNXUEJxcmNUcWVWbXA2T1plM2ppSjBZUCtOZDVJTWFHQTFIY2JYTjJsdTllUVZ1a2E2Q3NwT1JNCmZGeVlrZk05Z0VmQlJHemZzWjM4eFFERVZObU91K1VLTVdMOG1rcHVGQTEyZGw0bVhrTWZrT3doZkxTcXVlRGsKNldEWlNBVStzZlppbVZ3aTVTYnphbU5MMWljPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
                   "verification":{
-                     
+
                   }
                }
             ]
          }
       },
       "timeouts":{
-         
+
       },
       "version":"3.2.0"
    },
    "passwd":{
-      
+
    },
    "storage":{
       "files":[
@@ -470,7 +470,7 @@ The content of the `master.ign` should follow the output:
       ]
    },
    "systemd":{
-      
+
    }
 }
 {% endhighlight %}
@@ -480,10 +480,10 @@ Running the podman service that is exposing the files for further use:
  podman run -d --name rhcos_image_cache -v /apps/rhcos_image_cache:/var/www/html -p 9092:8080/tcp quay.io/centos7/httpd-24-centos7:latest
 {% endhighlight %}
 - Boot the node using the `Virtual CD/DVD/ISO` boot mode and boot with it.
-  
+
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
 {% highlight bash %}
-nmcli connection show 
+nmcli connection show
 sudo nmcli con mod "eno12399" ipv4.addresses "192.168.34.53/25"
 sudo nmcli con mod "eno12399" ipv4.method manual
 nmcli con mod "eno12399" ipv4.gateway 192.168.34.1
@@ -498,11 +498,15 @@ sudo coreos-installer install /dev/sdb --ignition-url http://192.168.34.20:9092/
 
 NOTE: This proses will take some time until its finished, once this its finished the node will reboot and boot using the root disk.
 
+Step 5.2. Reinstall of the removed node by building the `RHCOS`
+
+[sysconfig-network-config]: https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/
+
 Step 6. Approving the new node certificates
 
 - Check if there are newly created certificates pending:
 {% highlight bash %}
-oc get csr 
+oc get csr
 {% endhighlight %}
 
 - Approve all the pending certificates:
