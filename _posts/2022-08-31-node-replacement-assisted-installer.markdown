@@ -389,7 +389,7 @@ Before proceeding on the removed node, we should download the [rhcos-4.10.16-x86
 
 - Upload the downloaded [rhcos-4.10.16-x86_64-live.x86_64.iso][rhcos-download] to the controller node that you want to add to the cluster virtual-console server:
 
-Open the used port on BastionVM to be used by the service:
+Open the used port on Bastion Host to be used by the service:
 {% highlight bash %}
  sudo firewall-cmd --add-port=9092/tcp --zone=public --permanent
  sudo firewall-cmd --reload
@@ -675,7 +675,13 @@ The content of the `custom.ign` should follow the output:
 podman run --privileged -v /apps/rhcos_image_cache/:/data quay.io/coreos/coreos-installer:release iso ignition embed /apps/rhcos-4.10.16-x86_64-live.x86_64.iso -f -i /data/cu-master3/custom.ign -o /data/cu-master3/rhcos-4.10.16-cu-master3.iso
 {% endhighlight %}
 
-This command will provide the `rhcos-4.10.16-cu-master3.iso` in the `/data/cu-master3/`.
+This command will provide the `rhcos-4.10.16-cu-master3.iso` in the `/data/cu-master3/`, use the image resulted to mount to the virtualmedia of the server and boot using `Virtual CD/DVD/ISO`.
+
+NOTE: You can use the command from `Step 5.1. Reinstall of the removed node` where we are creating a container that exposes the files for fruther use from the Bastion Host.
+To achieve this, you can run the following command:
+{% highlight bash %}
+podman run -d --name rhcos_image_cache -v /apps/rhcos_image_cache:/var/www/html -p 9092:8080/tcp quay.io/centos7/httpd-24-centos7:latest
+{% endhighlight %}
 
 Step 6. Approving the new node certificates
 
