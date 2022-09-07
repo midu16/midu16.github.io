@@ -518,7 +518,7 @@ mkdir -p /apps/rhcos_image_cache/{cu-master1,cu-master2,cu-master3,hub-node1,hub
 
 - Downloading the image to the openshift image mirror:
 {% highlight bash %}
-curl https://rhcos.mirror.openshift.com/art/storage/releases/rhcos-4.10/410.84.202208030316-0/x86_64/rhcos-410.84.202208030316-0-live.x86_64.iso--output /apps/rhcos_image_cache/rhcos-4.10.26-x86_64-live.x86_64.iso
+curl https://rhcos.mirror.openshift.com/art/storage/releases/rhcos-4.10/410.84.202208030316-0/x86_64/rhcos-410.84.202208030316-0-live.x86_64.iso --output /apps/rhcos_image_cache/rhcos-4.10.26-x86_64-live.x86_64.iso
 {% endhighlight %}
 
 - Directory structure:
