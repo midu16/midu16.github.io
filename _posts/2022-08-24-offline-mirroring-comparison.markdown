@@ -9,7 +9,7 @@ In the following post, we are going to talk on how to mirror the container base 
 Prerequisites
 
 - OCPv4.10.X
-- Redhat Enterprise Linux/Rocky Linux/Fedora 
+- Redhat Enterprise Linux/Rocky Linux/Fedora
 - Downloaded pull-secret.txt file
 - podman package available to the OS
 
@@ -31,7 +31,7 @@ sudo cp oc-mirror /usr/local/bin
 
 Note:  The `oc-mirror` its Technical Preview on `stable-4.10` channel and on `stable-4.11` channel its General Available.
 
-Step 2. Creating the redhat-operator-index container 
+Step 2. Creating the redhat-operator-index container
 
 {% highlight bash %}
 podman run -d --name redhat-operator-index-4.10 -p 5051:5051 -it registry.redhat.io/redhat/redhat-operator-index:v4.10
@@ -376,7 +376,7 @@ Make sure you are checking the following [What to configure for pull-secret file
 [offline-mirroring]: https://midu16.github.io/openshift4/2022/07/10/offline-mirroring.html
 
 We are going to split the action of mirroring in two parts:
- - Connected Host, where the host can reach the internet 
+ - Connected Host, where the host can reach the internet
  - Offline Host, where the host doesnt reach the internet BUT has a connection to an SFTP server.
 
 - Connected Host actions:
@@ -415,7 +415,7 @@ opm index prune -f registry.redhat.io/redhat/redhat-operator-index:${OCP_VERSION
 Pushing the pruned container based images to the local registry:
 
 {% highlight bash %}
-podman push ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION} 
+podman push ${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}/redhat-operator-index:${OCP_VERSION}
 {% endhighlight %}
 
 Downloading the container base images from the local registry localy:
@@ -496,7 +496,7 @@ cp pull-secret.json ${HOME}/.docker/config.json
 {% endhighlight %}
 
 We are going to split the action of mirroring in two parts:
- - Connected Host, where the host can reach the internet 
+ - Connected Host, where the host can reach the internet
  - Offline Host, where the host doesnt reach the internet BUT has a connection to an SFTP server.
 
 - Connected Host actions:
@@ -638,7 +638,7 @@ oc-mirror --config imageset-config.yaml file://archive
 	WARN[0076] DEPRECATION NOTICE:
 	Sqlite-based catalogs and their related subcommands are deprecated. Support for
 	them will be removed in a future release. Please migrate your catalog workflows
-	to the new file-based catalog format. 
+	to the new file-based catalog format.
 	wrote mirroring manifests to archive/oc-mirror-workspace/operators.1661356546/manifests-redhat-operator-index
 
 	To upload local images to a registry, run:
@@ -682,7 +682,7 @@ Upload the container base images to the Offline Host registry:
 oc-mirror --from ./archive docker://${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}
 {% endhighlight %}
 
-Step 5. Mirroring tools comparison 
+Step 5. Mirroring tools comparison
 
 In the initial phase we are going to consider the mirroring size .tar file for each tool.
 
@@ -690,13 +690,13 @@ In the initial phase we are going to consider the mirroring size .tar file for e
 
 Once the mirror has finished, the size of the tar file for the operator list used in the example above:
 {% highlight bash %}
-du -h INBACRNRDL0100.offline.oxtechnix.lan.tar.gz 
+du -h INBACRNRDL0100.offline.oxtechnix.lan.tar.gz
 	29G	INBACRNRDL0100.offline.oxtechnix.lan.tar.gz
 {% endhighlight %}
 
 - oc-mirror-cli mirroring:
 {% highlight bash %}
-ls -l 
+ls -l
 total 26643192
 -rw-rw-r--. 1 midu midu 2053686272 Aug 24 18:26 mirror_seq1_000000.tar
 -rw-rw-r--. 1 midu midu 2126430208 Aug 24 18:26 mirror_seq1_000001.tar
@@ -713,12 +713,12 @@ total 26643192
 -rw-rw-r--. 1 midu midu 2138003456 Aug 24 18:32 mirror_seq1_000012.tar
 -rw-rw-r--. 1 midu midu  166561280 Aug 24 18:32 mirror_seq1_000013.tar
 drwxrwxr-x. 2 midu midu       4096 Aug 24 18:32 oc-mirror-workspace
-du -h 
+du -h
 4.0K	./oc-mirror-workspace
 26G	.
 {% endhighlight %}
 
-In order to describe the content of the mirror_seq1_000000.tar 
+In order to describe the content of the mirror_seq1_000000.tar
 {% highlight bash %}
 oc-mirror describe mirror_seq1_000000.tar
 {% endhighlight %}
@@ -729,7 +729,7 @@ Step 6. How to use the container based images to your OCPv.4.10 cluster
 
 Once the container based images are mirrored to the BastionHost offline registry, there is still required to perform a couple of steps until the OCPv4.10 cluster is able to make use of them, therefore in this subchapter we will going to focus on what is required to do and how it differentiates from the `oc-mirror` and `oc` cli.
 
-- oc-cli upload the container based images : 
+- oc-cli upload the container based images :
 
 Checking the content of the `BastionHost` Offline registry content after mirroring upload:
 
@@ -840,7 +840,7 @@ spec:
     source: local/index/olm-mirror/redhat-operator-index/odf4/odf-operator-bundle
 {% endhighlight %}
 
-NOTE: One of the aspect that should be changed for the `ImageContentSourcePolicy.yaml` is the source path. The `local/index/olm-mirror/redhat-operator-index`should be replace with the `registry.redhat.io/redhat/redhat-operator-index`. 
+NOTE: One of the aspect that should be changed for the `ImageContentSourcePolicy.yaml` is the source path. The `local/index/olm-mirror/redhat-operator-index`should be replace with the `registry.redhat.io/redhat/redhat-operator-index`.
 
 
 The content of the `CatalogSource.yaml`:
@@ -855,7 +855,7 @@ spec:
   sourceType: grpc
 {% endhighlight %}
 
-- oc-mirror-cli upload the container based images : 
+- oc-mirror-cli upload the container based images :
 
 Checking the content of the `BastionHost` Offline registry content after mirror upload:
 
@@ -913,7 +913,7 @@ info: Planning completed in 10ms
 sha256:33d5a81a5f78a4a63c1fd4c7bad0b0ec82beef5b847025ae1d097248a59705d2 inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/odf4/odf-csi-addons-operator-bundle:fbc9d4f0
 info: Mirroring completed in 830ms (16.76kB/s)
 Wrote release signatures to oc-mirror-workspace/results-1661760261
-Rendering catalog image "inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat/rh-index:v1-test" with file-based catalog 
+Rendering catalog image "inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat/rh-index:v1-test" with file-based catalog
 Writing image mapping to oc-mirror-workspace/results-1661760261/mapping.txt
 Writing CatalogSource manifests to oc-mirror-workspace/results-1661760261
 Writing ICSP manifests to oc-mirror-workspace/results-1661760261
@@ -967,7 +967,7 @@ Differences between `oc-cli`and `oc-mirror-cli` of the container base images upl
 
 - For the `oc-mirror-cli` container based images are uploaded to the `olm-mirror`namespace and inside this namespace has been defined other sub-namespaces `odf4`, `openshift4`, `redhat` and `rhel8`.
 
-- The `ICSP.yaml` file generated using the `oc-mirror-cli` its generating a more dynamic content for which no update is required. 
+- The `ICSP.yaml` file generated using the `oc-mirror-cli` its generating a more dynamic content for which no update is required.
 
 
 Step 7. How to backtrack the content of .tar file container base images content
@@ -14826,7 +14826,7 @@ In the following subchapter we will try to compare the how to backtrack the imag
 
 
 
-Step 8. Automating the process with Ansible 
+Step 8. Automating the process with Ansible
 
 One alternative to automate the mirroring process is to use the following [playbook][oc-mirror-ansible].
 
@@ -14834,7 +14834,74 @@ One alternative to automate the mirroring process is to use the following [playb
 [oc-documentation]: https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-disconnected.html
 
 
-Step 9. Preparing the Offline registry for OCP upgrade 
+Step 9. Preparing the Offline registry for OCP upgrade
 
 In this step we are going to discuss on how to prepare the Offline registry for OCP upgrade. The highlight in this step will be the process on how to use the `oc adm catalog mirror` and `oc-mirror` cli to prepare the required `container base images` for minor or major OCP upgrade.
 
+
+Step 10. Comparing container base images operators size
+
+In this step we are going to analyze the size of a set container base images operator from different OCP versions.
+
+In the mirroring process we used the following `imageset-config.yaml` definition:
+- Container Base Images Operators for OCPv4.8:
+
+{% highlight bash %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.8    
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true                                                        
+      packages:
+        - name: local-storage-operator
+        - name: compliance-operator
+        - name: file-integrity-operator
+        - name: ocs-operator
+{% endhighlight %}
+
+- Container Base Images Operators for OCPv4.10:
+
+{% highlight bash %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10    
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true                                                        
+      packages:
+        - name: local-storage-operator
+        - name: odf-csi-addons-operator
+        - name: file-integrity-operator
+        - name: ocs-operator
+        - name: mcg-operator
+        - name: odf-operator
+{% endhighlight %}
+
+- Comparrison of the operators mirror .tar file size:
+
+| Operator Name            | Redhat Operator Index  | Size |
+|------------------------- |----------------------- |----- |
+| local-storage-operator   | v4.8                   | 1.3G |
+| compliance-operator      | v4.8                   | 1.4G |  
+| file-integrity-operator  | v4.8                   | 1.3G |  
+| ocs-operator             | v4.8                   |      |
+|------------------------- |------------------------|------|
+| TOTAL .tar file bundle   | v4.8                   | 88G  |
+
+| Operator Name            | Redhat Operator Index  | Size |
+|------------------------- |----------------------- |----- |
+| local-storage-operator   | v4.10                  | 1.8G |  
+| odf-csi-addons-operator  | v4.10                  | 3.7G |  
+| file-integrity-operator  | v4.10                  | 1.6G |  
+| ocs-operator             | v4.10                  |      |
+| mcg-operator             | v4.10                  |      |
+| odf-operator             | v4.10                  |      |
+|------------------------- |------------------------|------|
+| TOTAL .tar file bundle   | v4.10                  | 61G  |
