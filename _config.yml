@@ -18,6 +18,11 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
+# Minima date format
+# refer to http://shopify.github.io/liquid/filters/date/ if you want to customize this
+minima:
+  date_format: "%b %-d, %Y"
+  
 title: midu16 - Github home page
 email: idumihai16@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
