@@ -14895,13 +14895,13 @@ mirror:
 |------------------------- |------------------------|------|
 | TOTAL .tar file bundle   | v4.8                   | 88G  |
 
-| Operator Name            | Redhat Operator Index  | Size |
-|------------------------- |----------------------- |----- |
-| local-storage-operator   | v4.10                  | 1.8G |  
-| odf-csi-addons-operator  | v4.10                  | 3.7G |  
-| file-integrity-operator  | v4.10                  | 1.6G |  
-| ocs-operator             | v4.10                  |      |
-| mcg-operator             | v4.10                  |      |
-| odf-operator             | v4.10                  |      |
-|------------------------- |------------------------|------|
-| TOTAL .tar file bundle   | v4.10                  | 61G  |
+| Operator Name           | Redhat Operator Index  | Size |
+|-------------------------|----------------------- |----- |
+| local-storage-operator  | v4.10                  | 1.8G |  
+| odf-csi-addons-operator | v4.10                  | 3.7G |  
+| file-integrity-operator | v4.10                  | 1.6G |  
+| ocs-operator            | v4.10                  |      |
+| mcg-operator            | v4.10                  |      |
+| odf-operator            | v4.10                  |      |
+|-------------------------|------------------------|------|
+| TOTAL .tar file bundle  | v4.10                  | 61G  |
