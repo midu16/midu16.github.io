@@ -52,6 +52,29 @@ To download the `grpcurl`, you will need to download the binary from [grpcurl bi
 
 [grpcurl-release]: https://github.com/fullstorydev/grpcurl/releases
 
+Documenting the offline registry api:
+{% highlight bash %}
+grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 list api.Registry
+api.Registry.GetBundle
+api.Registry.GetBundleForChannel
+api.Registry.GetBundleThatReplaces
+api.Registry.GetChannelEntriesThatProvide
+api.Registry.GetChannelEntriesThatReplace
+api.Registry.GetDefaultBundleThatProvides
+api.Registry.GetLatestChannelEntriesThatProvide
+api.Registry.GetPackage
+api.Registry.ListBundles
+api.Registry.ListPackages
+{% endhighlight %}
+
+In order to dig more information about an specific api:
+{% highlight bash %}
+grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 describe api.Registry.GetBundleForChannel
+api.Registry.GetBundleForChannel is a method:
+rpc GetBundleForChannel ( .api.GetBundleInChannelRequest ) returns ( .api.Bundle );
+{% endhighlight %}
+
+Further in this stage we are going to use the following offline registry api's:
 {% highlight bash %}
 grpcurl -plaintext -d '{"name":"local-storage-operator"}' INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry/GetPackage
 {
@@ -14865,7 +14888,7 @@ mirror:
 
 - Container Base Images Operators for OCPv4.10:
 
-{% highlight bash %}
+{% highlight yaml %}
 ---
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
@@ -14891,9 +14914,9 @@ mirror:
 | local-storage-operator   | v4.8                   | 1.3G |
 | compliance-operator      | v4.8                   | 1.4G |  
 | file-integrity-operator  | v4.8                   | 1.3G |  
-| ocs-operator             | v4.8                   |      |
+| ocs-operator             | v4.8                   | 51G  |
 |------------------------- |------------------------|------|
-| TOTAL .tar file bundle   | v4.8                   | 88G  |
+| TOTAL .tar file bundle   | v4.8                   | 55G  |
 
 | Operator Name           | Redhat Operator Index  | Size |
 |-------------------------|----------------------- |----- |
@@ -14901,7 +14924,16 @@ mirror:
 | odf-csi-addons-operator | v4.10                  | 3.7G |  
 | file-integrity-operator | v4.10                  | 1.6G |  
 | ocs-operator            | v4.10                  |      |
-| mcg-operator            | v4.10                  |      |
+| mcg-operator            | v4.10                  | 25G  |
 | odf-operator            | v4.10                  |      |
 |-------------------------|------------------------|------|
 | TOTAL .tar file bundle  | v4.10                  | 61G  |
+
+
+For the OCPv4.10:
+- ocs-operator:
+{% highlight bash %}
+"stable-4.10"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:18da22ffcea86ef09c61d20ae81cd6f82cbf73c292dc4ef206dfd976ec7c5971"
+"4.10.4"
+{% endhighlight %}
