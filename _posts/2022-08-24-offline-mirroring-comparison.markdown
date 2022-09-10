@@ -14869,7 +14869,7 @@ In this step we are going to analyze the size of a set container base images ope
 In the mirroring process we used the following `imageset-config.yaml` definition:
 - Container Base Images Operators for OCPv4.8:
 
-{% highlight bash %}
+{% highlight yaml %}
 ---
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
