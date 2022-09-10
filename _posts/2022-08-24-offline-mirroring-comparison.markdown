@@ -14923,7 +14923,7 @@ mirror:
 | local-storage-operator  | v4.10                  | 1.8G |  
 | odf-csi-addons-operator | v4.10                  | 3.7G |  
 | file-integrity-operator | v4.10                  | 1.6G |  
-| ocs-operator            | v4.10                  |      |
+| ocs-operator            | v4.10                  | 22G  |
 | mcg-operator            | v4.10                  | 25G  |
 | odf-operator            | v4.10                  |      |
 |-------------------------|------------------------|------|
@@ -14931,9 +14931,131 @@ mirror:
 
 
 For the OCPv4.10:
+
+When do you run the following command `grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry.ListBundles | jq ' .packageName, .channelName, .bundlePath, .version'` you will obtain the full list of bundles shipped  by a `redhat operator index` for a specific OCP version (in this example its for OCPv4.10). If the administrator is not mentioning the specific version to mirror, then all the versions will be downloaded.
+Here its a snip output from the command for `ocs-operator`:
+
 - ocs-operator:
 {% highlight bash %}
+grpcurl -plaintext INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry.ListBundles | jq ' .packageName, .channelName, .bundlePath, .version'
+...
+"ocs-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:a640d9395a7dad7c5d2306af3ba60a3430358e705b647ebf272e38e27282ad4c"
+"4.10.0"
+"ocs-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:dedbaa13ec89f3f8217ed23722ae0589fedc96f319d61cd2a79c9afc66dce340"
+"4.10.1"
+"ocs-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:ef2c06eaaf145efaabc638045f92bec3a4e50c892b261eb35a706446a0ffe7f5"
+"4.10.2"
+"ocs-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:28161864968ee4dc66ed6600697c469c714538cf27c66a2096e4443a6eef52b4"
+"4.10.3"
+"ocs-operator"
 "stable-4.10"
 "registry.redhat.io/odf4/ocs-operator-bundle@sha256:18da22ffcea86ef09c61d20ae81cd6f82cbf73c292dc4ef206dfd976ec7c5971"
 "4.10.4"
+"ocs-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:1cbe53d6e1ebbbacef1bcb5459aa3ad882568aa006b059bd334287363eb35aae"
+"4.10.5"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:19baeee4a9db7519f1b88a885034be1e35423f34854323ac4a1b0e88e881bc3f"
+"4.9.0"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:4c2217d270f3e5b09d83e4b713845df210a5935b43d81b30c913e44e27e98917"
+"4.9.1"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:27bf074d75ede1eba4540999ae045e8ef0c8f34fdbca8785f8551ccd18e38252"
+"4.9.10"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:30d094fa926cbd20840e175c9234780546f1b355b1964f4aac5e23b73f5991c6"
+"4.9.2"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:a6c7aa894cc578ef11d07ba9f82d74c0d46ed2f02b03bde239abfe04b66f2b33"
+"4.9.3"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:8cf5c287c376fe8db3cd8a941c922b2b9d679ba98c83058a0d80e5e7d91a0157"
+"4.9.4"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:4d282908c43ab8c9555f6a0a3323e39176d9f69d3614b5ee78cf097510cd07d8"
+"4.9.5"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:e928e32b013cbdcd1e5651212c787202f6b52b1b431a44291e0307e3e83defe6"
+"4.9.6"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:6138a2d4f7659bb3e5c61ddb5d13e471b55285c912d2b7de3480c9682c558eb4"
+"4.9.7"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:2a3a98cc36c8a1ae92e1c48a3620b9adea1f4e0165bc2f6af28fde4b73d2a2d1"
+"4.9.8"
+"ocs-operator"
+"stable-4.9"
+"registry.redhat.io/odf4/ocs-operator-bundle@sha256:f50a3dbafcc475dad490b2c14e62aebb7969ee5584be97ca4eaa223dc315af9f"
+"4.9.9"
+...
 {% endhighlight %}
+
+In order to mirror a specific version, you will need to use the `oc-mirror` cli and define the `imageset-config.yaml` file as below:
+{% highlight yaml %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true
+      packages:
+        - name: ocs-operator
+      packages:
+        - name: ocs-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+{% endhighlight %}
+
+In order to mirror all available versions, you will need to use the `oc-mirror` cli and define the `imageset-config.yaml` file as below:
+{% highlight yaml %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true
+      packages:
+        - name: ocs-operator
+      packages:
+        - name: ocs-operator
+          minVersion: '4.9.0'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+{% endhighlight %}
+
+Below we will compare the size of the bundle of `oc-operator`
+
+| Operator Name           | Operator version       | Size |
+|-------------------------|----------------------- |----- |
+| ocs-operator            | v4.9.0 - v4.10.5       |      |
+| ocs-operator            | v4.10.4                | 22G  |
+|-------------------------|----------------------- |----- |
