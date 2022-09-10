@@ -14925,9 +14925,9 @@ mirror:
 | file-integrity-operator | v4.10                  | 1.6G |  
 | ocs-operator            | v4.10                  | 22G  |
 | mcg-operator            | v4.10                  | 25G  |
-| odf-operator            | v4.10                  |      |
+| odf-operator            | v4.10                  | 25G  |
 |-------------------------|------------------------|------|
-| TOTAL .tar file bundle  | v4.10                  | 61G  |
+| TOTAL .tar file bundle  | v4.10                  | 79.1G|
 
 
 For the OCPv4.10:
@@ -15182,6 +15182,6 @@ Below we will compare the size of the bundle of `odf-operator`
 
 | Operator Name           | Channel version        | Size |
 |-------------------------|----------------------- |----- |
-| odf-operator            | v4.9.0 - v4.10.5       | G  |
-| odf-operator            | v4.10.4                | G  |
+| odf-operator            | v4.9.0 - v4.10.5       |   G  |
+| odf-operator            | v4.10.4                | 25G  |
 |-------------------------|----------------------- |----- |
