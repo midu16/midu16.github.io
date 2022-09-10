@@ -15055,7 +15055,7 @@ mirror:
 
 Below we will compare the size of the bundle of `ocs-operator`
 
-| Operator Name           | Operator version       | Size |
+| Operator Name           | Channel version        | Size |
 |-------------------------|----------------------- |----- |
 | ocs-operator            | v4.9.0 - v4.10.5       | 51G  |
 | ocs-operator            | v4.10.4                | 22G  |
@@ -15180,8 +15180,8 @@ mirror:
 
 Below we will compare the size of the bundle of `odf-operator`
 
-| Operator Name           | Operator version       | Size |
+| Operator Name           | Channel version        | Size |
 |-------------------------|----------------------- |----- |
-| odf-operator            | v4.9.0 - v4.10.5       | 51G  |
-| odf-operator            | v4.10.4                | 22G  |
+| odf-operator            | v4.9.0 - v4.10.5       | G  |
+| odf-operator            | v4.10.4                | G  |
 |-------------------------|----------------------- |----- |
