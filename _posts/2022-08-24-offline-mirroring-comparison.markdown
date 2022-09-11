@@ -14886,7 +14886,7 @@ mirror:
         - name: ocs-operator
 {% endhighlight %}
 
-- Container Base Images Operators for OCPv4.10:
+- Container Base Images Operators for OCPv4.10 if you do not mention a specific version and stream:
 
 {% highlight yaml %}
 ---
@@ -14905,6 +14905,51 @@ mirror:
         - name: ocs-operator
         - name: mcg-operator
         - name: odf-operator
+{% endhighlight %}
+
+- Container Base Images Operators for OCPv4.10 if you mention a specific version and stream:
+
+{% highlight yaml %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10    
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true                                                        
+      packages:
+        - name: local-storage-operator
+          minVersion: '4.10.0-202208150436'
+          maxVersion: '4.10.0-202208150436'
+          channels:
+                  - name: 'stable'
+        - name: odf-csi-addons-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+        - name: file-integrity-operator
+          minVersion: '0.1.13'
+          maxVersion: '0.1.13'
+          channels:
+                  - name: '4.7'
+        - name: ocs-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+        - name: mcg-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+        - name: odf-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
 {% endhighlight %}
 
 - Comparrison of the operators mirror .tar file size:
@@ -14929,6 +14974,16 @@ mirror:
 |-------------------------|------------------------|------|
 | TOTAL .tar file bundle  | v4.10                  | 79.1G|
 
+| Operator Name           | Redhat Operator Index  | Operator version | Size |
+|-------------------------|----------------------- | ---------------- |----- |
+| local-storage-operator  | v4.10                  | v4.10.4          |      |  
+| odf-csi-addons-operator | v4.10                  | v4.10.4          |      |  
+| file-integrity-operator | v4.10                  | v0.1.13          |      |  
+| ocs-operator            | v4.10                  | v4.10.4          |      |
+| mcg-operator            | v4.10                  | v4.10.4          |      |
+| odf-operator            | v4.10                  | v4.10.4          |      |
+|-------------------------|------------------------|------------------|------|
+| TOTAL .tar file bundle  | v4.10                                     | 26G  |
 
 For the OCPv4.10:
 
@@ -15182,6 +15237,6 @@ Below we will compare the size of the bundle of `odf-operator`
 
 | Operator Name           | Channel version        | Size |
 |-------------------------|----------------------- |----- |
-| odf-operator            | v4.9.0 - v4.10.5       |   G  |
+| odf-operator            | v4.9.0 - v4.10.5       | 57G  |
 | odf-operator            | v4.10.4                | 25G  |
 |-------------------------|----------------------- |----- |
