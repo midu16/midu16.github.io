@@ -14983,7 +14983,7 @@ mirror:
 | mcg-operator            | v4.10                  | v4.10.4          |      |
 | odf-operator            | v4.10                  | v4.10.4          |      |
 |-------------------------|------------------------|------------------|------|
-| TOTAL .tar file bundle  | v4.10                                     | 26G  |
+| TOTAL .tar file bundle  | v4.10                  |------------------| 26G  |
 
 For the OCPv4.10:
 
