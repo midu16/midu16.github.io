@@ -15240,3 +15240,22 @@ Below we will compare the size of the bundle of `odf-operator`
 | odf-operator            | v4.9.0 - v4.10.5       | 57G  |
 | odf-operator            | v4.10.4                | 25G  |
 |-------------------------|----------------------- |----- |
+
+{% highlight yaml %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.8    
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true                                                        
+      packages:
+        - name: ocs-operator
+          minVersion: '4.8.13'
+          maxVersion: '4.8.13'
+          channels:
+                  - name: 'stable-4.8'
+{% endhighlight %}
+
