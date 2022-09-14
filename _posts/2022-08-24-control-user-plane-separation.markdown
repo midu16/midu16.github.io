@@ -589,9 +589,9 @@ By applying the routing config, we are going to send specific traffic from the p
 
 - `NorthBound routing config`:
 {% highlight bash %}
-iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f0 -j ACCEPT
-iptables -A FORWARD -i br-ex-ens7f0 -o ovn-k8s-mp0 -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -j MASQUERADE
+iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f0 -j ACCEPT -s 192.168.111.1
+iptables -A FORWARD -i br-ex-ens7f0 -o ovn-k8s-mp0 -m state -s 192.168.111.1 --state ESTABLISHED,RELATED -j ACCEPT
+iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -s 192.168.111.1 -j MASQUERADE
 {% endhighlight %}
 
 - `SouthBound routing config`:
