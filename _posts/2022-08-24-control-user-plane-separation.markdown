@@ -104,83 +104,132 @@ Once the installation is finished, the cluster status should be as displayed bel
 
 {% highlight bash %}
 oc get nodes
-NAME         STATUS   ROLES    AGE     VERSION
-cu-master1   Ready    master   38m     v1.23.5+012e945
-cu-master2   Ready    master   37m     v1.23.5+012e945
-cu-master3   Ready    master   37m     v1.23.5+012e945
-hub-node1    Ready    worker   9m41s   v1.23.5+012e945
-hub-node2    Ready    worker   3m1s    v1.23.5+012e945
-hub-node3    Ready    worker   4m10s   v1.23.5+012e945
+NAME         STATUS   ROLES    AGE   VERSION           INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                                                        KERNEL-VERSION                 CONTAINER-RUNTIME
+cu-master1   Ready    master   28h   v1.23.5+012e945   192.168.34.51   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+cu-master2   Ready    master   28h   v1.23.5+012e945   192.168.34.52   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+cu-master3   Ready    master   28h   v1.23.5+012e945   192.168.34.53   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+hub-node1    Ready    worker   28h   v1.23.5+012e945   192.168.34.31   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+hub-node2    Ready    worker   28h   v1.23.5+012e945   192.168.34.32   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+hub-node3    Ready    worker   28h   v1.23.5+012e945   192.168.34.33   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
 {% endhighlight %}
 
 
 Step 2. Day 2 operations
 
-Install the NMStateOperator:
+- Install the NMStateOperator steb-by-step:
 
 {% highlight bash %}
 cat << EOF | oc apply -f -
- apiVersion: v1
- kind: Namespace
- metadata:
-   labels:
-     kubernetes.io/metadata.name: openshift-nmstate
-     name: openshift-nmstate
+apiVersion: v1
+kind: Namespace
+metadata:
+ labels:
+   kubernetes.io/metadata.name: openshift-nmstate
    name: openshift-nmstate
- spec:
-   finalizers:
-   - kubernetes
- EOF
+ name: openshift-nmstate
+spec:
+ finalizers:
+ - kubernetes
+EOF
 namespace/openshift-nmstate created
 {% endhighlight %}
 
 {% highlight bash %}
 cat << EOF | oc apply -f -
- apiVersion: operators.coreos.com/v1
- kind: OperatorGroup
- metadata:
-   annotations:
-     olm.providedAPIs: NMState.v1.nmstate.io
-   generateName: openshift-nmstate-
-   name: openshift-nmstate-tn6k8
-   namespace: openshift-nmstate
- spec:
-   targetNamespaces:
-   - openshift-nmstate
- EOF
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+ annotations:
+   olm.providedAPIs: NMState.v1.nmstate.io
+ generateName: openshift-nmstate-
+ name: openshift-nmstate-tn6k8
+ namespace: openshift-nmstate
+spec:
+ targetNamespaces:
+ - openshift-nmstate
+EOF
 operatorgroup.operators.coreos.com/openshift-nmstate-tn6k8 created
 {% endhighlight %}
 
 {% highlight bash %}
 cat << EOF| oc apply -f -
- apiVersion: operators.coreos.com/v1alpha1
- kind: Subscription
- metadata:
-   labels:
-     operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
-   name: kubernetes-nmstate-operator
-   namespace: openshift-nmstate
- spec:
-   channel: stable
-   installPlanApproval: Automatic
-   name: kubernetes-nmstate-operator
-   source: redhat-operators
-   sourceNamespace: openshift-marketplace
- EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+ labels:
+   operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
+ name: kubernetes-nmstate-operator
+ namespace: openshift-nmstate
+spec:
+ channel: stable
+ installPlanApproval: Automatic
+ name: kubernetes-nmstate-operator
+ source: redhat-operators
+ sourceNamespace: openshift-marketplace
+EOF
 subscription.operators.coreos.com/kubernetes-nmstate-operator created
 {% endhighlight %}
 
 {% highlight bash %}
 cat << EOF | oc apply -f -
- apiVersion: nmstate.io/v1
- kind: NMState
- metadata:
-   name: nmstate
- EOF
+apiVersion: nmstate.io/v1
+kind: NMState
+metadata:
+ name: nmstate
+EOF
 nmstate.nmstate.io/nmstate created
 {% endhighlight %}
 
-Validating that the installation has succeeded:
+
+- Install the NMStateOperator all-in-one:
+
+{% highlight yaml %}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+ labels:
+   kubernetes.io/metadata.name: openshift-nmstate
+   name: openshift-nmstate
+ name: openshift-nmstate
+spec:
+ finalizers:
+ - kubernetes
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+ annotations:
+   olm.providedAPIs: NMState.v1.nmstate.io
+ generateName: openshift-nmstate-
+ name: openshift-nmstate-tn6k8
+ namespace: openshift-nmstate
+spec:
+ targetNamespaces:
+ - openshift-nmstate
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+ labels:
+   operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
+ name: kubernetes-nmstate-operator
+ namespace: openshift-nmstate
+spec:
+ channel: stable
+ installPlanApproval: Automatic
+ name: kubernetes-nmstate-operator
+ source: redhat-operators
+ sourceNamespace: openshift-marketplace
+---
+apiVersion: nmstate.io/v1
+kind: NMState
+metadata:
+ name: nmstate
+---
+{% endhighlight %}
+
+- Validating that the installation has succeeded:
 
 {% highlight bash %}
 oc get clusterserviceversion -n openshift-nmstate -o custom-columns=Name:.metadata.name,Phase:.status.phase
@@ -192,7 +241,7 @@ Check [more documentation on NMStateOperator for Openshiftv4.10][nmstateoperator
 
 [nmstateoperator-documentation]: https://docs.openshift.com/container-platform/4.10/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html
 
-Make sure that all the available worker nodes has the same NIC installed:
+- Make sure that all the available worker nodes has the same NIC installed:
 {% highlight bash %}
 ssh core@hub-node1 "ifconfig ens7f0"
 ens7f0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
@@ -304,9 +353,29 @@ spec:
         mtu: 1400
 {% endhighlight %}
 
+
+Once created the files, we will proceed by creating the configuration:
+{% highlight bash %}
+oc create -f br-ex-ens7f0-policy-hub-node1.yaml
+nodenetworkconfigurationpolicy.nmstate.io/br-ex-ens7f0-policy-hub-node1 created
+oc create -f br-ex-ens7f0-policy-hub-node2.yaml
+nodenetworkconfigurationpolicy.nmstate.io/br-ex-ens7f0-policy-hub-node2 created
+oc create -f br-ex-ens7f0-policy-hub-node3.yaml
+nodenetworkconfigurationpolicy.nmstate.io/br-ex-ens7f0-policy-hub-node3 created
+{% endhighlight %}
+
+Validating that the configuration was applied successfully to the nodes:
+{% highlight bash %}
+oc get NodeNetworkConfigurationPolicy
+NAME                            STATUS
+br-ex-ens7f0-policy-hub-node1   Available
+br-ex-ens7f0-policy-hub-node2   Available
+br-ex-ens7f0-policy-hub-node3   Available
+{% endhighlight %}
+
 [OVNKubernetes-documentation]: https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/networking/multiple-networks
 
-Configuring IP failover for the additional interface OCPv4.10
+- Configuring IP failover for the additional interface OCPv4.10
 
 For more documentation on [Configuring IP failover for additional interface OCPv4.10][vip-failover]
 
@@ -315,6 +384,20 @@ For more documentation on [Configuring IP failover for additional interface OCPv
 Create an IP failover service account:
 {% highlight bash %}
 oc create sa ipfailover
+{% endhighlight %}
+
+{% highlight bash %}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ipfailover-namespace
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ipfailover
+  namespace: ipfailover-namespace
 {% endhighlight %}
 
 Update security context constraints for `hostNetwork`:
@@ -329,20 +412,20 @@ Create a deployment yaml file to configure IP:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nb-ipfailover-keepalived
+  name: ipfailover-keepalived
   labels:
-    ipfailover: nb-openshift
+    ipfailover: ens7f0-openshift
 spec:
   strategy:
     type: Recreate
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
-      ipfailover: nb-openshift
+      ipfailover: ens7f0-openshift
   template:
     metadata:
       labels:
-        ipfailover: nb-openshift
+        ipfailover: ens7f0-openshift
     spec:
       serviceAccountName: ipfailover
       privileged: true
@@ -379,7 +462,7 @@ spec:
         - name: OPENSHIFT_HA_VIP_GROUPS
           value: "10"
         - name: OPENSHIFT_HA_NETWORK_INTERFACE
-          value: "ens7f0" #The host interface to assign the VIPs
+          value: "br-ex-ens7f0" #The host interface to assign the VIPs
         - name: OPENSHIFT_HA_MONITOR_PORT
           value: "30060"
         - name: OPENSHIFT_HA_VRRP_ID_OFFSET
@@ -394,12 +477,7 @@ spec:
           value: "INPUT"
         #- name: OPENSHIFT_HA_NOTIFY_SCRIPT
         #  value: /etc/keepalive/mynotifyscript.sh
-        - name: OPENSHIFT_HA
-
-When a Virtual IP (VIP) on a node leaves the fault state by passing the check script, the VIP on the node enters the backup state if it has lower priority than the VIP on the node that is currently in the master state. However, if the VIP on the node that is leaving fault state has a higher priority, the preemption strategy determines its role in the cluster.
-
-The nopreempt strategy does not move master from the lower priority VIP on the host to the higher priority VIP on the host. With preempt_delay 300, the default, Keepalived waits the specified 300 seconds and moves master to the higher priority VIP on the host.
-_CHECK_SCRIPT
+        - name: OPENSHIFT_HA_CHECK_SCRIPT
           value: "/etc/keepalive/mycheckscript.sh"
         - name: OPENSHIFT_HA_PREEMPTION
           value: "preempt_delay 300"
@@ -449,9 +527,11 @@ exit 0
 
 {% highlight bash %}
 oc create configmap mycustomcheck --from-file=mycheckscript.sh
+oc set env deploy/ipfailover-keepalived OPENSHIFT_HA_CHECK_SCRIPT=/etc/keepalive/mycheckscript.sh
+oc set volume deploy/ipfailover-keepalived --add --overwrite --name=config-volume --mount-path=/etc/keepalive --source='{"configMap": { "name": "mycustomcheck", "defaultMode": 493}}'
 {% endhighlight %}
 
-Configuring VRRP preemption
+- Configuring VRRP preemption
 
 When a Virtual IP (VIP) on a node leaves the fault state by passing the check script, the VIP on the node enters the backup state if it has lower priority than the VIP on the node that is currently in the master state. However, if the VIP on the node that is leaving fault state has a higher priority, the preemption strategy determines its role in the cluster.
 
@@ -461,6 +541,42 @@ The nopreempt strategy does not move master from the lower priority VIP on the h
 NOTE : If you are using OpenShift Container Platform health checks, the nature of IP failover and groups means that all instances in the group are not checked. For that reason, the [Kubernetes health checks must be used to ensure that services are live][K8s-health-checks].
 
 [K8s-health-checks]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+
+- Checking that the configuration was successfully:
+{% highlight bash %}
+oc get pods
+NAME                                     READY   STATUS    RESTARTS   AGE     IP              NODE        NOMINATED NODE   READINESS GATES
+ipfailover-keepalived-866f45865d-c6p7w   1/1     Running   0          3m28s   192.168.34.31   hub-node1   <none>           <none>
+ipfailover-keepalived-866f45865d-jxtx2   1/1     Running   0          3m28s   192.168.34.33   hub-node3   <none>           <none>
+ipfailover-keepalived-866f45865d-zh79t   1/1     Running   0          3m28s   192.168.34.32   hub-node2   <none>           <none>
+{% endhighlight %}
+
+- Validating the `br-ex-ens7f0` interface configuration until this point:
+{% highlight bash %}
+ssh core@hub-node1 "ip -f inet addr show br-ex-ens7f0"
+12: br-ex-ens7f0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1400 qdisc noqueue state DOWN group default qlen 1000
+    inet 192.168.111.2/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+{% endhighlight %}
+
+{% highlight bash %}
+ssh core@hub-node2 "ip -f inet addr show br-ex-ens7f0"
+23: br-ex-ens7f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default qlen 1000
+    inet 192.168.111.3/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+{% endhighlight %}
+
+{% highlight bash %}
+ssh core@hub-node3 "ip -f inet addr show br-ex-ens7f0"
+28: br-ex-ens7f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default qlen 1000
+    inet 192.168.111.4/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+    inet 192.168.111.1/32 scope global br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+{% endhighlight %}
+
+We can observe that the VIP has been alocated to `br-ex-ens7f0` interface of hub-node3.
 
 Step 3. Applying the MachineConfig
 
@@ -473,9 +589,9 @@ By applying the routing config, we are going to send specific traffic from the p
 
 - `NorthBound routing config`:
 {% highlight bash %}
-iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f0 -j ACCEPT
-iptables -A FORWARD -i br-ex-ens7f0 -o ovn-k8s-mp0 -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -j MASQUERADE
+iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f0 -j ACCEPT -s 192.168.111.1
+iptables -A FORWARD -i br-ex-ens7f0 -o ovn-k8s-mp0 -m state -s 192.168.111.1 --state ESTABLISHED,RELATED -j ACCEPT
+iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -s 192.168.111.1 -j MASQUERADE
 {% endhighlight %}
 
 - `SouthBound routing config`:
@@ -535,3 +651,47 @@ Step 4. Workflow architecture
 ![OCP IPI Workflow Architecture](/assets/images/NetworkSegregation.drawio.png)
 
 Once the `Step 2` it has been finished, you should have the above workflow architecture implemented.
+
+
+Step 5. Creating the command-pod for testing
+
+- Namespace and Pod defition object:
+{% highlight yaml %}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: command-pod-namespace
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: command-pod
+  namespace: command-pod-namespace
+  labels:
+    app: debug-application-pod
+spec:
+  nodeName: hub-node1
+  containers:
+  - name: command-pod
+    image: quay.io/midu/systat:latest
+    command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  restartPolicy: OnFailure
+{% endhighlight %}
+
+- Creating the pod on the specific node:
+{% highlight bash %}
+oc create -f command-pod.yaml
+{% endhighlight %}
+
+- Checking that the pod has been successful created:
+{% highlight bash %}
+oc get pods -n command-pod-namespace
+NAME          READY   STATUS    RESTARTS   AGE
+command-pod   1/1     Running   0          10s
+{% endhighlight %}
+
+- Connecting to the pod terminal:
+{% highlight bash %}
+oc rsh command-pod -n command-pod-namespace
+{% endhighlight %}
