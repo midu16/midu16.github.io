@@ -104,83 +104,132 @@ Once the installation is finished, the cluster status should be as displayed bel
 
 {% highlight bash %}
 oc get nodes
-NAME         STATUS   ROLES    AGE     VERSION
-cu-master1   Ready    master   38m     v1.23.5+012e945
-cu-master2   Ready    master   37m     v1.23.5+012e945
-cu-master3   Ready    master   37m     v1.23.5+012e945
-hub-node1    Ready    worker   9m41s   v1.23.5+012e945
-hub-node2    Ready    worker   3m1s    v1.23.5+012e945
-hub-node3    Ready    worker   4m10s   v1.23.5+012e945
+NAME         STATUS   ROLES    AGE   VERSION           INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                                                        KERNEL-VERSION                 CONTAINER-RUNTIME
+cu-master1   Ready    master   28h   v1.23.5+012e945   192.168.34.51   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+cu-master2   Ready    master   28h   v1.23.5+012e945   192.168.34.52   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+cu-master3   Ready    master   28h   v1.23.5+012e945   192.168.34.53   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+hub-node1    Ready    worker   28h   v1.23.5+012e945   192.168.34.31   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+hub-node2    Ready    worker   28h   v1.23.5+012e945   192.168.34.32   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
+hub-node3    Ready    worker   28h   v1.23.5+012e945   192.168.34.33   <none>        Red Hat Enterprise Linux CoreOS 410.84.202207140725-0 (Ootpa)   4.18.0-305.49.1.el8_4.x86_64   cri-o://1.23.3-10.rhaos4.10.git84a5d4b.el8
 {% endhighlight %}
 
 
 Step 2. Day 2 operations
 
-Install the NMStateOperator:
+- Install the NMStateOperator steb-by-step:
 
 {% highlight bash %}
 cat << EOF | oc apply -f -
- apiVersion: v1
- kind: Namespace
- metadata:
-   labels:
-     kubernetes.io/metadata.name: openshift-nmstate
-     name: openshift-nmstate
+apiVersion: v1
+kind: Namespace
+metadata:
+ labels:
+   kubernetes.io/metadata.name: openshift-nmstate
    name: openshift-nmstate
- spec:
-   finalizers:
-   - kubernetes
- EOF
+ name: openshift-nmstate
+spec:
+ finalizers:
+ - kubernetes
+EOF
 namespace/openshift-nmstate created
 {% endhighlight %}
 
 {% highlight bash %}
 cat << EOF | oc apply -f -
- apiVersion: operators.coreos.com/v1
- kind: OperatorGroup
- metadata:
-   annotations:
-     olm.providedAPIs: NMState.v1.nmstate.io
-   generateName: openshift-nmstate-
-   name: openshift-nmstate-tn6k8
-   namespace: openshift-nmstate
- spec:
-   targetNamespaces:
-   - openshift-nmstate
- EOF
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+ annotations:
+   olm.providedAPIs: NMState.v1.nmstate.io
+ generateName: openshift-nmstate-
+ name: openshift-nmstate-tn6k8
+ namespace: openshift-nmstate
+spec:
+ targetNamespaces:
+ - openshift-nmstate
+EOF
 operatorgroup.operators.coreos.com/openshift-nmstate-tn6k8 created
 {% endhighlight %}
 
 {% highlight bash %}
 cat << EOF| oc apply -f -
- apiVersion: operators.coreos.com/v1alpha1
- kind: Subscription
- metadata:
-   labels:
-     operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
-   name: kubernetes-nmstate-operator
-   namespace: openshift-nmstate
- spec:
-   channel: stable
-   installPlanApproval: Automatic
-   name: kubernetes-nmstate-operator
-   source: redhat-operators
-   sourceNamespace: openshift-marketplace
- EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+ labels:
+   operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
+ name: kubernetes-nmstate-operator
+ namespace: openshift-nmstate
+spec:
+ channel: stable
+ installPlanApproval: Automatic
+ name: kubernetes-nmstate-operator
+ source: redhat-operators
+ sourceNamespace: openshift-marketplace
+EOF
 subscription.operators.coreos.com/kubernetes-nmstate-operator created
 {% endhighlight %}
 
 {% highlight bash %}
 cat << EOF | oc apply -f -
- apiVersion: nmstate.io/v1
- kind: NMState
- metadata:
-   name: nmstate
- EOF
+apiVersion: nmstate.io/v1
+kind: NMState
+metadata:
+ name: nmstate
+EOF
 nmstate.nmstate.io/nmstate created
 {% endhighlight %}
 
-Validating that the installation has succeeded:
+
+- Install the NMStateOperator all-in-one:
+
+{% highlight yaml %}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+ labels:
+   kubernetes.io/metadata.name: openshift-nmstate
+   name: openshift-nmstate
+ name: openshift-nmstate
+spec:
+ finalizers:
+ - kubernetes
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+ annotations:
+   olm.providedAPIs: NMState.v1.nmstate.io
+ generateName: openshift-nmstate-
+ name: openshift-nmstate-tn6k8
+ namespace: openshift-nmstate
+spec:
+ targetNamespaces:
+ - openshift-nmstate
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+ labels:
+   operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
+ name: kubernetes-nmstate-operator
+ namespace: openshift-nmstate
+spec:
+ channel: stable
+ installPlanApproval: Automatic
+ name: kubernetes-nmstate-operator
+ source: redhat-operators
+ sourceNamespace: openshift-marketplace
+---
+apiVersion: nmstate.io/v1
+kind: NMState
+metadata:
+ name: nmstate
+---
+{% endhighlight %}
+
+- Validating that the installation has succeeded:
 
 {% highlight bash %}
 oc get clusterserviceversion -n openshift-nmstate -o custom-columns=Name:.metadata.name,Phase:.status.phase
