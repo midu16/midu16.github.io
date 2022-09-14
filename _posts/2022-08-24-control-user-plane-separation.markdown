@@ -535,3 +535,47 @@ Step 4. Workflow architecture
 ![OCP IPI Workflow Architecture](/assets/images/NetworkSegregation.drawio.png)
 
 Once the `Step 2` it has been finished, you should have the above workflow architecture implemented.
+
+
+Step 5. Creating the command-pod for testing
+
+- Namespace and Pod defition object:
+{% highlight yaml %}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: command-pod-namespace
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: command-pod
+  namespace: command-pod-namespace
+  labels:
+    app: debug-application-pod
+spec:
+  nodeName: hub-node1
+  containers:
+  - name: command-pod
+    image: quay.io/midu/systat:latest
+    command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  restartPolicy: OnFailure
+{% endhighlight %}
+
+- Creating the pod on the specific node:
+{% highlight bash %}
+oc create -f command-pod.yaml
+{% endhighlight %}
+
+- Checking that the pod has been successful created:
+{% highlight bash %}
+oc get pods -n command-pod-namespace
+NAME          READY   STATUS    RESTARTS   AGE
+command-pod   1/1     Running   0          10s
+{% endhighlight %}
+
+- Connecting to the pod terminal:
+{% highlight bash %}
+oc rsh command-pod -n command-pod-namespace
+{% endhighlight %}
