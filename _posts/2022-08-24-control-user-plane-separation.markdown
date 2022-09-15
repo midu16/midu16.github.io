@@ -679,7 +679,7 @@ ip route add 192.168.111.0/24 dev br-ex-ens7f0 src 192.168.111.1
 
 Define the static routing imperative definition for `br-ex-ens7f1` :
 {% highlight bash %}
-ip route add 192.168.111.0/24 dev br-ex-ens7f1 src 10.10.10.1
+ip route add 10.10.10.0/24 dev br-ex-ens7f1 src 10.10.10.1
 {% endhighlight %}
 
 Where the address `192.168.111.1` its the VIP for the NorthBound interface and `10.10.10.1` its the VIP for the SouthBound interface.
