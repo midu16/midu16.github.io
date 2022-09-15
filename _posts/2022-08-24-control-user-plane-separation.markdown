@@ -241,6 +241,10 @@ Check [more documentation on NMStateOperator for Openshiftv4.10][nmstateoperator
 
 [nmstateoperator-documentation]: https://docs.openshift.com/container-platform/4.10/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html
 
+The NMStateOperator status from the `web-console`
+
+![NMStateOperator Status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-22 Installed Operators · Red Hat OpenShift Container Platform.png)
+
 - Make sure that all the available worker nodes has the same NIC installed:
 {% highlight bash %}
 ssh core@hub-node1 "ifconfig ens7f0"
