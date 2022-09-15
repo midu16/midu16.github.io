@@ -245,6 +245,10 @@ The NMStateOperator status from the `web-console`
 
 ![NMStateOperator Status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-22 Installed Operators · Red Hat OpenShift Container Platform.png)
 
+The NMStateOperator pods state from the `web-console`
+
+![NMStateOperator pods status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-57 Pods · Red Hat OpenShift Container Platform.png)
+
 - Make sure that all the available worker nodes has the same NIC installed:
 {% highlight bash %}
 ssh core@hub-node1 "ifconfig ens7f0"
