@@ -241,6 +241,14 @@ Check [more documentation on NMStateOperator for Openshiftv4.10][nmstateoperator
 
 [nmstateoperator-documentation]: https://docs.openshift.com/container-platform/4.10/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html
 
+The NMStateOperator status from the `web-console`
+
+![NMStateOperator Status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-22 Installed Operators · Red Hat OpenShift Container Platform.png)
+
+The NMStateOperator pods state from the `web-console`
+
+![NMStateOperator pods status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-57 Pods · Red Hat OpenShift Container Platform.png)
+
 - Make sure that all the available worker nodes has the same NIC installed:
 {% highlight bash %}
 ssh core@hub-node1 "ifconfig ens7f0"
@@ -578,11 +586,107 @@ ssh core@hub-node3 "ip -f inet addr show br-ex-ens7f0"
 
 We can observe that the VIP has been alocated to `br-ex-ens7f0` interface of hub-node3.
 
+- Validating that the Out-Bound traffic its using as `srcIP: 192.168.111.1`:
+
+Making sure that one of the worker nodes have the VIP associated on the `br-ex-ens7f0` interface:
+{% highlight bash %}
+ssh core@hub-node3 "ip -f inet addr show br-ex-ens7f0"
+28: br-ex-ens7f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default qlen 1000
+    inet 192.168.111.4/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+    inet 192.168.111.1/32 scope global br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+ssh core@hub-node2 "ip -f inet addr show br-ex-ens7f0"
+23: br-ex-ens7f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default qlen 1000
+    inet 192.168.111.3/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+ssh core@hub-node1 "ip -f inet addr show br-ex-ens7f0"
+12: br-ex-ens7f0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1400 qdisc noqueue state DOWN group default qlen 1000
+    inet 192.168.111.2/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+{% endhighlight %}
+
+On the `hub-node2` listen on the physical `ens7f0` interface traffic and filter by `icmp`:
+{% highlight bash %}
+tcpdump -i ens7f0 icmp -vvne
+dropped privs to tcpdump
+tcpdump: listening on ens7f0, link-type EN10MB (Ethernet), capture size 262144 bytes
+05:15:00.853295 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 51770, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 915, length 64
+05:15:00.853328 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 47096, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 915, length 64
+05:15:01.877298 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 52403, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 916, length 64
+05:15:01.877330 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 47192, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 916, length 64
+05:15:02.901298 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 53189, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 917, length 64
+05:15:02.901331 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 47629, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 917, length 64
+05:15:03.925295 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 54188, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 918, length 64
+05:15:03.925320 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 47749, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 918, length 64
+05:15:04.949302 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 54957, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 919, length 64
+05:15:04.949324 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 48058, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 919, length 64
+05:15:05.973419 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 55575, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 920, length 64
+05:15:05.973451 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 48492, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 920, length 64
+05:15:06.997299 04:3f:72:f0:15:3e > 04:3f:72:f0:15:32, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 55981, offset 0, flags [DF], proto ICMP (1), length 84)
+    192.168.111.1 > 192.168.111.3: ICMP echo request, id 51299, seq 921, length 64
+05:15:06.997321 04:3f:72:f0:15:32 > 04:3f:72:f0:15:3e, ethertype IPv4 (0x0800), length 98: (tos 0x0, ttl 64, id 49037, offset 0, flags [none], proto ICMP (1), length 84)
+    192.168.111.3 > 192.168.111.1: ICMP echo reply, id 51299, seq 921, length 64
+{% endhighlight %}
+
+Source MAC_ADDR:
+{% highlight bash %}
+ip -f inet addr show br-ex-ens7f0
+12: br-ex-ens7f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default qlen 1000
+    link/ether 04:3f:72:f0:15:3e brd ff:ff:ff:ff:ff:ff
+     inet 192.168.111.4/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+    inet 192.168.111.1/32 scope global br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+{% endhighlight %}
+
+Destination MAC_ADDR:
+{% highlight bash %}
+ip -f inet addr show br-ex-ens7f0
+23: br-ex-ens7f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default qlen 1000
+    link/ether 04:3f:72:f0:15:32 brd ff:ff:ff:ff:ff:ff
+     inet 192.168.111.3/24 brd 192.168.111.255 scope global noprefixroute br-ex-ens7f0
+       valid_lft forever preferred_lft forever
+{% endhighlight %}
+
+As we can observe the traffic from the `hub-node3` to `hub-node2` its using as the source IP address the VIP.
+
 Step 3. Applying the MachineConfig
 
-In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`.
+In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`, as well we will maintain the routes for `br-ex-ens7f0` and `br-ex-ens7f1` to use the VIP as the source IP address for the Outbound traffic.
+
 
 ![OCP flow Architecture](/assets/images/cu-separation.png)
+
+By applying the following routing config, we are going to instruct the host routing table to use the VIP as the source IP Address for the Outbound traffic. Since the service is replicated on the nodes, and there is created a High Availability from the cluster perspective, this will allow to have a unified addressing.
+
+Define the static routing imperative definition for `br-ex-ens7f0` :
+{% highlight bash %}
+ip route add 192.168.111.0/24 dev br-ex-ens7f0 src 192.168.111.1
+{% endhighlight %}
+
+Define the static routing imperative definition for `br-ex-ens7f1` :
+{% highlight bash %}
+ip route add 10.10.10.0/24 dev br-ex-ens7f1 src 10.10.10.1
+{% endhighlight %}
+
+Where the address `192.168.111.1` its the VIP for the NorthBound interface and `10.10.10.1` its the VIP for the SouthBound interface.
+
+Define the static routing [declarative definition using MachineConfig][static-routing-with-machine-config] for `br-ex-ens7f0` :
+
+[static-routing-with-machine-config]: https://access.redhat.com/solutions/5423561
 
 
 By applying the routing config, we are going to send specific traffic from the pods in charge of the `NorthBound` processing and the traffic from the pods in charge of the `SouthBound` processing to the corresponding interface. This will allow the `UserPlane` traffic from the pods hoasted on the worker nodes from the worker nodes through a dedicated interface withouth applying any rules at this moment. Any traffic rules can be applied on the edge switch.
@@ -593,6 +697,8 @@ iptables -A FORWARD -i ovn-k8s-mp0 -o br-ex-ens7f0 -j ACCEPT -s 192.168.111.1
 iptables -A FORWARD -i br-ex-ens7f0 -o ovn-k8s-mp0 -m state -s 192.168.111.1 --state ESTABLISHED,RELATED -j ACCEPT
 iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -s 192.168.111.1 -j MASQUERADE
 {% endhighlight %}
+
+iptables -t nat -A POSTROUTING -o br-ex-ens7f0 -s 127.0.1.1 -p all -j SNAT --to 192.168.111.1
 
 - `SouthBound routing config`:
 {% highlight bash %}
