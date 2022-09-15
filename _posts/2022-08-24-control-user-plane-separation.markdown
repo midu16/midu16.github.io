@@ -665,9 +665,28 @@ As we can observe the traffic from the `hub-node3` to `hub-node2` its using as t
 
 Step 3. Applying the MachineConfig
 
-In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`.
+In this step, we are going to apply the Machineconfig.yaml file to configure on the `worker-nodes` routes the traffic from the `pods-network-subnet` to the `Northbound interface` and `Southbound interface`, as well we will maintain the routes for `br-ex-ens7f0` and `br-ex-ens7f1` to use the VIP as the source IP address for the Outbound traffic.
+
 
 ![OCP flow Architecture](/assets/images/cu-separation.png)
+
+By applying the following routing config, we are going to instruct the host routing table to use the VIP as the source IP Address for the Outbound traffic. Since the service is replicated on the nodes, and there is created a High Availability from the cluster perspective, this will allow to have a unified addressing.
+
+Define the static routing imperative definition for `br-ex-ens7f0` :
+{% highlight bash %}
+ip route add 192.168.111.0/24 dev br-ex-ens7f0 src 192.168.111.1
+{% endhighlight %}
+
+Define the static routing imperative definition for `br-ex-ens7f1` :
+{% highlight bash %}
+ip route add 192.168.111.0/24 dev br-ex-ens7f1 src 10.10.10.1
+{% endhighlight %}
+
+Where the address `192.168.111.1` its the VIP for the NorthBound interface and `10.10.10.1` its the VIP for the SouthBound interface.
+
+Define the static routing [declarative definition using MachineConfig][static-routing-with-machine-config] for `br-ex-ens7f0` :
+
+[static-routing-with-machine-config]: https://access.redhat.com/solutions/5423561
 
 
 By applying the routing config, we are going to send specific traffic from the pods in charge of the `NorthBound` processing and the traffic from the pods in charge of the `SouthBound` processing to the corresponding interface. This will allow the `UserPlane` traffic from the pods hoasted on the worker nodes from the worker nodes through a dedicated interface withouth applying any rules at this moment. Any traffic rules can be applied on the edge switch.
