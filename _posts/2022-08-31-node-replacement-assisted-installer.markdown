@@ -9,8 +9,63 @@ In the following post, we are going to talk on how to perform a node replacement
 Prerequisites
 
 - OCPv4.10.X installed using AssistedInstaller.
+- skopeo cli available. For more information on how to [install container tools][container-tools].
 
+[container-tools]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index?extIdCarryOver=true&sc_cid=701f2000001OH7JAAW
 
+Step 0. How to mirror the `quay.io` container base images to the offline registry
+
+The list of the used container based images in this tutorial are:
+{% highlight bash %}
+quay.io/centos7/httpd-24-centos7:latest
+quay.io/coreos/butane:release
+quay.io/coreos/coreos-installer:release
+{% endhighlight %}
+
+In order to mirror those images to the offline registry:
+{% highlight bash %}
+skopeo copy docker://quay.io/centos7/httpd-24-centos7:latest docker://INBACRNRDL0100.offline.oxtechnix.lan:5000/centos7/httpd-24-centos7:latest --dest-tls-verify=false
+{% endhighlight %}
+
+Validating that the image its available on the offline registry:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+    "centos7/httpd-24-centos7"
+    ]
+  }
+{% endhighlight %}
+
+{% highlight bash %}
+skopeo copy docker://quay.io/coreos/butane:release docker://INBACRNRDL0100.offline.oxtechnix.lan:5000/coreos/butane:release --dest-tls-verify=false
+{% endhighlight %}
+
+Validating that the image its available on the offline registry:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+  "coreos/butane"
+    ]
+  }
+{% endhighlight %}
+
+{% highlight bash %}
+skopeo copy docker://quay.io/coreos/coreos-installer:release docker://INBACRNRDL0100.offline.oxtechnix.lan:5000/coreos/coreos-installer:release --dest-tls-verify=false
+{% endhighlight %}
+
+Validating that the image its available on the offline registry:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+  "coreos/coreos-installer"
+    ]
+  }
+{% endhighlight %}
+
+If this step its implemented, you will need on further steps to replace the `quay.io/centos7/` with `INBACRNRDL0100.offline.oxtechnix.lan:5000/centos7/` and `quay.io/coreos/` with `INBACRNRDL0100.offline.oxtechnix.lan:5000/coreos/` in order to use the offline registry as a source and not the public registry.
 
 Step 1. How to change the state of the nodes after the Assisted Installer finished
 
@@ -482,6 +537,11 @@ Running the podman service that is exposing the files for further use:
 {% endhighlight %}
 - Boot the node using the `Virtual CD/DVD/ISO` boot mode and boot with it.
 
+Once the right booting control has been chosen you will be able to see in your virtual console the following:
+
+![RHCOS Initial Boot Stage](/assets/images/rpviewer.png)
+
+
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
 {% highlight bash %}
 sudo nmcli connection show
@@ -503,7 +563,7 @@ Step 5.2. Reinstall of the removed node by building the `RHCOS`
 
 [sysconfig-network-config]: https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/
 
-In the `Step5.1 ` we introduced the procedure of reinstalling of the removed node in a more decoupled procedure way. The purpose of the `Step5.2` its to centralized all the customisations pre-mounting the iso to the virtual-console of the server.
+In the `Step5.1 ` we introduced the procedure of reinstalling of the removed node in a more decoupled manner. The purpose of the `Step5.2` its to centralized all the customisations pre-mounting the iso to the virtual-console of the server.
 
 - On the ProvisioningNode we will need to create the directory for each OCP node:
 {% highlight bash %}
