@@ -552,6 +552,10 @@ sudo nmcli con mod "eno12399" ipv4.dns 192.168.34.20
 sudo nmcli con up "eno12399"
 {% endhighlight %}
 
+In case you are using a bonding configuration on your cluster, check more details [here][nmcli-bonding-config].
+
+[nmcli-bonding-config]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-network_bonding_using_the_networkmanager_command_line_tool_nmcli
+
 - Start the installation of the RHCOS to the selected root disk:
 {% highlight bash %}
 sudo coreos-installer install /dev/sdb --ignition-url http://192.168.34.20:9092/discovery/master.ign --insecure-ignition --copy-network
