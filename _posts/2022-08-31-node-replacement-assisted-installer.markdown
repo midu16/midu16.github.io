@@ -543,6 +543,8 @@ Once the right booting control has been chosen you will be able to see in your v
 
 
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
+NOTE: In case you are using a different network configuration you will need to adapt it to reflect your environment. The below its a example that reflects the configuration on the test cluster.
+
 {% highlight bash %}
 sudo nmcli connection show
 sudo nmcli con mod "eno12399" ipv4.addresses "192.168.34.53/25"
