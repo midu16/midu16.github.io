@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Control Node replacement on Openshift 4 using AssistedInstaller!"
+title:  "Control Node replacement on Openshift 4 for AssistedInstaller!"
 date:   2022-09-06 10:10:29 +0200
 categories: openshift4
 ---
@@ -9,7 +9,9 @@ In the following post, we are going to talk on how to perform a node replacement
 Prerequisites
 
 - OCPv4.10.X installed using AssistedInstaller.
-- skopeo cli available. For more information on how to [install container tools][container-tools].
+- skopeo cli available.
+- podman cli available.  For more information on how to [install container tools][container-tools].
+- internet connection (through a proxy).
 
 [container-tools]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index?extIdCarryOver=true&sc_cid=701f2000001OH7JAAW
 
