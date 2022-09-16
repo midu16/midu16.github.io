@@ -4,7 +4,7 @@ title:  "Control Node replacement on Openshift 4 for AssistedInstaller!"
 date:   2022-09-06 10:10:29 +0200
 categories: openshift4
 ---
-In the following post, we are going to talk on how to perform a node replacement (control or worker node) of OCPv4.10.X.
+In the following post, we are going to talk on how to perform a node replacement (control node) of OCPv4.10.X.
 
 Prerequisites
 
