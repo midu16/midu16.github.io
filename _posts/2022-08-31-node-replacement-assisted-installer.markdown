@@ -537,6 +537,11 @@ Running the podman service that is exposing the files for further use:
 {% endhighlight %}
 - Boot the node using the `Virtual CD/DVD/ISO` boot mode and boot with it.
 
+Once the right booting control has been chosen you will be able to see in your virtual console the following:
+
+![RHCOS Initial Boot Stage](/assets/images/rpviewer.png)
+
+
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
 {% highlight bash %}
 sudo nmcli connection show
