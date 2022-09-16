@@ -545,6 +545,7 @@ Once the right booting control has been chosen you will be able to see in your v
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
 NOTE: In case you are using a different network configuration you will need to adapt it to reflect your environment. The below its a example that reflects the configuration on the test cluster.
 
+Configuring an ethernet connection of the node:
 {% highlight bash %}
 sudo nmcli connection show
 sudo nmcli con mod "eno12399" ipv4.addresses "192.168.34.53/25"
@@ -557,6 +558,31 @@ sudo nmcli con up "eno12399"
 In case you are using a bonding configuration on your cluster, check more details [here][nmcli-bonding-config].
 
 [nmcli-bonding-config]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-network_bonding_using_the_networkmanager_command_line_tool_nmcli
+
+Configuring an bond mode 1 connection of the node:
+{% highlight bash %}
+sudo nmcli connection show
+sudo nmcli connection add type bond ifname bond0 mode 1
+sudo nmcli connection add type bond-slave ifname eno1 master bond0
+sudo nmcli connection add type bond-slave ifname eno2 master bond0
+{% endhighlight %}
+
+Configuring an bond mode 4 connection of the node:
+{% highlight bash %}
+sudo nmcli connection show
+sudo nmcli connection add type bond ifname bond0 mode 4
+sudo nmcli connection add type bond-slave ifname eno1 master bond0
+sudo nmcli connection add type bond-slave ifname eno2 master bond0
+{% endhighlight %}
+
+For both situation of monding above the administrator needs to configure the IP address of the `bond0` interface:
+{% highlight bash %}
+sudo nmcli con mod "bond0" ipv4.addresses "192.168.34.53/25"
+sudo nmcli con mod "bond0" ipv4.method manual
+sudo nmcli con mod "bond0" ipv4.gateway 192.168.34.1
+sudo nmcli con mod "bond0" ipv4.dns 192.168.34.20
+sudo nmcli con up "bond0"
+{% endhighlight %}
 
 - Start the installation of the RHCOS to the selected root disk:
 {% highlight bash %}
