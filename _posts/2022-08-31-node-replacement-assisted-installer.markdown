@@ -539,10 +539,13 @@ Running the podman service that is exposing the files for further use:
 {% endhighlight %}
 - Boot the node using the `Virtual CD/DVD/ISO` boot mode and boot with it.
 
+![RHCOS Initial Boot Order](/assets/images/rpviewer1.png)
+
 Once the right booting control has been chosen you will be able to see in your virtual console the following:
 
 ![RHCOS Initial Boot Stage](/assets/images/rpviewer.png)
 
+In this example the RHCOS image its `Red Hat Enterprise Linux CoreOS 410.84.202208030316-0 (Ootpa) 4.10`, this represents an indicator of the image that its usind in the procedure.
 
 - Once the RHCOS booted up, you will need to define the `baremetal` interface:
 NOTE: In case you are using a different network configuration you will need to adapt it to reflect your environment. The below its a example that reflects the configuration on the test cluster.
