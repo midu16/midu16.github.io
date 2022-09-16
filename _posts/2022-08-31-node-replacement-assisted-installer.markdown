@@ -13,7 +13,7 @@ Prerequisites
 
 [container-tools]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index?extIdCarryOver=true&sc_cid=701f2000001OH7JAAW
 
-Step 0 How to mirror the `quay.io` container base images to the offline registry
+Step 0. How to mirror the `quay.io` container base images to the offline registry
 
 The list of the used container based images in this tutorial are:
 {% highlight bash %}
