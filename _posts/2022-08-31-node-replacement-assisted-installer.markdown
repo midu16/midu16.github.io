@@ -666,7 +666,7 @@ storage:
           interface-name=eno12399
           [ipv4]
           address1=192.168.43.53/25,192.168.43.1
-          dns=8.8.8.8;
+          dns=192.168.34.20;192.168.34.21
           dns-search=
           may-fail=false
           method=manual
