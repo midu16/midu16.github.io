@@ -563,7 +563,7 @@ Step 5.2. Reinstall of the removed node by building the `RHCOS`
 
 [sysconfig-network-config]: https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/
 
-In the `Step5.1 ` we introduced the procedure of reinstalling of the removed node in a more decoupled procedure way. The purpose of the `Step5.2` its to centralized all the customisations pre-mounting the iso to the virtual-console of the server.
+In the `Step5.1 ` we introduced the procedure of reinstalling of the removed node in a more decoupled manner. The purpose of the `Step5.2` its to centralized all the customisations pre-mounting the iso to the virtual-console of the server.
 
 - On the ProvisioningNode we will need to create the directory for each OCP node:
 {% highlight bash %}
