@@ -586,6 +586,26 @@ sudo nmcli con mod "bond0" ipv4.dns 192.168.34.20
 sudo nmcli con up "bond0"
 {% endhighlight %}
 
+- In the case you are using a root disk over SAN with multipath:
+{% highlight bash %}
+sudo modprobe dm-multipath
+sudo modprobe dm-round-robin
+sudo multipathd -v0
+sudo mpathconf --enable
+sudo systemctl restart multipathd.service
+sudo multipath -ll
+{% endhighlight %}
+
+- Validate that your LUN disks are available:
+{% highlight bash %}
+sudo multipath -ll
+{% endhighlight %}
+
+NOTE: The `multipathd.service` its enabled only for the time until the next reboot has been issued. In order to enable the multipath permanent for [iscsi][multipath-enable-iscsi], if you want to [enable multipath in ocp][multipath-enable-ocp-kernel].
+
+[multipath-enable-iscsi]: https://access.redhat.com/solutions/5607891
+[multipath-enable-ocp-kernel]: https://docs.openshift.com/container-platform/4.10/post_installation_configuration/machine-configuration-tasks.html#rhcos-enabling-multipath-day-2_post-install-machine-configuration-tasks
+
 - Start the installation of the RHCOS to the selected root disk:
 {% highlight bash %}
 sudo coreos-installer install /dev/sdb --ignition-url http://192.168.34.20:9092/discovery/master.ign --insecure-ignition --copy-network
