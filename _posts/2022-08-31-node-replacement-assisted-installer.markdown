@@ -811,6 +811,12 @@ Once the newly added control plane node it has booted with the .iso image, you w
 sudo coreos-installer install /dev/sdb --copy-network
 {% endhighlight %}
 
+If you are using a multipath root disk over SAN you will need to install the RHCOS:
+{% highlight bash %}
+sudo coreos-installer install /dev/dm-0 --append-karg rd.multipath=default --append-karg root=/dev/disk/by-label/dm-mpath-root --append-karg=rw --copy-network
+{% endhighlight %}
+
+NOTE: The following parameter flags: `--append-karg rd.multipath=default --append-karg root=/dev/disk/by-label/dm-mpath-root --append-karg=rw` are emabling the multipath flags in kernel.
 
 Step 6. Approving the new node certificates
 
