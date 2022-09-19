@@ -614,6 +614,11 @@ NOTE: The `multipathd.service` its enabled only for the time until the next rebo
 sudo coreos-installer install /dev/sdb --ignition-url http://192.168.34.20:9092/discovery/master.ign --insecure-ignition --copy-network
 {% endhighlight %}
 
+If you are using a multipath root disk over SAN you will need to install the RHCOS:
+{% highlight bash %}
+sudo coreos-installer install /dev/dm-0 --append-karg rd.multipath=default --append-karg root=/dev/disk/by-label/dm-mpath-root --append-karg=rw --ignition-url http://192.168.34.20:9092/discovery/master.ign --insecure-ignition --copy-network
+{% endhighlight %}
+
 NOTE: This proses will take some time until its finished, once this its finished the node will reboot and boot using the root disk.
 
 Step 5.2. Reinstall of the removed node by building the `RHCOS`
