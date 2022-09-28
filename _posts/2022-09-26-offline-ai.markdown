@@ -17,6 +17,7 @@ Prerequisites
 
 Step 1. Mirroring the OpenShift Assisted Installer Service
 
+- Mirroring the container base images:
 {% highlight bash %}
 PULL_SECRET_PATH=${HOME}/pull-secret.json
 LOCAL_REGISTRY=INBACRNRDL0100.offline.oxtechnix.lan
@@ -32,25 +33,208 @@ oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-iso-create:late
 oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-installer:latest ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-installer:latest --insecure
 oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-installer-controller:latest ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-installer-controller:latest --insecure
 oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-service:latest ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-service:latest --insecure
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/$IMAGE:latest ${LOCAL_REGISTRY}:5000/edge-infrastructure/$IMAGE:latest
 
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/ocp-metal-ui:stable ${LOCAL_REGISTRY}:5000/ocpmetal/ocp-metal-ui:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-iso-create:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-iso-create:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-installer:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-installer:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-installer-controller:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-installer-controller:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-service:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-service:stable
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/ocp-metal-ui:stable ${LOCAL_REGISTRY}:5000/ocpmetal/ocp-metal-ui:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-iso-create:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-iso-create:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-installer:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-installer:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-installer-controller:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-installer-controller:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/ocpmetal/assisted-service:stable ${LOCAL_REGISTRY}:5000/ocpmetal/assisted-service:stable --insecure
 
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer-agent:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer-agent:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer-controller:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer-controller:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-service:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-service:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-image-service:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-image-service:stable
-oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer-ui:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer-ui:stable
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer-agent:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer-agent:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer-controller:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer-controller:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-service:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-service:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-image-service:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-image-service:stable --insecure
+oc -a ${PULL_SECRET_PATH} image mirror quay.io/edge-infrastructure/assisted-installer-ui:stable ${LOCAL_REGISTRY}:5000/edge-infrastructure/assisted-installer-ui:stable --insecure
 {% endhighlight %}
 
+- Validating the content of the Offline registry:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://INBACRNRDL0100.offline.oxtechnix.lan:5000/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+    "centos7/httpd-24-centos7",
+    "coreos/butane",
+    "coreos/coreos-installer",
+    "edge-infrastructure/assisted-image-service",
+    "edge-infrastructure/assisted-installer",
+    "edge-infrastructure/assisted-installer-agent",
+    "edge-infrastructure/assisted-installer-controller",
+    "edge-infrastructure/assisted-installer-ui",
+    "edge-infrastructure/assisted-service",
+    "library/haproxy",
+    "library/nginx",
+    "ocpmetal/agent",
+    "ocpmetal/assisted-installer",
+    "ocpmetal/assisted-installer-agent",
+    "ocpmetal/assisted-installer-controller",
+    "ocpmetal/assisted-iso-create",
+    "ocpmetal/assisted-service",
+    "ocpmetal/ocp-metal-ui",
+    "ocpmetal/postgresql-12-centos7"
+  ]
+}
+{% endhighlight %}
 
 Step 2. OpenShift and Assisted Installer Service Configuration Files
 
+- Creating the path:
+{% highlight bash %}
+export MIRROR_BASE_PATH=/apps
+mkdir -p $MIRROR_BASE_PATH/{mirror-ingress/{haproxy,nginx/templates/,scripts}/,ai-svc/{local-store,volumes/{db,opt,imgsvc}}/,auth,dns,pki,downloads/{images,olm,rhcos,tools}}
+{% endhighlight %}
+
+- Validating that the proper path has been created:
+{% highlight bash %}
+tree mirror-ingress/
+mirror-ingress/
+├── haproxy
+├── nginx
+│   └── templates
+└── scripts
+
+4 directories, 0 files
+
+tree ai-svc/
+ai-svc/
+├── cluster-versions.json
+├── local-store
+└── volumes
+    ├── db
+    ├── imgsvc
+    └── opt
+
+5 directories, 1 file
+
+{% endhighlight %}
+
+In order to interact with the RH APIs you need an [Offline Token][offline-token-api].
+[offline-token-api]: https://access.redhat.com/management/api
+
+Save the Offline Token to a file in the Mirror VM at `/apps/mirror-ingress/rh-api-offline-token`.
+{% highlight bash %}
+RH_OFFLINE_TOKEN=$(cat /apps/mirror-ingress/rh-api-offline-token)
+export ACCESS_TOKEN=$(curl -s --fail https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$RH_OFFLINE_TOKEN | jq .access_token  | tr -d '"')
+QUERY_CLUSTER_VERSIONS_REQUEST=$(curl -s --fail --header "Authorization: Bearer $ACCESS_TOKEN" --header "Content-Type: application/json" --header "Accept: application/json" --request GET "https://api.openshift.com/api/assisted-install/v2/openshift-versions")
+echo $QUERY_CLUSTER_VERSIONS_REQUEST > ${MIRROR_BASE_PATH}/ai-svc/cluster-versions.json
+{% endhighlight %}
+
+- Checking the `cluster-versions.json` file content:
+{% highlight json %}
+echo $QUERY_CLUSTER_VERSIONS_REQUEST | jq .
+{
+  "4.10": {
+    "cpu_architectures": [
+      "x86_64",
+      "arm64"
+    ],
+    "display_name": "4.10.30",
+    "support_level": "production"
+  },
+  "4.11": {
+    "cpu_architectures": [
+      "x86_64",
+      "arm64"
+    ],
+    "default": true,
+    "display_name": "4.11.5",
+    "support_level": "production"
+  },
+  "4.11.1": {
+    "cpu_architectures": [
+      "x86_64",
+      "arm64"
+    ],
+    "display_name": "4.11.1",
+    "support_level": "production"
+  },
+  "4.12": {
+    "cpu_architectures": [
+      "arm64",
+      "x86_64"
+    ],
+    "display_name": "4.12.0-ec.3",
+    "support_level": "beta"
+  },
+  "4.8": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.8.46",
+    "support_level": "production"
+  },
+  "4.8.12": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.8.12",
+    "support_level": "production"
+  },
+  "4.8.29": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.8.29",
+    "support_level": "production"
+  },
+  "4.8.36": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.8.36",
+    "support_level": "production"
+  },
+  "4.8.39": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.8.39",
+    "support_level": "production"
+  },
+  "4.9": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.9.43",
+    "support_level": "production"
+  },
+  "4.9.13": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.9.13",
+    "support_level": "production"
+  },
+  "4.9.17": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.9.17",
+    "support_level": "production"
+  },
+  "4.9.25": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.9.25",
+    "support_level": "production"
+  },
+  "4.9.37": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.9.37",
+    "support_level": "production"
+  },
+  "4.9.9": {
+    "cpu_architectures": [
+      "x86_64"
+    ],
+    "display_name": "4.9.9",
+    "support_level": "production"
+  }
+}
+{% endhighlight %}
 
 - Assisted Installer Service Config
 
