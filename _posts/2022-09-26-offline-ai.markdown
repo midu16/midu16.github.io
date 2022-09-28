@@ -109,6 +109,7 @@ ai-svc/
 {% endhighlight %}
 
 In order to interact with the RH APIs you need an [Offline Token][offline-token-api].
+
 [offline-token-api]: https://access.redhat.com/management/api
 
 Save the Offline Token to a file in the Mirror VM at `/apps/mirror-ingress/rh-api-offline-token`.
