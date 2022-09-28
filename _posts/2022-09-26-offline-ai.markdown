@@ -80,32 +80,37 @@ Step 2. OpenShift and Assisted Installer Service Configuration Files
 
 - Creating the path:
 {% highlight bash %}
-export MIRROR_BASE_PATH=/apps
+export MIRROR_BASE_PATH=/apps/offline-assisted-installer
 mkdir -p $MIRROR_BASE_PATH/{mirror-ingress/{haproxy,nginx/templates/,scripts}/,ai-svc/{local-store,volumes/{db,opt,imgsvc}}/,auth,dns,pki,downloads/{images,olm,rhcos,tools}}
 {% endhighlight %}
 
 - Validating that the proper path has been created:
 {% highlight bash %}
-tree mirror-ingress/
-mirror-ingress/
-├── haproxy
-├── nginx
-│   └── templates
-└── scripts
+tree /apps/offline-assisted-installer/
+offline-assisted-installer/
+├── ai-svc
+│   ├── cluster-versions.json
+│   ├── local-store
+│   └── volumes
+│       ├── db
+│       ├── imgsvc
+│       └── opt
+├── auth
+├── dns
+├── downloads
+│   ├── images
+│   ├── olm
+│   ├── rhcos
+│   └── tools
+├── mirror-ingress
+│   ├── haproxy
+│   ├── nginx
+│   │   └── templates
+│   ├── rh-api-offline-token
+│   └── scripts
+└── pki
 
-4 directories, 0 files
-
-tree ai-svc/
-ai-svc/
-├── cluster-versions.json
-├── local-store
-└── volumes
-    ├── db
-    ├── imgsvc
-    └── opt
-
-5 directories, 1 file
-
+19 directories, 2 files
 {% endhighlight %}
 
 In order to interact with the RH APIs you need an [Offline Token][offline-token-api].
@@ -115,6 +120,7 @@ In order to interact with the RH APIs you need an [Offline Token][offline-token-
 Save the Offline Token to a file in the Mirror VM at `/apps/mirror-ingress/rh-api-offline-token`.
 {% highlight bash %}
 RH_OFFLINE_TOKEN=$(cat /apps/mirror-ingress/rh-api-offline-token)
+export MIRROR_BASE_PATH=/apps/offline-assisted-installer
 export ACCESS_TOKEN=$(curl -s --fail https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$RH_OFFLINE_TOKEN | jq .access_token  | tr -d '"')
 QUERY_CLUSTER_VERSIONS_REQUEST=$(curl -s --fail --header "Authorization: Bearer $ACCESS_TOKEN" --header "Content-Type: application/json" --header "Accept: application/json" --request GET "https://api.openshift.com/api/assisted-install/v2/openshift-versions")
 echo $QUERY_CLUSTER_VERSIONS_REQUEST > ${MIRROR_BASE_PATH}/ai-svc/cluster-versions.json
