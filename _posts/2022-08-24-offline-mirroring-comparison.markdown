@@ -15255,13 +15255,34 @@ mirror:
                   - name: 'stable-4.10'
 {% endhighlight %}
 
-
+In order to mirror specific versions, you will need to use the `oc-mirror` cli and define the `imageset-config.yaml` file as below:
+{% highlight yaml %}
+---
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: false
+      packages:
+        - name: odf-operator
+      packages:
+        - name: odf-operator
+          minVersion: '4.9.0'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.9'
+                  - name: 'stable-4.10'
+{% endhighlight %}
 
 Below we will compare the size of the bundle of `odf-operator`
 
 | Operator Name           | Channel version        | Size | Note                |
 |-------------------------|----------------------- |----- | ------------------- |
-| odf-operator            | v4.9.0 - v4.10.5       | 57G  |                     |
+| odf-operator            | v4.9.0 - v4.10.5       | 57G  | all channel images  |
+| odf-operator            | v4.9.0 - v4.10.5       | 11G  | specific version    |
 | odf-operator            | v4.10.4                | 25G  | all channel images  |
 | odf-operator            | v4.10.4                | 6.3G | a specific version  |
 |-------------------------|----------------------- |----- | ------------------- |
