@@ -15277,6 +15277,7 @@ mirror:
                   - name: 'stable-4.10'
 {% endhighlight %}
 
+
 Below we will compare the size of the bundle of `odf-operator`
 
 | Operator Name           | Channel version        | Size | Note                |
