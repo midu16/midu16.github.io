@@ -15280,13 +15280,18 @@ mirror:
 
 Below we will compare the size of the bundle of `odf-operator`
 
-| Operator Name           | Channel version        | Size | Note                |
-|-------------------------|----------------------- |----- | ------------------- |
-| odf-operator            | v4.9.0 - v4.10.5       | 57G  | all channel images  |
-| odf-operator            | v4.9.0 - v4.10.5       | 11G  | specific version    |
-| odf-operator            | v4.10.4                | 25G  | all channel images  |
-| odf-operator            | v4.10.4                | 6.3G | a specific version  |
-|-------------------------|----------------------- |----- | ------------------- |
+| Operator Name           | Channel version        | Size | Note                | Size compaction |
+|-------------------------|----------------------- |----- | ------------------- |---------------- |
+| odf-operator            | v4.9.0 - v4.10.5       | 57G  | all channel images  | -               |
+| odf-operator            | v4.9.0 - v4.10.5       | 11G  | specific version    | 80%             |
+|-------------------------|----------------------- |----- | ------------------- |---------------- |
+
+
+| Operator Name           | Channel version        | Size | Note                | Size compaction |
+|-------------------------|----------------------- |----- | ------------------- |---------------- |
+| odf-operator            | v4.10.4                | 25G  | all channel images  | -               |
+| odf-operator            | v4.10.4                | 6.3G | a specific version  | 75%             |
+|-------------------------|----------------------- |----- | ------------------- |---------------- |
 
 {% highlight yaml %}
 ---
