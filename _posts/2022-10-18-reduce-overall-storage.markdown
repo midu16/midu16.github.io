@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Reduce overall storage required for Upgrades using oc-mirror!"
-date:   2022-08-24 10:10:29 +0200
+date:   2022-10-18 10:10:29 +0200
 categories: openshift4
 ---
 In the following post, we are going to talk on how to reduce the overall storage required for upgrades using oc-mirror cli to the offline registry on the Bastion Host.
@@ -41,7 +41,7 @@ mirror:
 
 - a example of the channel content for the `registry.redhat.io/redhat/redhat-operator-index:v4.10`:
 
-- odf-operator:
+  - odf-operator:
 {% highlight bash %}
 ...
 "odf-operator"
