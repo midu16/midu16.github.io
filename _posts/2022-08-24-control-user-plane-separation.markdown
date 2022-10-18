@@ -682,6 +682,11 @@ Define the static routing imperative definition for `br-ex-ens7f1` :
 ip route add 10.10.10.0/24 dev br-ex-ens7f1 src 10.10.10.1
 {% endhighlight %}
 
+Define the static routing for `br-ex-ens7f1` in `/etc/sysconfig/network-scripts/route-br-ex-ens7f1`:
+{% highlight bash %}
+10.10.10.0/24 dev br-ex-ens7f1 src 10.10.10.1
+{% endhighlight %}
+
 Where the address `192.168.111.1` its the VIP for the NorthBound interface and `10.10.10.1` its the VIP for the SouthBound interface.
 
 Define the static routing [declarative definition using MachineConfig][static-routing-with-machine-config] for `br-ex-ens7f0` :
