@@ -4,7 +4,7 @@ title:  "Reduce overall storage required for Upgrades using oc-mirror!"
 date:   2022-10-18 10:10:29 +0200
 categories: openshift4
 ---
-In the following post, we are going to talk on how to reduce the overall storage required for upgrades using oc-mirror cli to the offline registry on the Bastion Host.
+Having a better control of the ammount of images that the administrator of OCP is downloading in the mirroring process to the offline registry it becomes to be one of a key requirement. This control implies a better storage usage management of the offline registry. How to achieve this management we are going to discuss further.
 
 Prerequisites
 
