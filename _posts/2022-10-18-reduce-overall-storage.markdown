@@ -6,7 +6,7 @@ categories: openshift4
 ---
 Having a better control of the ammount of images that the administrator of OCP is downloading in the mirroring process to the offline registry it becomes to be one of a key requirement. This control implies a better storage usage management of the offline registry. How to achieve this management we are going to discuss further.
 
-Prerequisites
+The following list represents the prerequisites that needs to be fullfilled before proceeding with the first step:
 
 - OCPv4.10.X
 - Redhat Enterprise Linux/Rocky Linux/Fedora
@@ -43,6 +43,7 @@ mirror:
 
   - odf-operator:
 {% highlight bash %}
+grpcurl -plaintext  INBACRNRDL0100.offline.oxtechnix.lan:50051 api.Registry.ListBundles | jq ' .packageName, .channelName, .bundlePath, .version'
 ...
 "odf-operator"
 "stable-4.10"
