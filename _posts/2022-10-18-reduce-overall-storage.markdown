@@ -192,21 +192,158 @@ mirror:
                   - name: 'stable-4.10'
 {% endhighlight %}
 
+In order to proceed with the mirroring process we splitted the process in two stages:
+
+Stage number 1. Where we are downloading the specific packages locally to a tar file:
+{% highlight bash %}
+oc-mirror --config imageset-config.yaml file://archive
+{% endhighlight %}
+
+Stage number 2. Where we are uploading the content of the local tar file to local offline registry:
+Exporting the global variables:
+{% highlight bash %}
+export REGISTRY_NAME=INBACRNRDL0100.offline.oxtechnix.lan
+export REGISTRY_NAMESPACE=olm-mirror
+{% endhighlight %}
+
+Upload the container base images to the Offline Host registry:
+{% highlight bash %}
+oc-mirror --from ./archive docker://${REGISTRY_NAME}:5000/${REGISTRY_NAMESPACE}
+{% endhighlight %}
+
+Once those two stages are completed without errors, we will obtain the ICSP yaml file and we are able to verify the content of the local offline registry, to do so, use the following command:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://$(hostname -f):5000/v2/_catalog --insecure | jq .
+{% endhighlight %}
+
+For the first `imageset-config.yaml` the Offline Registry content its the following:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://$(hostname -f):5000/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+    "olm-mirror/odf4/cephcsi-rhel8",
+    "olm-mirror/odf4/mcg-core-rhel8",
+    "olm-mirror/odf4/mcg-operator-bundle",
+    "olm-mirror/odf4/mcg-rhel8-operator",
+    "olm-mirror/odf4/ocs-must-gather-rhel8",
+    "olm-mirror/odf4/ocs-operator-bundle",
+    "olm-mirror/odf4/ocs-rhel8-operator",
+    "olm-mirror/odf4/odf-console-rhel8",
+    "olm-mirror/odf4/odf-csi-addons-operator-bundle",
+    "olm-mirror/odf4/odf-csi-addons-rhel8-operator",
+    "olm-mirror/odf4/odf-csi-addons-sidecar-rhel8",
+    "olm-mirror/odf4/odf-operator-bundle",
+    "olm-mirror/odf4/odf-rhel8-operator",
+    "olm-mirror/odf4/rook-ceph-rhel8-operator",
+    "olm-mirror/odf4/volume-replication-rhel8-operator",
+    "olm-mirror/openshift4/ose-csi-external-attacher",
+    "olm-mirror/openshift4/ose-csi-external-provisioner",
+    "olm-mirror/openshift4/ose-csi-external-provisioner-rhel8",
+    "olm-mirror/openshift4/ose-csi-external-resizer",
+    "olm-mirror/openshift4/ose-csi-external-resizer-rhel8",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter-rhel8",
+    "olm-mirror/openshift4/ose-csi-node-driver-registrar",
+    "olm-mirror/openshift4/ose-kube-rbac-proxy",
+    "olm-mirror/redhat/rh-index",
+    "olm-mirror/rhceph/rhceph-5-rhel8",
+    "olm-mirror/rhel8/postgresql-12"
+  ]
+}
+{% endhighlight %}
+
+For the second `imageset-config.yaml` the Offline Registry content its the following:
+{% highlight bash %}
+curl -X GET -u <username>:<password> https://$(hostname -f):5000/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+    "olm-mirror/odf4/cephcsi-rhel8",
+    "olm-mirror/odf4/mcg-core-rhel8",
+    "olm-mirror/odf4/mcg-operator-bundle",
+    "olm-mirror/odf4/mcg-rhel8-operator",
+    "olm-mirror/odf4/ocs-must-gather-rhel8",
+    "olm-mirror/odf4/ocs-operator-bundle",
+    "olm-mirror/odf4/ocs-rhel8-operator",
+    "olm-mirror/odf4/odf-console-rhel8",
+    "olm-mirror/odf4/odf-csi-addons-operator-bundle",
+    "olm-mirror/odf4/odf-csi-addons-rhel8-operator",
+    "olm-mirror/odf4/odf-csi-addons-sidecar-rhel8",
+    "olm-mirror/odf4/odf-operator-bundle",
+    "olm-mirror/odf4/odf-rhel8-operator",
+    "olm-mirror/odf4/rook-ceph-rhel8-operator",
+    "olm-mirror/odf4/volume-replication-rhel8-operator",
+    "olm-mirror/openshift4/ose-csi-external-attacher",
+    "olm-mirror/openshift4/ose-csi-external-provisioner",
+    "olm-mirror/openshift4/ose-csi-external-provisioner-rhel8",
+    "olm-mirror/openshift4/ose-csi-external-resizer",
+    "olm-mirror/openshift4/ose-csi-external-resizer-rhel8",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter-rhel8",
+    "olm-mirror/openshift4/ose-csi-node-driver-registrar",
+    "olm-mirror/openshift4/ose-kube-rbac-proxy",
+    "olm-mirror/redhat/rh-index",
+    "olm-mirror/rhceph/rhceph-5-rhel8",
+    "olm-mirror/rhel8/postgresql-12"
+  ]
+}
+{% endhighlight %}
 
 Below we will compare the size of the bundle of `odf-operator`
 
 | Operator Name           | Channel Name                  | Size | Container base image versions downloaded        | Size compaction |
 |-------------------------|------------------------------ |----- | ----------------------------------------------- |---------------- |
-| odf-operator            |  stable-4.9 & stable-4.10     | 57G  | 4.10.0, 4.10.1, 4.10.2, 4.10.3, 4.10.4,         | -               |
+| odf-operator            |  stable-4.9 & stable-4.10     | 68G  | 4.10.0, 4.10.1, 4.10.2, 4.10.3, 4.10.4,         | -               |
 |                         |                               |      | 4.10.5                                          | -               |
 |                         |                               |      | 4.9.0, 4.9.1, 4.9.2, 4.9.3, 4.9.4, 4.9.5,       |                 |
 |                         |                               |      | 4.9.6, 4.9.7, 4.9.8, 4.9.9, 4.9.10              |                 |
 |-------------------------|------------------------------ |----- | ----------------------------------------------- |---------------- |
-| odf-operator            | stable-4.9 & stable-4.10      | 11G  | 4.9.0 & 4.10.4                                  | 75%             |
+| odf-operator            | stable-4.9 & stable-4.10      | 12G  | 4.9.0 & 4.10.4                                  | 82%             |
 |-------------------------|------------------------------ |----- | ----------------------------------------------- |---------------- |
 
+The content of the `imageContentSourcePolicy.yaml` :
+{% highlight bash %}
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/rhceph
+    source: registry.redhat.io/rhceph
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/odf4
+    source: registry.redhat.io/odf4
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat
+    source: registry.redhat.io/redhat
+  - mirrors:
+    - inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/rhel8
+    source: registry.redhat.io/rhel8
+{% endhighlight %}
 
+and the content of the `catalogSource-rh-index.yaml`:
+{% highlight bash %}
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: rh-index
+  namespace: openshift-marketplace
+spec:
+  image: inbacrnrdl0100.offline.oxtechnix.lan:5000/olm-mirror/redhat/rh-index:v1-test
+  sourceType: grpc
+{% endhighlight %}
 
 A more detail overview its available [here][offline-mirroring-tool-comparission].
 
 [offline-mirroring-tool-comparission]: https://midu16.github.io/openshift4/2022/08/24/offline-mirroring-comparison.html
+
+
+As a conclusion, we can observe that using the `full: false` parameter, the mirroring process its taking in consideration the `minVersion` and `maxVersion` parameter values and its considering only the mention container image versions. Proceeding in this way, the used storage for the mirroring its reduced considerable.
