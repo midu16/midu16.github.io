@@ -40,7 +40,7 @@ Step 1. Install podman
 Step 2. Open firewall
 
 {% highlight bash %}
- sudo firewall-cmd --add-port=8080/tcp --zone=public --permanent
+ sudo firewall-cmd --add-port=3000/tcp --zone=public --permanent
  sudo firewall-cmd --reload
 {% endhighlight %}
 
@@ -78,7 +78,7 @@ Step 5. Get the name of the image that the installation program will deploy on t
 Step 6. Create the pod:
 
 {% highlight bash %}
- podman run -d --name rhcos_image_cache -v /apps/rhcos_image_cache:/var/www/html -p 8080:8080/tcp quay.io/centos7/httpd-24-centos7:latest
+ podman run -d --name rhcos_image_cache -v /apps/rhcos_image_cache:/var/www/html -p 3000:8080/tcp quay.io/centos7/httpd-24-centos7:latest
 {% endhighlight %}
 
 Step 7. Systemd manage of `rhcos_image_cache`
