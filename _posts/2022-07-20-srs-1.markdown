@@ -21,7 +21,7 @@ Preparing the environment
 Step 1. Install upgrade the OS
 
 {% highlight bash %}
- sudo dnf upgrade -y  && sudo dnf install cmake fftw3-devel mbedtls-devel lksctp-tools-devel libconfig-devel boost-devel git -y
+ sudo dnf upgrade -y  && sudo dnf install cmake fftw3-devel mbedtls-devel lksctp-tools-devel libconfig-devel boost-devel git gcc gcc-c++ -y
 {% endhighlight %}
 
 Step 2. Install the UHD Drivers for the USRP
