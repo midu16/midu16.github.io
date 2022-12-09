@@ -92,6 +92,11 @@ Move the files from the current directory under the /usr/local/bin/
  sudo mv srslte_install_configs.sh /usr/local/bin/srslte_install_configs.sh ; sudo chmod a+x /usr/local/bin/srslte_install_configs.sh
 {% endhighlight %}
 
+Make sure that you have the following library configuration set in your `.bashrc` file:
+{% highlight bash %}
+export LD_LIBRARY_PATH="/usr/local/lib64:/usr/local/lib64:/usr/local/lib64/libsrslte_rf.so.0"
+{% endhighlight %}
+
 Step 5. Download the srs conf files
 
 {% highlight bash %}
