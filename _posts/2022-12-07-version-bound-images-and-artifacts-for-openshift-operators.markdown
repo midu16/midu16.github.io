@@ -146,3 +146,150 @@ $ podman run -d --name ocpdiscon-registry -p 5050:5000 \
 ```
 
 Based on the version list determined section **Step 1.1 How to check the operator version included in the redhat-operator-index channel** we are going to build the **imageset-config.yaml**  in order to mirror the container base images. 
+
+### Step 1.3. Building the credential file for the mirroring process 
+
+In this section we are going to build the config.json file used in the mirroring process by the oc-mirror cli to gain authorization to the registry.redhat.io and to the Offline Registry.
+
+In the Offline Registry director create the config.json file:
+
+```bash
+$ touch ${HOME}/registry/config.json
+```
+
+Open the browser and go to the following [link][openshift-pull-secret]. As described in [here][using-image-pull-secrets], to obtain the pull-secret.json file which we are going to edit and save it under the config.json.
+[openshift-pull-secret]: https://console.redhat.com/openshift/install/pull-secret
+[using-image-pull-secrets]: https://docs.openshift.com/container-platform/4.10/openshift_images/managing_images/using-image-pull-secrets.html
+The config.json file structure should be close to the following format:
+
+```json
+{
+  "auths": {
+    "cloud.openshift.com": {
+      "auth": "<base64-secret>"
+    },
+    "inbacrnrdl0101.offline.redhat.lan:5051": {
+      "auth": "<base64-secret>"
+    },
+    "quay.io": {
+      "auth": "<base64-secret>"
+    },
+    "registry.connect.redhat.com": {
+      "auth": "<base64-secret>"
+    },
+    "registry.fedoraproject.org": {
+      "auth": "<base64-secret>"
+    },
+    "registry.redhat.io": {
+      "auth": "<base64-secret>"
+    }
+  }
+}
+```
+Now we will have to let oc-mirror cli use the config.json file:
+
+```bash
+$ export DOCKER_CONFIG=${HOME}/registry/config.json
+```
+
+## Step 2. How to control the storage usage of the mirror
+
+### Step 2.1. How to mirror container base images with a compact filesystem usage
+
+Mirror the container base images operator to the .tar file under the archive directory:
+
+```bash
+$ oc-mirror --config imageset-config.yaml file://archive
+```
+
+The content of a sample imageset-config.yaml file to be used in command above are :
+
+```bash
+$ cat imageset-config.yaml
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: false
+      packages:
+        - name: odf-operator
+      packages:
+        - name: odf-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+```
+
+Check the archive  mirror_seq1_000000.tar size after the entire mirroring process has been finished:
+
+```bash
+$ du -h ./archive/mirror_seq1_000000.tar
+6.2G    ./archive/mirror_seq1_000000.tar
+```
+Before proceeding with any kind of mirroring steps, we are going to have a closer look at the Offline Registry status:
+
+```bash
+$ tree ${HOME}/registry/
+registry/
+├── auth
+│   └── htpasswd
+├── certs
+│   ├── domain.crt
+│   └── domain.key
+└── data
+
+3 directories, 3 files
+```
+As we can observe, the ./data/ directory is empty at this point and we are going to proceed with the container base image mirroring procedure.
+
+Mirror the container base images from the file mirror_seq1_000000.tar to the offline registry. 
+
+```bash
+$ export REGISTRY_NAME=inbacrnrdl0101.offline.redhat.lan
+$ export REGISTRY_NAMESPACE=olm-mirror
+$ export REGISTRY_PORT=5050
+$ oc-mirror --from ./archive docker://${REGISTRY_NAME}:${REGISTRY_PORT}/${REGISTRY_NAMESPACE}
+```
+Check the content of the offline registry:
+
+```bash
+$ curl -X GET -u <username>:<password> https://${REGISTRY_NAME}:${REGISTRY_PORT}/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+    "karmab/curl",
+    "karmab/kubectl",
+    "karmab/mdns-publisher",
+    "karmab/origin-coredns",
+    "karmab/origin-keepalived-ipfailover",
+    "ocp-release",
+    "olm-mirror/odf4/cephcsi-rhel8",
+    "olm-mirror/odf4/mcg-core-rhel8",
+    "olm-mirror/odf4/mcg-operator-bundle",
+    "olm-mirror/odf4/mcg-rhel8-operator",
+    "olm-mirror/odf4/ocs-must-gather-rhel8",
+    "olm-mirror/odf4/ocs-operator-bundle",
+    "olm-mirror/odf4/ocs-rhel8-operator",
+    "olm-mirror/odf4/odf-console-rhel8",
+    "olm-mirror/odf4/odf-csi-addons-operator-bundle",
+    "olm-mirror/odf4/odf-csi-addons-rhel8-operator",
+    "olm-mirror/odf4/odf-csi-addons-sidecar-rhel8",
+    "olm-mirror/odf4/odf-operator-bundle",
+    "olm-mirror/odf4/odf-rhel8-operator",
+    "olm-mirror/odf4/rook-ceph-rhel8-operator",
+    "olm-mirror/odf4/volume-replication-rhel8-operator",
+    "olm-mirror/openshift4/ose-csi-external-attacher",
+    "olm-mirror/openshift4/ose-csi-external-provisioner",
+    "olm-mirror/openshift4/ose-csi-external-resizer",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter",
+    "olm-mirror/openshift4/ose-csi-node-driver-registrar",
+    "olm-mirror/openshift4/ose-kube-rbac-proxy",
+    "olm-mirror/redhat/rh-index",
+    "olm-mirror/rhceph/rhceph-5-rhel8",
+    "olm-mirror/rhel8/postgresql-12"
+  ]
+}
+```
