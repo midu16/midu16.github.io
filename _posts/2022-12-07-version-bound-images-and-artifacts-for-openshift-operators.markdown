@@ -28,7 +28,8 @@ curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/oc-mi
 sudo cp oc-mirror /usr/local/bin
 {% endhighlight %}
 
-As described in [1], the oc-mirror cli becomes GA in channel-4.11.
+As described in [here][disconnected_install], the oc-mirror cli becomes GA in channel-4.11.
+[disconnected_install]: https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-disconnected.html
 
 The use of the oc-mirror cli is independent of the Offline Registry used (eg. Quay, docker registry, JFROG Artifactory, etc).  
 
@@ -56,3 +57,32 @@ podman ps
 CONTAINER ID  IMAGE                                                  COMMAND               CREATED       STATUS          PORTS                     NAMES
 ffe3352d17f9  registry.redhat.io/redhat/redhat-operator-index:v4.10  registry serve --...  7 weeks ago   Up 2 hours ago  0.0.0.0:50051->50051/tcp redhat-operator-index-4.10
 {% endhighlight %}
+
+By creating this container, we will be able to check the content of the channel content for OCPv4.10.
+
+To determine the versions available we need to query the redhat-operator-index endpoint:
+
+{% highlight bash %}
+export LOCAL_RH_OPERATOR_INDEX=inbacrnrdl0101.offline.redhat.lan
+export LOCAL_RH_OPERATOR_INDEX_PORT=50051
+grpcurl -plaintext  ${LOCAL_RH_OPERATOR_INDEX}:${LOCAL_RH_OPERATOR_INDEX_PORT} api.Registry.ListBundles | jq ' .packageName, .channelName, .bundlePath, .version'
+…
+parts of the output omitted
+…
+"odf-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/odf-operator-bundle@sha256:662ec108960703f41652ff47b49e6a509a52fe244d52891d320b821dd9521f55"
+"4.10.4"
+"odf-operator"
+"stable-4.10"
+"registry.redhat.io/odf4/odf-operator-bundle@sha256:182d966cb488b188075d2ffd3f6451eec179429ac4bff55e2e26245049953a82"
+"4.10.5"
+…
+parts of the output omitted
+…
+{% endhighlight %}
+
+The grpcurl binary has been obtained from [here][grpcurl-download]
+[grpcurl-download]: https://github.com/fullstorydev/grpcurl/releases
+
+### Step 1.2. How to build a Offline Registry [Optional]
