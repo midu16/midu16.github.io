@@ -18,6 +18,12 @@ Lets start the installation steps:
 
 Preparing the environment
 
+Step 0. Disable the firewall
+
+```bash
+$ sudo systemctl disable firewalld && sudo systemctl stop firewalld
+```
+
 Step 1. Install upgrade the OS
 
 {% highlight bash %}
@@ -151,7 +157,7 @@ Terminal number 2:
 Before starting the srsenb we should masquarade the SGi interface to the eth0 of the Raspberry PI 4B+ interface:
 
 {% highlight bash %}
- sudo srsepc_if_masq.sh enp3s0
+ sudo srsepc_if_masq.sh eth0
 {% endhighlight %}
 
 Now we can start the srsenb:
