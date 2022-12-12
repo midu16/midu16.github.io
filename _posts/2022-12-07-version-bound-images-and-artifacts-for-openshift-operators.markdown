@@ -293,3 +293,79 @@ $ curl -X GET -u <username>:<password> https://${REGISTRY_NAME}:${REGISTRY_PORT}
   ]
 }
 ```
+
+As it can be observed in the above output, we have a header containing base images whose purpose is to be used in the OCP deployment, those images are not usable in the odf-operator installation. This header is the following:
+
+```bash
+$ curl -X GET -u <username>:<password> https://${REGISTRY_NAME}:${REGISTRY_PORT}/v2/_catalog --insecure | jq .                                     
+{
+  "repositories": [
+    "karmab/curl",
+    "karmab/kubectl",
+    "karmab/mdns-publisher",
+    "karmab/origin-coredns",
+    "karmab/origin-keepalived-ipfailover",
+    "ocp-release"
+  ]
+}
+```
+
+This header’s filesystem usage:
+```bash
+$ du -h ${HOME}/registry/data/ --max-depth=1
+13G     registry/data/docker
+13G     registry/data/
+```
+
+Highlighted the content of the **odf-operator** mirrored. Now we are going to evaluate the file system used at this moment by the above content of the offline registry.
+```bash
+$ du -h ${HOME}/registry/data/ --max-depth=1
+19G     registry/data/docker
+19G     registry/data/
+```
+
+### Step 2.2. How to make use of the Offline Registry content to your OCP cluster
+
+Once the mirroring of the operators is finished the process is creating the following directory: oc-mirror-workspace/results-1667747309 for which we will use the following two files to apply it to the OCP cluster:
+```bash
+$ cat oc-mirror-workspace/results-1667747309/catalogSource-rh-index.yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: rh-index
+  namespace: openshift-marketplace
+spec:
+  image: inbacrnrdl0101.offline.redhat.lan:5050/olm-mirror/redhat/rh-index:v1-test
+  sourceType: grpc
+```
+
+```bash
+$ cat oc-mirror-workspace/results-1667747309/imageContentSourcePolicy.yaml
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - inbacrnrdl0101.offline.redhat.lan:5050/olm-mirror/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - inbacrnrdl0101.offline.redhat.lan:5050/olm-mirror/odf4
+    source: registry.redhat.io/odf4
+  - mirrors:
+    - inbacrnrdl0101.offline.redhat.lan:5050/olm-mirror/rhel8
+    source: registry.redhat.io/rhel8
+  - mirrors:
+    - inbacrnrdl0101.offline.redhat.lan:5050/olm-mirror/rhceph
+    source: registry.redhat.io/rhceph
+  - mirrors:
+    - inbacrnrdl0101.offline.redhat.lan:5050/olm-mirror/redhat
+    source: registry.redhat.io/redhat
+```
+
+
+
