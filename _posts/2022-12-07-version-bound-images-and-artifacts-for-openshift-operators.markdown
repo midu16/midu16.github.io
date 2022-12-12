@@ -376,4 +376,142 @@ Looking at the applied catalog source, we can observe that the endpoint correspo
 
 In order to validate that there are no dependencies missing for the odf-mirror we will proceed installing the operator on the OCP cluster.
 
-- Start the installation of odf-operator:
+- Start the installation of **odf-operator**:
+
+![InstallingODFOperator](/assets/images/RHblog/pic4.png)
+
+- **odf-operator** is installed:
+
+![InstalledODFOperator](/assets/images/RHblog/pic5.png)
+
+- The installed **odf-operator** subscription used:
+
+![InstalledODFOperator](/assets/images/RHblog/pic6.png)
+
+- **odf-operator** pods status:
+
+```bash
+$ oc get pods -n openshift-storage
+NAME                                               READY   STATUS    RESTARTS      AGE
+csi-addons-controller-manager-78c75c4c7-wq4p5      2/2     Running   2 (37m ago)   77m
+noobaa-operator-6fdd894554-ptnm9                   1/1     Running   0             78m
+ocs-metrics-exporter-775b6d4bdf-k5d52              1/1     Running   0             78m
+ocs-operator-6bf7b6dfc6-zwwzv                      1/1     Running   2 (37m ago)   78m
+odf-console-6dff658495-dcfxh                       1/1     Running   0             78m
+odf-operator-controller-manager-54ddd5db9c-mpkwt   2/2     Running   2 (37m ago)   78m
+rook-ceph-operator-57bfbcc9d-hb9tk                 1/1     Running   0             78m
+```
+
+### Step 2.3. How to mirror container base images with a uncompact filesystem usage
+
+Now we evaluate the filesystem usage when the imageset-config.yaml parameter full: true is used, the imageset-config.yaml file will have the following content:
+
+```bash
+$ cat imageset-config.yaml
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.10
+      targetName: 'rh-index'
+      targetTag: v1-test
+      full: true
+      packages:
+        - name: odf-operator
+      packages:
+        - name: odf-operator
+          minVersion: '4.10.4'
+          maxVersion: '4.10.4'
+          channels:
+                  - name: 'stable-4.10'
+```
+
+Proceed to mirror the **odf-operator** container base images to the .tar file as highlighted above:
+```bash
+$ oc-mirror --config imageset-config.yaml file://archive
+```
+
+Once the mirroring has completed, validate the .tar file size in comparison with the previous check:
+
+```bash
+$ du -h ./archive/mirror_seq1_000000.tar
+32G     ./archive/mirror_seq1_000000.tar
+```
+
+- Filesystem usage of the .tar file comparison:
+
+| imageset-config.yaml differences      | mirror_seq1_000000.tar [Gb] | Notes             |
+| ------------------------------------- | --------------------------- | ----------------- |
+| with full: true                       | 32                          |                   |
+| with full: false                      | 6.2                         | 80.625% decrease  |
+
+We can observe from the .tar file size that its size was reduced by 80% for the same content as in the previous,  **Step 2.1. How to mirror container base images with a compact filesystem usage example**.
+
+Mirror the container base images from the newly created file mirror_seq1_000000.tar to the offline registry. Be advised that the following values are an example representation for the purpose of this article, in your case the values might differ.
+
+```bash
+$ export REGISTRY_NAME=inbacrnrdl0101.offline.redhat.lan
+$ export REGISTRY_NAMESPACE=olm-mirror
+$ export REGISTRY_PORT=5050
+$ oc-mirror --from ./archive docker://${REGISTRY_NAME}:${REGISTRY_PORT}/${REGISTRY_NAMESPACE}
+```
+Check the content of the offline registry:
+
+```bash
+$ curl -X GET -u <username>:<password> https://${REGISTRY_NAME}:${REGISTRY_PORT}/v2/_catalog --insecure | jq .
+{
+  "repositories": [
+    "karmab/curl",
+    "karmab/kubectl",
+    "karmab/mdns-publisher",
+    "karmab/origin-coredns",
+    "karmab/origin-keepalived-ipfailover",
+    "ocp-release",
+    "olm-mirror/odf4/cephcsi-rhel8",
+    "olm-mirror/odf4/mcg-core-rhel8",
+    "olm-mirror/odf4/mcg-operator-bundle",
+    "olm-mirror/odf4/mcg-rhel8-operator",
+    "olm-mirror/odf4/ocs-must-gather-rhel8",
+    "olm-mirror/odf4/ocs-operator-bundle",
+    "olm-mirror/odf4/ocs-rhel8-operator",
+    "olm-mirror/odf4/odf-console-rhel8",
+    "olm-mirror/odf4/odf-csi-addons-operator-bundle",
+    "olm-mirror/odf4/odf-csi-addons-rhel8-operator",
+    "olm-mirror/odf4/odf-csi-addons-sidecar-rhel8",
+    "olm-mirror/odf4/odf-operator-bundle",
+    "olm-mirror/odf4/odf-rhel8-operator",
+    "olm-mirror/odf4/rook-ceph-rhel8-operator",
+    "olm-mirror/odf4/volume-replication-rhel8-operator",
+    "olm-mirror/openshift4/ose-csi-external-attacher",
+    "olm-mirror/openshift4/ose-csi-external-provisioner",
+    "olm-mirror/openshift4/ose-csi-external-resizer",
+    "olm-mirror/openshift4/ose-csi-external-snapshotter",
+    "olm-mirror/openshift4/ose-csi-node-driver-registrar",
+    "olm-mirror/openshift4/ose-kube-rbac-proxy",
+    "olm-mirror/redhat/rh-index",
+    "olm-mirror/rhceph/rhceph-5-rhel8",
+    "olm-mirror/rhel8/postgresql-12"
+  ]
+}
+```
+We can observe that the content of the offline registry is identical.
+
+Validate the file system used by the container base images mirrored to the offline registry:
+
+```bash
+$ du -h ${HOME}/registry/data/ --max-depth=1
+44G     registry/data/docker
+44G     registry/data/
+```
+- Filesystem usage of the uncompressed container base images usage comparison: 
+
+| imageset-config.yaml differences      | mirror_seq1_000000.tar [Gb] | Notes             |
+| ------------------------------------- | --------------------------- | ----------------- |
+| with full: true                       | 44                          |                   |
+| with full: false                      | 19                          | 56.8182% decrease |
+
+We can observe from the offline registry container base image content size was optimized with 56.8182% for the same content in the previous example.
+
+## Conclusions
+
+In conclusion, by leveraging the version control and restricting the container base image download we are able to optimize the filesystem usage of the offline registry.
