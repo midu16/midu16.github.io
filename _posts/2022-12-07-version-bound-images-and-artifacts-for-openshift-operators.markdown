@@ -51,7 +51,7 @@ podman generate systemd --name  redhat-operator-index-4.10 >> container-redhat-o
 systemctl --user daemon-reload
 systemctl --user enable container-redhat-operator-index.service
 systemctl --user restart container-redhat-operator-index.service
-{% endhighlight %}
+{% endraw %}{% endhighlight %}
 
 Validate if the container its running:
 podman ps
@@ -81,7 +81,7 @@ parts of the output omitted
 …
 parts of the output omitted
 …
-{% endhighlight %}
+{% endraw %}{% endhighlight %}
 
 The grpcurl binary has been obtained from [here][grpcurl-download]
 
