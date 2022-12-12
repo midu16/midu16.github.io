@@ -43,6 +43,7 @@ In this section we are going to introduce the procedure for obtaining the specif
 We are going to run the redhat-operator-index for tag 4.10 as a rootless podman:
 
 {% highlight bash %}
+```
 mkdir -p ${HOME}/.config/systemd/user
 podman login registry.redhat.io
 podman run -d --name redhat-operator-index-4.10 -p 50051:50051 -it registry.redhat.io/redhat/redhat-operator-index:v4.10
@@ -51,7 +52,8 @@ podman generate systemd --name  redhat-operator-index-4.10 >> container-redhat-o
 systemctl --user daemon-reload
 systemctl --user enable container-redhat-operator-index.service
 systemctl --user restart container-redhat-operator-index.service
-{% endraw %}{% endhighlight %}
+```
+{% endhighlight %}
 
 Validate if the container its running:
 podman ps
@@ -81,7 +83,7 @@ parts of the output omitted
 …
 parts of the output omitted
 …
-{% endraw %}{% endhighlight %}
+{% endhighlight %}
 
 The grpcurl binary has been obtained from [here][grpcurl-download]
 
