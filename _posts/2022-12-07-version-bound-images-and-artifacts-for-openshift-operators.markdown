@@ -367,5 +367,6 @@ spec:
     source: registry.redhat.io/redhat
 ```
 
+![CatalogSources](/assets/images/RHblog/pic1.png)
 
 
