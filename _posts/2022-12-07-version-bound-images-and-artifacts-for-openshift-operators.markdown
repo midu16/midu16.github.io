@@ -22,11 +22,11 @@ The details contained in this article are independent of the installer used to d
 
 Download the **oc-mirror**  cli:
 
-{% highlight bash %}
-export VERSION=stable-4.11
-curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/oc-mirror.tar.gz | tar zxvf - oc-mirror
-sudo cp oc-mirror /usr/local/bin
-{% endhighlight %}
+```bash
+$ export VERSION=stable-4.11
+$ curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/oc-mirror.tar.gz | tar zxvf - oc-mirror
+$ sudo cp oc-mirror /usr/local/bin
+```
 
 As described in [here][disconnected_install], the oc-mirror cli becomes GA in channel-4.11.
 
@@ -55,7 +55,7 @@ $ systemctl --user restart container-redhat-operator-index.service
 
 Validate if the container its running:
 ```bash
-podman ps
+$ podman ps
 CONTAINER ID  IMAGE                                                  COMMAND               CREATED       STATUS          PORTS                     NAMES
 ffe3352d17f9  registry.redhat.io/redhat/redhat-operator-index:v4.10  registry serve --...  7 weeks ago   Up 2 hours ago  0.0.0.0:50051->50051/tcp redhat-operator-index-4.10
 ```
@@ -64,10 +64,10 @@ By creating this container, we will be able to check the content of the channel 
 
 To determine the versions available we need to query the redhat-operator-index endpoint:
 
-{% highlight bash %}
-export LOCAL_RH_OPERATOR_INDEX=inbacrnrdl0101.offline.redhat.lan
-export LOCAL_RH_OPERATOR_INDEX_PORT=50051
-grpcurl -plaintext  ${LOCAL_RH_OPERATOR_INDEX}:${LOCAL_RH_OPERATOR_INDEX_PORT} api.Registry.ListBundles | jq ' .packageName, .channelName, .bundlePath, .version'
+```bash
+$ export LOCAL_RH_OPERATOR_INDEX=inbacrnrdl0101.offline.redhat.lan
+$ export LOCAL_RH_OPERATOR_INDEX_PORT=50051
+$ grpcurl -plaintext  ${LOCAL_RH_OPERATOR_INDEX}:${LOCAL_RH_OPERATOR_INDEX_PORT} api.Registry.ListBundles | jq ' .packageName, .channelName, .bundlePath, .version'
 …
 parts of the output omitted
 …
@@ -82,7 +82,7 @@ parts of the output omitted
 …
 parts of the output omitted
 …
-{% endhighlight %}
+```
 
 The grpcurl binary has been obtained from [here][grpcurl-download]
 
@@ -94,28 +94,28 @@ In this section we are going to highlight an example on how to create an Offline
 
 Creating the working directory of the Offline Registry:
 
-{% highlight bash %}
-mkdir -p ${HOME}/registry/{auth,certs,data}
-{% endhighlight %}
+```bash
+$ mkdir -p ${HOME}/registry/{auth,certs,data}
+```
 
 Creating the username and password used by the Offline Registry:
 
-{% highlight bash %}
-htpasswd -bBc ${HOME}/registry/auth/htpasswd <username><password>
-{% endhighlight %}
+```bash
+$ htpasswd -bBc ${HOME}/registry/auth/htpasswd <username><password>
+```
 
 Please, note that the values for the <username> and <password> should be updated with your particular ones.
 
 Creating the certificate used by the Offline Registry:
-{% highlight bash %}
-export host_fqdn=inbacrnrdl0101.offline.redhat.lan
-cert_c="AT" 
-cert_s="WIEN"
-cert_l="WIEN"
-cert_o="TelcoEngineering"
-cert_ou="RedHat"
-cert_cn="${host_fqdn}" 
-openssl req \
+```bash
+$ export host_fqdn=inbacrnrdl0101.offline.redhat.lan
+$ cert_c="AT" 
+$ cert_s="WIEN"
+$ cert_l="WIEN"
+$ cert_o="TelcoEngineering"
+$ cert_ou="RedHat"
+$ cert_cn="${host_fqdn}" 
+$ openssl req \
     -newkey rsa:4096 \
     -nodes \
     -sha256 \
@@ -125,13 +125,13 @@ openssl req \
     -out ${HOME}/registry/certs/domain.crt \
     -addext "subjectAltName = DNS:${host_fqdn}" \
     -subj "/C=${cert_c}/ST=${cert_s}/L=${cert_l}/O=${cert_o}/OU=${cert_ou}/CN=${cert_cn}"
-{% endhighlight %}
+```
 
 Please, note that the values used in the certificate creation should be updated with your particular ones.
 Start the Offline Registry container:
 
-{% highlight bash %}
-podman run -d --name ocpdiscon-registry -p 5050:5000 \
+```bash
+$ podman run -d --name ocpdiscon-registry -p 5050:5000 \
 -e REGISTRY_AUTH=htpasswd \
 -e REGISTRY_AUTH_HTPASSWD_REALM=Registry \
 -e REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry \
@@ -143,6 +143,6 @@ podman run -d --name ocpdiscon-registry -p 5050:5000 \
 -v ${HOME}/registry/data:/var/lib/registry:z \
 -v ${HOME}/registry/auth:/auth:z \
 -v ${HOME}/registry/certs:/certs:z docker.io/library/registry:2.8.1
-{% endhighlight %}
+```
 
 Based on the version list determined section **Step 1.1 How to check the operator version included in the redhat-operator-index channel** we are going to build the **imageset-config.yaml**  in order to mirror the container base images. 
