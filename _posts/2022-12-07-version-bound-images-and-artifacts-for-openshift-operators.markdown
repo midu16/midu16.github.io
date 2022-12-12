@@ -86,3 +86,60 @@ The grpcurl binary has been obtained from [here][grpcurl-download]
 [grpcurl-download]: https://github.com/fullstorydev/grpcurl/releases
 
 ### Step 1.2. How to build a Offline Registry [Optional]
+
+In this section we are going to highlight an example on how to create an Offline Registry that can be used to highlight the principle of mirroring the container base images.
+
+Creating the working directory of the Offline Registry:
+
+{% highlight bash %}
+mkdir -p ${HOME}/registry/{auth,certs,data}
+{% endhighlight %}
+
+Creating the username and password used by the Offline Registry:
+
+{% highlight bash %}
+htpasswd -bBc ${HOME}/registry/auth/htpasswd <username><password>
+{% endhighlight %}
+
+Please, note that the values for the <username> and <password> should be updated with your particular ones.
+
+Creating the certificate used by the Offline Registry:
+{% highlight bash %}
+export host_fqdn=inbacrnrdl0101.offline.redhat.lan
+cert_c="AT" 
+cert_s="WIEN"
+cert_l="WIEN"
+cert_o="TelcoEngineering"
+cert_ou="RedHat"
+cert_cn="${host_fqdn}" 
+openssl req \
+    -newkey rsa:4096 \
+    -nodes \
+    -sha256 \
+    -keyout ${HOME}/registry/certs/domain.key \
+    -x509 \
+    -days 365 \
+    -out ${HOME}/registry/certs/domain.crt \
+    -addext "subjectAltName = DNS:${host_fqdn}" \
+    -subj "/C=${cert_c}/ST=${cert_s}/L=${cert_l}/O=${cert_o}/OU=${cert_ou}/CN=${cert_cn}"
+{% endhighlight %}
+
+Please, note that the values used in the certificate creation should be updated with your particular ones.
+Start the Offline Registry container:
+
+{% highlight bash %}
+podman run -d --name ocpdiscon-registry -p 5050:5000 \
+-e REGISTRY_AUTH=htpasswd \
+-e REGISTRY_AUTH_HTPASSWD_REALM=Registry \
+-e REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry \
+-e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+-e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+-e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
+-e REGISTRY_STORAGE_DELETE_ENABLED=true \
+-v ${HOME}/registry/data:/var/lib/registry:z \
+-v ${HOME}/registry/auth:/auth:z \
+-v ${HOME}/registry/certs:/certs:z docker.io/library/registry:2.8.1
+{% endhighlight %}
+
+Based on the version list determined section **Step 1.1 How to check the operator version included in the redhat-operator-index channel** we are going to build the **imageset-config.yaml**  in order to mirror the container base images. 
