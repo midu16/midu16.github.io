@@ -5,6 +5,7 @@ date:   2022-12-07 10:10:29 +0200
 categories: openshift4
 ---
 
+December 07, 2022 | by Mihai IDU
 
 ## Background/Purpose
 
