@@ -54,10 +54,11 @@ systemctl --user restart container-redhat-operator-index.service
 ```
 
 Validate if the container its running:
+```bash
 podman ps
 CONTAINER ID  IMAGE                                                  COMMAND               CREATED       STATUS          PORTS                     NAMES
 ffe3352d17f9  registry.redhat.io/redhat/redhat-operator-index:v4.10  registry serve --...  7 weeks ago   Up 2 hours ago  0.0.0.0:50051->50051/tcp redhat-operator-index-4.10
-{% endhighlight %}
+```
 
 By creating this container, we will be able to check the content of the channel content for OCPv4.10.
 
