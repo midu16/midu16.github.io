@@ -5,7 +5,7 @@ date:   2022-12-07 10:10:29 +0200
 categories: openshift4
 ---
 
-December 07, 2022 | by Mihai IDU
+#### December 07, 2022 | by Mihai IDU
 
 ## Background/Purpose
 
@@ -370,4 +370,10 @@ spec:
 
 ![CatalogSources](/assets/images/RHblog/pic1.png)
 
+Looking at the applied catalog source, we can observe that the endpoint corresponds to the offline registry used: inbacrnrdl0101.offline.redhat.lan:5050. 
 
+![CatalogSourcesDetails](/assets/images/RHblog/pic2.png)
+
+In order to validate that there are no dependencies missing for the odf-mirror we will proceed installing the operator on the OCP cluster.
+
+- Start the installation of odf-operator:
