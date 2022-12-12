@@ -29,6 +29,7 @@ sudo cp oc-mirror /usr/local/bin
 {% endhighlight %}
 
 As described in [here][disconnected_install], the oc-mirror cli becomes GA in channel-4.11.
+
 [disconnected_install]: https://docs.openshift.com/container-platform/4.10/installing/disconnected_install/installing-mirroring-disconnected.html
 
 The use of the oc-mirror cli is independent of the Offline Registry used (eg. Quay, docker registry, JFROG Artifactory, etc).  
@@ -83,6 +84,7 @@ parts of the output omitted
 {% endhighlight %}
 
 The grpcurl binary has been obtained from [here][grpcurl-download]
+
 [grpcurl-download]: https://github.com/fullstorydev/grpcurl/releases
 
 ### Step 1.2. How to build a Offline Registry [Optional]
