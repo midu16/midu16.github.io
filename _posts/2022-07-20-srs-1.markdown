@@ -21,7 +21,7 @@ Preparing the environment
 Step 1. Install upgrade the OS
 
 {% highlight bash %}
- sudo dnf upgrade -y
+ sudo dnf upgrade -y  && sudo dnf install cmake fftw3-devel mbedtls-devel lksctp-tools-devel libconfig-devel boost-devel git gcc gcc-c++ -y
 {% endhighlight %}
 
 Step 2. Install the UHD Drivers for the USRP
@@ -90,6 +90,11 @@ Move the files from the current directory under the /usr/local/bin/
  sudo mv srsenb /usr/local/bin/srsenb ; sudo chmod a+x /usr/local/bin/srsenb
  sudo mv srsepc /usr/local/bin/srsepc ; sudo chmod a+x /usr/local/bin/srsepc
  sudo mv srslte_install_configs.sh /usr/local/bin/srslte_install_configs.sh ; sudo chmod a+x /usr/local/bin/srslte_install_configs.sh
+{% endhighlight %}
+
+Make sure that you have the following library configuration set in your `.bashrc` file:
+{% highlight bash %}
+export LD_LIBRARY_PATH="/usr/local/lib64:/usr/local/lib64:/usr/local/lib64/libsrslte_rf.so.0"
 {% endhighlight %}
 
 Step 5. Download the srs conf files
