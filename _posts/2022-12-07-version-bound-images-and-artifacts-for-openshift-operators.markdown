@@ -159,8 +159,11 @@ $ touch ${HOME}/registry/config.json
 ```
 
 Open the browser and go to the following [link][openshift-pull-secret]. As described in [here][using-image-pull-secrets], to obtain the pull-secret.json file which we are going to edit and save it under the config.json.
+
 [openshift-pull-secret]: https://console.redhat.com/openshift/install/pull-secret
+
 [using-image-pull-secrets]: https://docs.openshift.com/container-platform/4.10/openshift_images/managing_images/using-image-pull-secrets.html
+
 The config.json file structure should be close to the following format:
 
 ```json
