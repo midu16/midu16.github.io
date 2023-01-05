@@ -39,7 +39,7 @@ Step 4. Creating the `username:password` of the offline registry
  htpasswd -bBc /apps/registry/auth/htpasswd <username> <password>
 {% endhighlight %}
 
-Note, that the <username> and <password> should be replaced with the values you are going to use for your environment.
+Note, that the `username` and `password` should be replaced with the values you are going to use for your environment.
 
 Step 5. Creating the offline self-signed certificate.
 
@@ -162,7 +162,7 @@ Now we should add the section that describes the credentials to the offline regi
   },
 {% endhighlight %}
 
-Replace the <credentials> with the output from the following command `echo -n '<user_name>:<password>' | base64 -w0`.
+Replace the <credentials> with the output from the following command `echo -n username:password | base64 -w0`.
 
 In the end the `pull-secret.json` should follow the following template:
 {% highlight json %}
