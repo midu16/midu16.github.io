@@ -209,7 +209,7 @@ Step 13. Mirroring OCP container base images to the offline registry
  export LOCAL_REPO=ocp-release
  export UPSTREAM_REPO=$(curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$OCP_VERSION/release.txt | grep 'Pull From: quay.io' | awk -F ' ' '{print $3}')
  export PULLSECRET_FILE=/apps/registry/pull-secret.json
- oc adm release mirror -a ${PULLSECRET_FILE} --from=$UPSTREAM_REPO --to-release-image=$LOCAL_REG:$LOCAL_REG_PORT/$LOCAL_REPO:${VERSION} --to=$LOCAL_REG:$LOCAL_REG_PORT/$LOCAL_REPO --apply-release-image-signature
+ oc adm release mirror -a ${PULLSECRET_FILE} --from=$UPSTREAM_REPO --to-release-image=$LOCAL_REG/$LOCAL_REPO:${VERSION} --to=$LOCAL_REG/$LOCAL_REPO --apply-release-image-signature
 {% endhighlight %}
 
 Step 14. ICSP.yaml and install-config.yaml
