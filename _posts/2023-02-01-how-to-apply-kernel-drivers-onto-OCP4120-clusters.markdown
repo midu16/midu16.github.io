@@ -16,14 +16,18 @@ In order to build the Red Hat CoreOS container base image layer there are a set 
 ❗Be advised that the following values are an example representation for the purpose of this article, in your case the values might differ. 
 
 ### Requirements:
-    - podman version: 4.2.0
-    - Red Hat Enterprise Linux 8.7 (Ootpa)
+
+- podman version: 4.2.0
+
+- Red Hat Enterprise Linux 8.7 (Ootpa)
 
 ## Environment Setup
 
 It is assumed that we are intending to install a OpenShift Container Platform version 4.12.0 in any supported configuration (Single Node or Multiple Node). The following configuration can be applied in two stages:
-    - During the installation of the cluster, by having the yaml file in the manifests directory, or
-    - As a post-configuration of the cluster.
+
+- During the installation of the cluster, by having the yaml file in the manifests directory, or
+  
+- As a post-configuration of the cluster.
 
 ## Step 0. Obtaining the base RHCOS image
 
@@ -31,14 +35,14 @@ In order to build the container base image that will serve as the RHCOS layer wh
 
 To do so, here is how we can obtain the respective image:
 
-    - If the OpenShift Container Platform its already installed, use the following command:
+- If the OpenShift Container Platform its already installed, use the following command:
 
 ```bash
 $ oc adm release info --image-for rhel-coreos-8
 Warning: the default reading order of registry auth file will be changed from "${HOME}/.docker/config.json" to podman registry config locations in the future version of oc. "${HOME}/.docker/config.json" is deprecated, but can still be used for storing credentials as a fallback. See https://github.com/containers/image/blob/main/docs/containers-auth.json.5.md for the order of podman registry config locations. 
 quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6db665511f305ef230a2c752d836fe073e80550dc21cede3c55cf44db01db365
 ```
-    - If the OpenShift Container Platform its not installed, use the following command:
+- If the OpenShift Container Platform its not installed, use the following command:
 
 ```bash
 $ export OCP_VERSION="4.12.0"
@@ -101,7 +105,7 @@ $ curl -X GET -u <username>:<password> https://inbacrnrdl0102.offline.redhat.lan
 
 At this step, we are going to proceed in creating the MachineConfig and apply it to the cluster, please note that the nodes will perform an immediate restart one-by-one in order to apply the specific change. The MachineConfig file format should respect the template highlighted in [1] and below:
 
-    - MachineConfig for the worker nodes:
+- MachineConfig for the worker nodes:
 
 ```yaml
 apiVersion: machineconfiguration.openshift.io/v1
@@ -114,7 +118,7 @@ spec:
   osImageURL: inbacrnrdl0102.offline.redhat.lan:5051/midu/side-kernel-4.18.0-372.40.1.el8_6.iavf.bz2149746.bz2152493.x86_64:latest
 ```
 
-    - MachineConfig for the master nodes:
+- MachineConfig for the master nodes:
 
 ```yaml
 apiVersion: machineconfiguration.openshift.io/v1
