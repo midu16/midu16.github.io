@@ -97,7 +97,7 @@ $ curl -X GET -u <username>:<password> https://inbacrnrdl0102.offline.redhat.lan
 }
 ```
 
-## Creating the MachineConfig 
+## Step 3. Creating the MachineConfig 
 
 At this step, we are going to proceed in creating the MachineConfig and apply it to the cluster, please note that the nodes will perform an immediate restart one-by-one in order to apply the specific change. The MachineConfig file format should respect the template highlighted in [1] and below:
 
@@ -169,7 +169,8 @@ someone-test-worker-1.test412.com     Ready                      worker         
 
 
 Please note that the above command output will change in time. Once each individual node will resume the configuration update, to validate the new RHCOS layer it's been applied we can use the below command:
-    - Before any change its applied:
+
+- Before any change its applied:
 
 ```bash
 $ sudo ssh core@192.168.122.127
@@ -187,7 +188,7 @@ make configuration changes via machineconfig objects:
 4.18.0-372.40.1.el8_6.x86_64
 ```
 
-    - After the MachineConfig change its applied:
+- After the MachineConfig change its applied:
 
 ```bash
 $ sudo ssh core@192.168.122.127
