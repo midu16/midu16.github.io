@@ -220,8 +220,6 @@ mirror:
       full: false
       packages:
         - name: odf-operator
-      packages:
-        - name: odf-operator
           minVersion: '4.10.4'
           maxVersion: '4.10.4'
           channels:
@@ -419,8 +417,6 @@ mirror:
       targetName: 'rh-index'
       targetTag: v1-test
       full: true
-      packages:
-        - name: odf-operator
       packages:
         - name: odf-operator
           minVersion: '4.10.4'
