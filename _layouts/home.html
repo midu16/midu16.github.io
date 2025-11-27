@@ -2,60 +2,97 @@
 layout: default
 ---
 
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>{{ site.title | escape }}</h1>
+    <p>{{ site.description | escape }}</p>
+    <div class="hero-cta">
+      <a href="#latest-posts" class="btn btn-primary">Explore Posts</a>
+      <a href="{{ "/about/" | relative_url }}" class="btn btn-secondary">About Me</a>
+    </div>
+  </div>
+</section>
+
 <div class="home">
-  {%- if page.title -%}
-    <h1 class="page-heading">{{ page.title }}</h1>
-  {%- endif -%}
-
-  {{ content }}
-
-
-  {% if site.paginate %}
-    {% assign posts = paginator.posts %}
-  {% else %}
-    {% assign posts = site.posts %}
-  {% endif %}
-
-
-  {%- if posts.size > 0 -%}
-    {%- if page.list_title -%}
-      <h2 class="post-list-heading">{{ page.list_title }}</h2>
-    {%- endif -%}
-    <ul class="post-list">
-      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-      {%- for post in posts -%}
-      <li>
-        <span class="post-meta">{{ post.date | date: date_format }}</span>
-        <h3>
-          <a class="post-link" href="{{ post.url | relative_url }}">
-            {{ post.title | escape }}
-          </a>
-        </h3>
-        {%- if site.show_excerpts -%}
-          {{ post.excerpt }}
-        {%- endif -%}
-      </li>
-      {%- endfor -%}
-    </ul>
+  <div class="wrapper">
+    {{ content }}
 
     {% if site.paginate %}
-      <div class="pager">
-        <ul class="pagination">
-        {%- if paginator.previous_page %}
-          <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page">{{ paginator.previous_page }}</a></li>
-        {%- else %}
-          <li><div class="pager-edge">•</div></li>
-        {%- endif %}
-          <li><div class="current-page">{{ paginator.page }}</div></li>
-        {%- if paginator.next_page %}
-          <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">{{ paginator.next_page }}</a></li>
-        {%- else %}
-          <li><div class="pager-edge">•</div></li>
-        {%- endif %}
-        </ul>
+      {% assign posts = paginator.posts %}
+    {% else %}
+      {% assign posts = site.posts %}
+    {% endif %}
+
+    {%- if posts.size > 0 -%}
+      <!-- Section Header -->
+      <div class="section-header" id="latest-posts">
+        <h2 class="section-title">Latest Articles</h2>
+        <p class="section-subtitle">Technical guides and tutorials on TelcoCloud Infrastructure & Applications</p>
       </div>
-    {%- endif %}
 
-  {%- endif -%}
+      <!-- Post Cards Grid -->
+      <div class="post-list">
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        {%- for post in posts -%}
+        <article class="post-card">
+          <div class="post-card-header">
+            <div class="post-card-icon">
+              {%- if post.title contains "OpenShift" or post.title contains "OCP" -%}
+                <i class="fas fa-cloud"></i>
+              {%- elsif post.title contains "offline" or post.title contains "mirroring" -%}
+                <i class="fas fa-download"></i>
+              {%- elsif post.title contains "node" -%}
+                <i class="fas fa-server"></i>
+              {%- elsif post.title contains "kernel" or post.title contains "driver" -%}
+                <i class="fas fa-cog"></i>
+              {%- elsif post.title contains "benchmark" or post.title contains "etcd" -%}
+                <i class="fas fa-tachometer-alt"></i>
+              {%- elsif post.title contains "registry" -%}
+                <i class="fas fa-box"></i>
+              {%- else -%}
+                <i class="fas fa-file-alt"></i>
+              {%- endif -%}
+            </div>
+          </div>
+          <div class="post-card-content">
+            <div class="post-meta">
+              <i class="far fa-calendar"></i>
+              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
+            </div>
+            <h3>
+              <a class="post-link" href="{{ post.url | relative_url }}">
+                {{ post.title | escape }}
+              </a>
+            </h3>
+            {%- if post.excerpt -%}
+              <div class="post-excerpt">
+                {{ post.excerpt | strip_html | truncatewords: 25 }}
+              </div>
+            {%- endif -%}
+          </div>
+        </article>
+        {%- endfor -%}
+      </div>
 
+      {% if site.paginate %}
+        <div class="pager">
+          <ul class="pagination">
+          {%- if paginator.previous_page %}
+            <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page">← Previous</a></li>
+          {%- else %}
+            <li><div class="pager-edge">•</div></li>
+          {%- endif %}
+            <li><div class="current-page">Page {{ paginator.page }}</div></li>
+          {%- if paginator.next_page %}
+            <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">Next →</a></li>
+          {%- else %}
+            <li><div class="pager-edge">•</div></li>
+          {%- endif %}
+          </ul>
+        </div>
+      {%- endif %}
+
+    {%- endif -%}
+  </div>
 </div>

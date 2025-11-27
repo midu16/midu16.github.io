@@ -1,0 +1,33 @@
+<footer class="site-footer h-card">
+  <data class="u-url" href="{{ "/" | relative_url }}"></data>
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <h3 class="footer-heading">{{ site.title | escape }}</h3>
+        <p>{{ site.description | escape }}</p>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <h3>Connect</h3>
+        {%- include social.html -%}
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <h3>Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="{{ "/" | relative_url }}">Home</a></li>
+          <li><a href="{{ "/about/" | relative_url }}">About</a></li>
+          {%- if site.github_username -%}
+          <li><a href="https://github.com/{{ site.github_username }}">GitHub</a></li>
+          {%- endif -%}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {{ 'now' | date: "%Y" }} {{ site.title | escape }}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+

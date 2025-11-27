@@ -23,20 +23,40 @@
 minima:
   date_format: "%b %-d, %Y"
   
-title: midu16 - Github home page
+title: midu16 - Tech Openness Hub
 email: idumihai16@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Militating for tech openness with tutorials and demo's.
+  Exploring TelcoCloud Infrastructure, OpenShift, and Cloud-Native Technologies.
+  Technical tutorials and guides for modern cloud infrastructure.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "midu16.com" # the base hostname & protocol for your site, e.g. http://example.com
-github_username:  midu16
+url: "https://midu16.github.io" # the base hostname & protocol for your site
+github_username: midu16
+linkedin_username: mihai-idu-407318123
 
-# Build settings
+# Social and metadata
+author: Mihai Idu
+twitter_username: # Add if you have one
+linkedin_url: https://www.linkedin.com/in/mihai-idu-407318123/
+
+# Show excerpts on homepage
+show_excerpts: true
+
+# Header pages
+header_pages:
+  - about.markdown
+
 # Build settings
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
+# SEO settings
+lang: en
+tagline: TelcoCloud Infrastructure & Cloud-Native Solutions
+
+# Google Analytics (uncomment and add your tracking ID)
+# google_analytics: UA-XXXXXXXXX-X
 
 # Exclude from processing.
 # The following items will not be processed, by default.
@@ -46,14 +66,17 @@ plugins:
 # Excluded items can be processed by explicitly listing the directories or
 # their entries' file path in the `include:` list.
 #
-# exclude:
-#   - .sass-cache/
-#   - .jekyll-cache/
-#   - gemfiles/
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules/
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - "*.sh"
+  - "*.zip"
+
