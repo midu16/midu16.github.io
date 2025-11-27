@@ -4,12 +4,16 @@ layout: default
 
 <!-- Hero Section -->
 <section class="hero">
-  <div class="hero-content">
+  <div class="hero-content wrapper">
     <h1>{{ site.title | escape }}</h1>
     <p>{{ site.description | escape }}</p>
     <div class="hero-cta">
-      <a href="#latest-posts" class="btn btn-primary">Explore Posts</a>
-      <a href="{{ "/about/" | relative_url }}" class="btn btn-secondary">About Me</a>
+      <a href="#latest-posts" class="btn btn-primary">
+        <i class="fas fa-book-open"></i> Explore Posts
+      </a>
+      <a href="{{ "/about/" | relative_url }}" class="btn btn-secondary">
+        <i class="fas fa-user"></i> About Me
+      </a>
     </div>
   </div>
 </section>
@@ -27,8 +31,10 @@ layout: default
     {%- if posts.size > 0 -%}
       <!-- Section Header -->
       <div class="section-header" id="latest-posts">
-        <h2 class="section-title">Latest Articles</h2>
-        <p class="section-subtitle">Technical guides and tutorials on TelcoCloud Infrastructure & Applications</p>
+        <h2 class="section-title">
+          <i class="fas fa-newspaper"></i> Latest Articles
+        </h2>
+        <p class="section-subtitle">Deep dives into TelcoCloud Infrastructure, OpenShift deployments, and Cloud-Native technologies</p>
       </div>
 
       <!-- Post Cards Grid -->
@@ -51,7 +57,7 @@ layout: default
               {%- elsif post.title contains "registry" -%}
                 <i class="fas fa-box"></i>
               {%- else -%}
-                <i class="fas fa-file-alt"></i>
+                <i class="fas fa-file-code"></i>
               {%- endif -%}
             </div>
           </div>
@@ -79,13 +85,13 @@ layout: default
         <div class="pager">
           <ul class="pagination">
           {%- if paginator.previous_page %}
-            <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page">← Previous</a></li>
+            <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page"><i class="fas fa-arrow-left"></i> Previous</a></li>
           {%- else %}
             <li><div class="pager-edge">•</div></li>
           {%- endif %}
             <li><div class="current-page">Page {{ paginator.page }}</div></li>
           {%- if paginator.next_page %}
-            <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">Next →</a></li>
+            <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">Next <i class="fas fa-arrow-right"></i></a></li>
           {%- else %}
             <li><div class="pager-edge">•</div></li>
           {%- endif %}
