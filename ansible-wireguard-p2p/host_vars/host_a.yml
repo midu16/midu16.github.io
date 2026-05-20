@@ -1,0 +1,9 @@
+# Host A specific configuration
+physical_ip: "192.168.1.10"
+wg_ip: "10.0.0.1"
+pod_ip: "10.0.0.10"
+pod_name: "pod-a"
+
+# Peer information (Host B)
+peer_public_key: "" # Will be populated by the playbook or manually
+peer_endpoint: "192.168.1.20:51820"

@@ -1,0 +1,116 @@
+---
+layout: post
+title:  "How install Microshift on Fedora 32"
+date:   2025-12-23 10:10:29 +0200
+categories: microshift
+---
+
+#### December 23, 2025 | by Mihai IDU
+
+## Background/Purpose
+
+Microshift is a format for distributing applications on Linux. It is a self-contained format that can be run on any Linux distribution without the need to install it. In this post we are going to highlight the process of installing an Microshift application on Fedora 32 and how to perform the lifecycle management of the application.
+
+
+### Requirements:
+
+- Fedora 32
+
+## Environment Setup
+
+It is assumed that the environment its already prepared and ready to be used, in this case we are going to use Fedora 32.
+
+## Obtaining the AppImage
+
+In order to obtain the AppImage file, we are going to use the following example:
+
+Step 1. Open the Browser
+
+Step 2. Type into your Browser the following URL:
+
+```bash
+https://lmstudio.ai/download
+```
+
+Step 3. Click on the Download button
+
+Step 4. Save the file to your desired location
+
+
+## Environment preparation for the AppImage install 
+
+Step 1. Make the file executable
+```bash
+$ chmod +x ./LM-Studio-0.3.36-1-x64.AppImage
+```
+
+> [!NOTE]
+> In order to run the AppImage you need to have the following dependencies installed:
+>
+> - libfuse2
+> - libappimage
+>
+> ```bash
+> sudo dnf install fuse-libs
+> ```
+
+Step 2. Run the AppImage
+```bash
+$ ./LM-Studio-0.3.36-1-x64.AppImage --no-sandbox
+```
+
+> [!NOTE]
+> The .AppImage application it will start, for testing that the application runs the on the system.
+
+
+## AppImage install 
+
+Step 1. Create the directory
+```bash
+$ sudo mkdir -p /opt/LMStudio
+```
+
+Step 2. Copy the AppImage to the directory
+```bash
+$ sudo install ./Downloads/LM-Studio-0.3.36-1-x64.AppImage /opt/LMStudio/LM_Studio.AppImage
+```
+
+Step 3. Create the desktop entry on the local user
+```bash
+$ mkdir -p .local/share/applications/
+```
+
+Step 4. Create the desktop entry
+```bash
+$ cat <<EOF > .local/share/applications/lmstudio.desktop
+[Desktop Entry]
+Name=LM Studio
+Comment=LM Studio
+Exec=/opt/LMStudio/LM_Studio.AppImage
+Icon=/opt/LMStudio/lmstudio.png
+Terminal=false
+Type=Application
+Categories=Development;
+EOF
+```
+
+Step 5. Now open your application menu and you should see the LM Studio application
+
+
+
+## AppImage update 
+
+Step 1. Download the new version of the AppImage
+
+Step 2. Replace the old AppImage with the new one
+```bash
+$ sudo chmod +x ./Downloads/LM-Studio-0.3.37-1-x64.AppImage
+
+$ sudo install ./Downloads/LM-Studio-0.3.37-1-x64.AppImage /opt/LMStudio/LM_Studio.AppImage
+```
+
+Step 3. Restart the application
+
+## References
+
+[1] https://lmstudio.ai/download

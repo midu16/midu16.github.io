@@ -1,0 +1,4 @@
+# Common variables for all hosts
+wireguard_subnet: "10.0.0.0/24"
+wireguard_port: 51820
+podman_network_name: "overlay_net"

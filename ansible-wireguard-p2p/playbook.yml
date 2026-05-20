@@ -1,0 +1,83 @@
+---
+- name: Configure WireGuard P2P Tunnel and Podman Overlay
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure WireGuard and Podman are installed
+      package:
+        name:
+          - wireguard
+          - wireguard-tools
+          - podman
+        state: present
+
+    - name: Create directory for WireGuard keys
+      file:
+        path: "/etc/wireguard/keys"
+        state: directory
+        mode: '0700'
+
+    - name: Generate WireGuard private key
+      shell: "wg genkey | tee /etc/wireguard/keys/privatekey | wg pubkey > /etc/wireguard/keys/publickey"
+      args:
+        creates: "/etc/wireguard/keys/privatekey"
+
+    - name: Read WireGuard private key
+      slurp:
+        src: "/etc/wireguard/keys/privatekey"
+      register: wg_private_key_encoded
+
+    - name: Set private key fact
+      set_fact:
+        wg_private_key: "{{ wg_private_key_encoded['content'] | b64decode }}"
+
+    - name: Read WireGuard public key
+      slurp:
+        src: "/etc/wireguard/keys/publickey"
+      register: wg_public_key_encoded
+
+    - name: Set public key fact
+      set_fact:
+        wg_public_key: "{{ wg_public_key_encoded['content'] | b64decode }}"
+
+    - name: Create WireGuard configuration from template
+      template:
+        src: "templates/wg0.conf.j2"
+        dest: "/etc/wireguard/wg0.conf"
+        mode: '0600'
+
+    - name: Bring up WireGuard interface
+      command: "wg-quick up wg0"
+      register: wg_up_result
+      failed_when: 
+        - wg_up_result.rc != 0
+        - "'already exists' not in wg_up_result.stderr"
+      ignore_errors: true
+
+    - name: Configure routing for the virtual subnet
+      shell: "ip route add {{ wireguard_subnet }} dev wg0"
+      register: route_result
+      failed_when:
+        - route_result.rc != 0
+        - "'File exists' not in route_result.stderr"
+      ignore_errors: true
+
+    - name: Create Podman network
+      command: "podman network create --subnet {{ wireguard_subnet }} {{ podman_network_name }}"
+      register: net_create_result
+      failed_when: 
+        - net_create_result.rc != 0
+        - "'already exists' not in net_create_result.stderr
+      ignore_errors: true
+
+    - Launch Pod with static IP
+      command: "podman run -d --name {{ pod_name }} --network {{ podman_network_name }} --ip {{ pod_ip }} alpine sleep infinity"
+      register: pod_run_result
+      failed_when: 
+        - pod_run_result.rc != 0
+        - "'already in use' not in pod_run_result.stderr
+      ignore_errors: true
+
+  # Note: This playbook assumes the peer's public key is already known or 
+  # handled via a separate mechanism (like a shared file or vault).
+  # For a truly dynamic setup, you would need a second pass or a shared state.

@@ -1,0 +1,8 @@
+[Interface]
+PrivateKey = {{ wg_private_key }}
+Address = {{ wg_ip }}/24
+
+[Peer]
+PublicKey = {{ peer_public_key }}
+Endpoint = {{ peer_endpoint }}
+AllowedIPs = {{ wireguard_subnet }}
