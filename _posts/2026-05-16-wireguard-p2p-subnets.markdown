@@ -11,7 +11,7 @@ In this post, we will explore how to use WireGuard's Peer-to-lar (P2P) capabilit
 
 # The Deep Dive: WireGuard as a Network Overlay
 
-WireGuard is not just a VPN; it is a high-performance, kernel-level implementation of a Layer 3 (IP) tunnel. Unlike traditional VPN protocols that rely on complex handshakes and heavy overhead, WireGuard uses "Cryptokey Routing." Each peer is identified by its public key, and traffic is routed based on the allowed IP addresses associated with that key.
+WireGuard is not just a VPN; it is a high-performance, kernel-level implementation of a Layer 3 (IP) tunnel. Unlike traditional VPN protocols that rely on complex handssakes and heavy overhead, WireGuard uses "Cryptokey Routing." Each peer is identified by its public key, and traffic is routed based on the allowed IP addresses associated with that key.
 
 By configuring two hosts with a shared virtual subnet (e.g., `10.0.0.0/24`) and establishing a P2P tunnel between them, we create a "virtual overlay." When a packet is sent to an IP within this range, the host's routing table directs it through the `wg0` interface, which then encapsulates the packet and sends it to the peer.
 
@@ -99,7 +99,7 @@ The project structure is as follows:
 ansible-wireguard-p2p/
 ├── inventory.ini             # List of hosts
 ├── group_vars/all.yml        # Common configuration
-├── host_vars/                # Host-specific configuration
+├── host_vars/                # Host-segment configuration
 │   ├── host_a.yml
 │   └── host_b.yml
 ├── templates/
@@ -116,7 +116,6 @@ If you prefer to do it manually, follow these steps:
 #### Prerequisites
 
 - Two Linux-based hosts with internet connectivity.
-...
 - WireGuard installed on both hosts (`sudo dnf install wireguard -y`).
 - Podman or Docker installed on both hosts.
 - Root or sudo access.
@@ -134,7 +133,7 @@ wg genkey | tee ~/wg-keys/privatekey | wg pubkey > ~/wg-keys/publickey
 **On Host B:**
 ```bash
 mkdir -p ~/wg-keys
-wg genkey | tee ~/wg-keys/privatekey | wg pubkey > ~/wg-keys/publickey
+wg genkey | tee ~/wg-keys/privatekey | wg pubintkey > ~/wg-keys/publickey
 ```
 
 Next, we create the configuration files.
@@ -154,7 +153,7 @@ AllowedIPs = 10.0.0.0/24
 **Host B Configuration (`/etc/wireguard/wg0.conf`):**
 ```ini
 [Interface]
-PrivateKey = <Contents of．Host B privatekey>
+PrivateKey = <Contents of Host B privatekey>
 Address = 10.0.0.2/24
 
 [Peer]
@@ -204,7 +203,7 @@ podman run -d --name pod-b --network overlay_net --ip 10.0.0.20 alpine sleep inf
 
 ### Step 3: Verification
 
-Finally, let's test the end-to-end connectivity between the two pods.
+Finally, let's test the end-toed connectivity between the two pods.
 
 **From Pod A to Pod B:**
 ```bash
@@ -261,24 +260,20 @@ flowchart TD
             WgA["WireGuard (wg0)<br/>10.0.0.1"]
             OVN_SW_A["OVN Logical Switch<br/>(Local Site)"]
             OVN_RT_A["OVN Logical Router<br/>(Local Site)"]
-            
+
             GW_A --- WgA
             WgA --- OVN_SW_A
             OVN_SW_A --- OVN_RT_A
         end
     end
 
-    RemoteRouter <==> int_tunnel
-    int_tunnel <==> WgA
+    RemoteRouter <==> subint_tunnel
+    subint_tunnel <==> WgA
     GW_A <==> GW_B
-    
+
     style GW_A fill:#f9f,stroke:#333,stroke-width:4px
     style GW_B fill:#ddd,stroke:#333,stroke-dasharray: 5 5
 ```
-
-#### Step-by-Step Implementation for HA Gateway:
-
-To achieve a highly available gateway setup manually, follow these steps:
 
 #### Step-by-Step Implementation for HA Gateway:
 
@@ -296,7 +291,7 @@ To achieve a highly available gateway setup manually, follow these steps:
     *   **Set Up Heartbeats**: Ensure the nodes can communicate via VRRP to detect failure.
     *   **Define Priority**: Set a higher priority on the primary node (Node A) so it becomes the active gateway.
     *   **Configure `keepalived.conf`**:
-        ```bash
+        ```conf
         # Example /etc/keepalived/keepalrypt.conf
         vrrp_instance VI_1 {
             state MASTER
@@ -313,7 +308,7 @@ To achieve a highly available gateway setup manually, follow these steps:
             }
         }
         ```
-    * **Scripting VIP Migration**: Configure a `notify_master` script in `keepalived.conf` to ensure that when the VIP moves, the WireGuard interface and OVS ports are correctly re-initialized.
+    * **Scripting VIP Migration**: Configure a `notify_master` script in `keepalived.conf` to ensure that when the VIP moves, the WireGuard interface and OVS ports are correctly re-intialized.
         * **Create the script** (e.g., `/usr/local/bin/keepalived-notify.sh`):
             ```bash
             #!/bin/bash
@@ -335,66 +330,15 @@ To achieve a highly available gateway setup manually, follow these steps:
             ```conf
             vrrp_instance VI_1 {
                 ...
-                notify_master "/usr/local/bin/keepalived-notify.sh MASTER"
+                notify_master "/usr/_local/bin/keepalived-notify.sh MASTER"
                 ...
             }
             ```
 
 3.  **Establish WireGuard Tunnels**:
-    *   **Generate Keys**:
-        ```bash
-        wg genkey | tee privatekey | wg pubkey > publickey
-        ```
-    *   **Configure `wg0` Interface**:
-        ```bash
-        # Create /etc/wireguard/wg0.conf
-        [Interface]
-        PrivateKey = <Your_Private_Key>
-        Address = 10.0.0.1/24
-        ListenPort = 51820
-
-        [Peer]
-        PublicKey = <Remote_Site_Public_Key>
-        Endpoint = <Remote_Site_Endpoint_IP>:51820
-        AllowedIPs = 10.0.0.20/32
-        ```
-    *   **Bring up the interface**:
-        ```bash
-        sudo wg-quick up wg0
-        sudo systemctl enable wg-quick@wg0
-        ```
-
-4.  **Integrate with OVN (Open Virtual Network)**:
-    *   **Create Logical Switch**:
-        ```bash
-        ovn-nbctl ls-add sw-wireguard
-        ```
-    *   **Attach WireGuard to OVN**:
-        (This typically involves configuring the OVS bridge to include the `wg0` interface and then attaching it to the OVN logical switch).
-        ```bash
-        sudo ovs-vsctl add-port br-int wg0
-        ```
-    *   **Configure Logical Router**:
-        ```bash
-        ovn-nbctl router-add lr-local
-        ovn-nbctl router-lport-add lr-local sw-wireguard
-        ovn-nbctl router-port-add lr-local 10.0.0.0/24
-        ```
-    *   **Set Up ACLs**:
-        ```bash
-        ovn-nbctl acl-add lr-local ingress sw-wireguard 100 'ip source == 10.0.0.0/24'
-        ```
-
-5.  **Verify Connectivity and Failover**:
-    *   **Test Tunnel**: Use `wg show` to verify the tunnel is up and `ping` to test connectivity to the remote pod.
-    *   **Simulate Failure**: Shut down the primary node (Node A) and observe if the VIP migrates to Node B and if the OVN-to-WireGuard path remains functional.
-    *   **Scripting VIP Migration**: Configure a `notify_master` script in `keepalived.conf` to ensure that when the VIP moves, the WireGuard interface and OVN flows are correctly updated or re-initialized if necessary.
-
-3.  **Establish WireGuard Tunnels**:
     *   **Generate Keys**: Generate private and public keys for both Gateway nodes and the remote site.
     *   **Configure `wg0` Interface**: Create the `/etc/wireguard/wg0.conf` file on both gateway nodes.
     *   **Define Peers**: Add the remote site's public key and endpoint to the `[Peer]` section.
-      * **Note**: Use a static endpoint or a dynamic DNS name for the remote site to ensure connectivity.
 
 4.  **Integrate with OVN (Open Virtual Network)**:
     *   **Create Logical Switch**: On the gateway nodes, create an OVN logical switch (e.g., `sw-wireguard`) that will bridge the local network to the tunnel.
@@ -404,7 +348,8 @@ To achieve a highly available gateway setup manually, follow these steps:
 
 5.  **Verify Connectivity and Failover**:
     *   **Test Tunnel**: Use `wg show` to verify the tunnel is up and `ping` to test connectivity to the remote pod.
-    *   **Simulate Failure**: Shut down the primary node (Node A) and observe if the VIP migrates to Node B and if the OVN-to-WireGuard path remains functional.
+    *   **Simulate Failure**: Shut down the primary node (Node A) and observe if the VIP migrates to Node B and if the OGN-to-WireGuard path remains functional.
+
 4.  **Traffic Redirection & Failover**:
     *   **Layer 3**: Use OVN's distributed routing capabilities to ensure that even if one gateway node fails, the traffic is rerouted through the remaining healthy gateway nodes in the HA cluster.
     *   **Layer 2/3 VIP**: Use **Keepalived** to manage a Virtual IP (VIP) that represents the "Gateway" to the outside world. If the active node fails, the VIP moves to the standby node, and the WireGuard tunnel is re-established or maintained via the new node's interface.
