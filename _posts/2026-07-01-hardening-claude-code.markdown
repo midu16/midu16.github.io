@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Mitigating Agentic Risk: An Enterprise Hardening Blueprint for CLI AI Agents"
-date: 2026-07-01
+date: 2026-07-01 00:00:00 +0000
 categories: [Security, Architecture]
 tags: [ClaudeCode, LinuxHardening, SELinux, Podman, ZeroTrust]
 ---
