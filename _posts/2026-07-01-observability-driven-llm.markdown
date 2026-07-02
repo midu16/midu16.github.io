@@ -14,6 +14,14 @@ tags: [Ollama, Podman, Prometheus, Observability, LocalLLM, Infrastructure]
 
 ---
 
+## 🗺️ High Level Architecture
+
+To understand how these components interact, refer to the system architecture diagram below. The flow begins with the user request, passing through the metrics proxy for latency tracking, hitting the optimized Ollama engine for inference, while the exporter continuously scrapes internal state for Prometheus.
+
+![Ollama Observability Architecture](../assets/images/ollama-observability-arch.png)
+
+---
+
 ## 🛠️ The Foundation: Rootless Containerization & Hardware Acceleration
 
 Before we touch the models, we need an execution environment that doesn't compromise the host system but still has direct access to the silicon. We use **Podman** for rootless execution, ensuring that our LLM service runs with the least privilege necessary.
@@ -83,13 +91,48 @@ podman run -d \
 ```
 
 ### Component B: The Metrics Proxy
-While the exporter tells us about the *state*, the `ollama-metrics` proxy tells us about the *traffic*. It intercepts every request to measure:
+While the exporter tells us about the *state*, the `ollama-metrics` proxy tells us about the *traffic*. It acts as a bridge, intercepting every request to measure:
 - **TTFT (Time To First Token):** The critical metric for perceived responsiveness.
 - **TPS (Tokens Per Second):** The actual throughput of your hardware setup.
 
+**Deployment:**
+```bash
+podman run -d \
+  --name=ollama_metrics_proxy \
+  --net=host \
+  -p 8080:8080 \
+  -e OLLAMA_HOST=http://<your-ollama-ip>:11434 \
+  -e PORT=8080 \
+  ghcr.io/norskhelsenett/ollama-metrics:latest
+```
+*Note: We use `--net=host` and explicit port mapping to ensure the metrics endpoint is reachable across the local network for Prometheus scraping.*
+
+## 🎨 Module 3: The Interface Layer — Open WebUI
+
+While a CLI or API is sufficient for automation, a sophisticated frontend is essential for human interaction and document management. **Open WebUI** provides a professional-grade interface that transforms the raw Ollama API into a full-featured AI workstation.
+
+### Deployment & Persistence
+To ensure chat history, user accounts, and uploaded documents persist across updates, we map the backend data to a host directory. This allows for seamless backups of the `webui.db` and the internal vector database.
+
+```bash
+podman run -d \
+  --name=open-webui \
+  --net=host \
+  -e PORT=3092 \
+  -e OLLAMA_BASE_URL=http://<your-ollama-ip>:11434 \
+  -v /var/apps/open-webui:/app/backend/data:Z \
+  ghcr.io/open-webui/open-webui:main
+```
+
+### Engineering Advantages
+- **Integrated RAG**: Through the built-in vector database, you can upload technical documentation and query it using your local models without writing a separate ingestion pipeline.
+- **Model Orchestration**: Manage Ollama model pulls and parameter tuning (temperature, top-k) directly from the UI.
+- **User Management**: Provide multi-user access to a single powerful inference node while maintaining isolated chat histories.
+
 ---
 
-## ⚖️ Module 3: Integration & Verification
+## ⚖️ Module 4: Integration & Verification
+
 
 Now we verify that our "Hardened" stack is actually performing as expected.
 
@@ -110,6 +153,7 @@ We've moved from a simple binary to a professional AI inference stack. By implem
 1. **Hardware Alignment**: GFX overrides for GPU stability.
 2. **Performance Tuning**: 64k context and Flash Attention for agentic utility.
 3. **Infrastructure Standards**: Rootless Podman with volume persistence.
-4. **Full Observability**: Prometheus integration to eliminate the "black box" problem.
+ 4. **Full Observability**: Prometheus integration to eliminate the "black box" problem.
+ 5. **Human Interface**: Open WebUI for RAG and orchestration.
 
 *The goal isn't just to run a model; it's to know exactly why that model is slow, where the bottleneck is, and how to scale it. Now you have the blueprint—go build your own ironclad inference station.*
