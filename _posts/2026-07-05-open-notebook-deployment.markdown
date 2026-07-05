@@ -142,9 +142,10 @@ Since Open Notebook persists its synthesized state and exports in `/var/apps/ope
 *   **The "Signal Gate":** Treating the `/app/data` directory as a "staging area." Only after a human reviews and approves an AI summary is it moved into the primary Zettelkasten folder, ensuring that the permanent knowledge base remains free of hallucinations.
 
 ## 6. Appendix: Production Checklist
+
 | Item | Requirement | Rationale |
 | :--- | :--- | :--- |
 | **User Namespace** | Rootless Podman | Mitigates container breakout risks to the host OS. |
 | **Storage Labels** | `:Z` Flag | Ensures SELinux context is correct for volume mounts on RHEL/Fedora. |
 | **Database Tuning** | SurrealDB v2+ | Required for latest graph-relational features and stability. |
-| **Model Config** | Valid Embedding API | Prevents `embed_insight` failures identified in logs. |
+| **Model Config** | Valid Embedding API | Prevents `embed_insight` failures identified in logs. | |
