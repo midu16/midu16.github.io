@@ -3,8 +3,7 @@ layout: post
 title: "How To Sign OCI Container Images Using Podman And Cosign With GPG Keys In A Linux System (COSIGN_EXPERIMENTAL_GPG)"
 date: 2026-07-13T15:49:08+01:00
 author: Mihai IDU
-description: This post is a How To sign OCI container images using Podman and Cosign with GPG keys in a Linux system. We will explore how to generate, verify the signer identity chain used by cosign for signing artifacts during build pipeline flow — specifically focusing on COSIGN_EXPERIMENTAL_GPG=1 mode which leverages OpenPGP capabilities through GNU Privacy Guard (GnuPG) for cryptographic operations without requiring Fulcio Sigstore CA dependencies or Rekor transparency logs. This is ideal for air-gapped environments where standard HTTPS endpoints would be blocked by organizational network policies — also worth noting: when running COSIGN_EXPERIMENTAL_GPG=1 mode in CI/CD environments such as GitHub Actions, GitLab CI runners etc., cosign falls back to offline verification path automatically since these platforms cannot access Fulcio endpoint; however production-grade builds should still consider switching to COSIGN_EXPERIMENTAL_FULCIO=true before deploying outside test infra if organization requires additional attestation beyond just local signature validation post-push completes below.
-categories: container-security, signing-images
+categories: [container-security, signing-images]
 tags: [podman, cosign, gpg, oci, air-gapped]
 ---
 
