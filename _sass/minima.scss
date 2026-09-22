@@ -34,7 +34,7 @@ $table-text-align: left !default;
 $content-width:    800px !default;
 
 $on-palm:          600px !default;
-$on-latptop:       1024px !default;
+$on-laptop:       1024px !default;
 $on-desktop:       1440px !default;
 
 @mixin media-query($device) {

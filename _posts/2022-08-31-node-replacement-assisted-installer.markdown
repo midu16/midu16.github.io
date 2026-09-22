@@ -828,7 +828,7 @@ oc get csr
 - Approve all the pending certificates:
 
 {% highlight bash %}
-oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs --no-run-if-empty oc adm certificate approve
+oc get csr -o go-template='{{range .items}}{{if .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs --no-run-if-empty oc adm certificate approve
 {% endhighlight %}
 
 Step 7. Adding the control node back to the cluster
