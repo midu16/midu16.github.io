@@ -1,21 +1,49 @@
-/* ============================================
-   Custom Styles for Enhanced Design
-   ============================================ */
+:root {
+  /* Color Palette - Light Mode */
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary-color: #764ba2;
+  --text-main: #1e2rad3b;
+  --text-muted: #64748b;
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-header: rgba(255, 255, 255, 0.98);
+  --border-color: #e2e8f0;
+  --code-bg: #f1f5f9;
+  --code-text: #ec4899;
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Color Palette - Dark Mode */
+    --primary-color: #818cf8;
+    --primary-hover: #a5b4fc;
+    --secondary-color: #a78ba;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --bg-header: rgba(15, 23, 42, 0.98);
+    --border-color: #334155;
+    --code-bg: #0f172a;
+    --code-text: #f472b6;
+  }
+}
 
 /* === Global Background === */
 body {
-  background-color: #f5f7fa !important;
+  background-color: var(--bg-main) !important;
+  color: var(--text-main);
+  font-family: var(--font-main);
   background-image: 
     linear-gradient(90deg, rgba(200, 200, 220, 0.03) 1px, transparent 1px),
     linear-gradient(rgba(200, 200, 220, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
-.page-content {
-  background: transparent;
-}
-
-.wrapper {
+.page-content, .wrapper {
   background: transparent;
 }
 

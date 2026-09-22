@@ -9,19 +9,19 @@ $base-font-weight: 400 !default;
 $small-font-size:  $base-font-size * 0.875 !default;
 $base-line-height: 1.6 !default;
 
-$spacing-unit:     30px !default;
+$spacing-unit:     24px !default;
 
-// Modern color palette
-$text-color:       #2d3748 !default;
-$background-color: #f5f7fa !default;
+// Professional Color Palette (Deep Slate & Indigo)
+$text-color:       #1e293b !default;
+$background-color: #ffffff !default;
 $brand-color:      #4f46e5 !default;  // Indigo
-$brand-color-light: #818cf8 !default;
+$brand-color-light: #e0e7ff !default;
 $brand-color-dark:  #3730a3 !default;
-$accent-color:     #ec4899 !default;  // Pink accent
+$accent-color:     #06b6d4 !default;  // Cyan accent
 
 $grey-color:       #64748b !default;
-$grey-color-light: #e2e8f0 !default;
-$grey-color-dark:  #1e293b !default;
+$grey-color-light: #f1f5f9 !default;
+$grey-color-dark:  #0f172a !default;
 
 // Additional colors
 $success-color:    #10b981 !default;
@@ -31,19 +31,12 @@ $info-color:       #3b82f6 !default;
 $table-text-align: left !default;
 
 // Width of the content area
-$content-width:    1200px !default;
+$content-width:    800px !default;
 
 $on-palm:          600px !default;
-$on-laptop:        1024px !default;
+$on-latptop:       1024px !default;
 $on-desktop:       1440px !default;
 
-// Use media queries like this:
-// @include media-query($on-palm) {
-//   .wrapper {
-//     padding-right: $spacing-unit / 2;
-//     padding-left: $spacing-unit / 2;
-//   }
-// }
 @mixin media-query($device) {
   @media screen and (max-width: $device) {
     @content;
@@ -54,7 +47,6 @@ $on-desktop:       1440px !default;
   font-size: $base-font-size * $ratio;
 }
 
-// Import partials.
 @import
   "minima/base",
   "minima/layout",
