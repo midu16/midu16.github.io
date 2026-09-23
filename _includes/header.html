@@ -6,6 +6,11 @@
       <span class="site-title-text">{{ site.title | escape }}</span>
     </a>
 
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+      <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+    </button>
+
     {%- if page_paths -%}
       <nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
