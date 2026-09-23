@@ -22,6 +22,17 @@
   --hover-shadow: rgba(79, 70, 229, 0.2);
   --font-main: 'Inter', system-ui, -apple-system, sans-serif;
   --transition: all 0.3s ease;
+
+  /* Fluid layout: content tracks viewport width */
+  --page-gutter: clamp(20px, 5vw, 48px);
+  --content-width: min(1400px, 100% - 2 * var(--page-gutter));
+  --reading-width: 52rem;
+  --content-font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --h1-size: clamp(2rem, 1.4rem + 3vw, 3.25rem);
+  --h2-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+  --h3-size: clamp(1.2rem, 1.05rem + 0.8vw, 1.5rem);
+  --header-height: 72px;
+  --scroll-padding: calc(var(--header-height) + 16px);
 }
 
 /* Dark mode: explicit choice wins, otherwise follow system preference */
@@ -73,6 +84,58 @@ html[data-theme="dark"] {
   }
 }
 
+/* === Fluid Layout === */
+/* Override minima's fixed centered .wrapper so content tracks the viewport */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--scroll-padding);
+}
+
+body {
+  font-size: var(--content-font-size);
+}
+
+.wrapper {
+  max-width: none !important;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding-left: var(--page-gutter);
+  padding-right: var(--page-gutter);
+  box-sizing: border-box;
+}
+
+.page-content {
+  padding: 40px 0 0;
+}
+
+.page-content > .wrapper > .post,
+.page-content > .wrapper > article {
+  max-width: var(--reading-width);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Fluid typography */
+h1, .post-title, .professional-name, .hero h1 {
+  font-size: var(--h1-size);
+}
+
+.section-title {
+  font-size: var(--h2-size);
+}
+
+h2 {
+  font-size: var(--h2-size);
+}
+
+h3 {
+  font-size: var(--h3-size);
+}
+
+h4 {
+  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem);
+}
+
 /* === Global Background === */
 body {
   background-color: var(--bg-main) !important;
@@ -92,8 +155,8 @@ body {
 .hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 100px 0 120px;
-  margin: -20px -20px 60px -20px;
+  padding: 100px var(--page-gutter) 120px;
+  margin: -40px calc(-1 * var(--page-gutter)) 60px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0,0,0,0.1);
@@ -119,7 +182,6 @@ body {
 }
 
 .hero h1 {
-  font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 20px;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -245,7 +307,7 @@ body {
 
 .post-link {
   color: var(--text-main);
-  font-size: 1.5rem;
+  font-size: var(--h3-size);
   font-weight: 600;
   line-height: 1.3;
   margin-bottom: 12px;
@@ -451,7 +513,6 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 }
 
 .section-title {
-  font-size: 2.5rem;
   font-weight: 700;
   color: var(--text-heading);
   margin-bottom: 10px;
@@ -473,7 +534,6 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 }
 
 .post-title {
-  font-size: 3rem;
   font-weight: 700;
   color: var(--text-heading);
   margin-bottom: 20px;
@@ -688,7 +748,6 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 }
 
 .professional-name {
-  font-size: 3rem;
   font-weight: 700;
   margin-bottom: 10px;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -1042,10 +1101,6 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
     padding: 60px 20px;
   }
   
-  .professional-name {
-    font-size: 2.25rem;
-  }
-  
   .professional-title {
     font-size: 1.25rem;
   }
@@ -1060,7 +1115,6 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
   .section-title-pro {
     font-size: 1.5rem;
   }
-  
   .competencies-grid,
   .expertise-columns,
   .mission-content,
@@ -1071,24 +1125,12 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 
 /* === Responsive Design === */
 @media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2.5rem;
-  }
-  
   .hero p {
     font-size: 1.1rem;
   }
   
   .post-list {
     grid-template-columns: 1fr;
-  }
-  
-  .post-title {
-    font-size: 2.25rem;
-  }
-  
-  .section-title {
-    font-size: 2rem;
   }
   
   .footer-col-wrapper {
@@ -1222,4 +1264,83 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 
 .home .wrapper {
   max-width: 1400px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* === Scroll Progress Bar === */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  z-index: 1001;
+  transition: width 0.1s linear;
+}
+
+/* === Back to Top Button === */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px var(--hover-shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15px);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background: var(--primary-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--hover-shadow);
+}
+
+/* === Scroll Reveal Animation === */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .post-card {
+    animation: none;
+  }
 }

@@ -91,5 +91,56 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    // Dynamic UI: scroll progress bar, back-to-top button, reveal-on-scroll
+    (function () {
+      document.addEventListener('DOMContentLoaded', function () {
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Scroll progress bar
+        var bar = document.createElement('div');
+        bar.className = 'scroll-progress';
+        document.body.appendChild(bar);
+        var progress = function () {
+          var doc = document.documentElement;
+          var max = doc.scrollHeight - doc.clientHeight;
+          bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+        };
+        window.addEventListener('scroll', progress, { passive: true });
+        progress();
+
+        // Back to top button
+        var topBtn = document.createElement('button');
+        topBtn.className = 'back-to-top';
+        topBtn.setAttribute('aria-label', 'Back to top');
+        topBtn.title = 'Back to top';
+        topBtn.innerHTML = '<i class="fas fa-arrow-up" aria-hidden="true"></i>';
+        topBtn.addEventListener('click', function () {
+          window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        });
+        document.body.appendChild(topBtn);
+        var toggleTop = function () {
+          topBtn.classList.toggle('visible', window.scrollY > 400);
+        };
+        window.addEventListener('scroll', toggleTop, { passive: true });
+        toggleTop();
+
+        // Reveal sections on scroll
+        var targets = document.querySelectorAll('.section-header, .about-section, .post-navigation');
+        if (!reduceMotion && 'IntersectionObserver' in window && targets.length) {
+          targets.forEach(function (el) { el.classList.add('reveal'); });
+          var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.12 });
+          targets.forEach(function (el) { observer.observe(el); });
+        }
+      });
+    })();
+  </script>
 </head>
 
