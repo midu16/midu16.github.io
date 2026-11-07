@@ -8,14 +8,22 @@ layout: default
     <div class="post-meta">
       {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
       <span>
-        <i class="far fa-calendar"></i>
+        <i class="far fa-calendar" aria-hidden="true"></i>
         <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
           {{ page.date | date: date_format }}
         </time>
       </span>
+      {%- assign words = content | number_of_words -%}
+      {%- if words > 0 -%}
+      <span>
+        <i class="far fa-clock" aria-hidden="true"></i>
+        {% assign minutes = words | plus: 199 | divided_by: 200 %}
+        {{ minutes }} min read
+      </span>
+      {%- endif -%}
       {%- if page.modified_date -%}
         <span>
-          <i class="fas fa-edit"></i>
+          <i class="fas fa-edit" aria-hidden="true"></i>
           {%- assign mdate = page.modified_date | date_to_xmlschema -%}
           <time class="dt-modified" datetime="{{ mdate }}" itemprop="dateModified">
             Updated: {{ mdate | date: date_format }}
@@ -24,7 +32,7 @@ layout: default
       {%- endif -%}
       {%- if page.author -%}
         <span>
-          <i class="fas fa-user"></i>
+          <i class="fas fa-user" aria-hidden="true"></i>
           {% for author in page.author %}
             <span itemprop="author" itemscope itemtype="http://schema.org/Person">
               <span class="p-author h-card" itemprop="name">{{ author }}</span>
@@ -44,10 +52,10 @@ layout: default
     {%- include disqus_comments.html -%}
   {%- endif -%}
 
-  <div class="post-navigation">
+  <nav class="post-navigation" aria-label="Post navigation">
     {%- if page.previous.url -%}
       <a href="{{ page.previous.url | relative_url }}" class="post-nav-link post-nav-prev">
-        <i class="fas fa-arrow-left"></i>
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
         <div>
           <span class="post-nav-label">Previous Post</span>
           <span class="post-nav-title">{{ page.previous.title | escape }}</span>
@@ -60,11 +68,10 @@ layout: default
           <span class="post-nav-label">Next Post</span>
           <span class="post-nav-title">{{ page.next.title | escape }}</span>
         </div>
-        <i class="fas fa-arrow-right"></i>
+        <i class="fas fa-arrow-right" aria-hidden="true"></i>
       </a>
     {%- endif -%}
-  </div>
+  </nav>
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
-

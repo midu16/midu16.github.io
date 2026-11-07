@@ -6,7 +6,7 @@ categories: [AI, Engineering]
 tags: [NVIDIA, Agents, Fedora, ReAct, RAG, Podman]
 ---
 
-# 🍄 Leveling Up: A Deep-Dive Guide to Building NVIDIA-Powered Agents on Fedora
+## 🍄 Leveling Up: A Deep-Dive Guide to Building NVIDIA-Powered Agents on Fedora
 
 *Pull up a chair. Clear the whiteboard. We aren't here for the marketing hype or the "AI will change the world" clickbait. We're here to talk about the mechanics. We're going to walk through the architecture used in the `brevdev/workshop-build-an-agent` workshop, but we're doing it the right way: with deep-dive code, measurable metrics, and a setup optimized strictly for Fedora.*
 

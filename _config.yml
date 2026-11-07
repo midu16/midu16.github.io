@@ -50,6 +50,7 @@ theme: minima
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 # SEO settings
 lang: en
@@ -69,6 +70,7 @@ tagline: TelcoCloud Infrastructure & Cloud-Native Solutions
 exclude:
   - .sass-cache/
   - .jekyll-cache/
+  - .jekyll-metadata
   - gemfiles/
   - Gemfile
   - Gemfile.lock
@@ -79,4 +81,8 @@ exclude:
   - vendor/ruby/
   - "*.sh"
   - "*.zip"
+  - README.md
+  - LICENSE
+  - scripts/
+  - tmp/
 

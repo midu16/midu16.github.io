@@ -3,16 +3,16 @@ layout: default
 ---
 
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero" aria-label="Introduction">
   <div class="hero-content wrapper">
     <h1>{{ site.title | escape }}</h1>
     <p>{{ site.description | escape }}</p>
     <div class="hero-cta">
       <a href="#latest-posts" class="btn btn-primary">
-        <i class="fas fa-book-open"></i> Explore Posts
+        <i class="fas fa-book-open" aria-hidden="true"></i> Explore Posts
       </a>
       <a href="{{ "/about/" | relative_url }}" class="btn btn-secondary">
-        <i class="fas fa-user"></i> About Me
+        <i class="fas fa-user" aria-hidden="true"></i> About Me
       </a>
     </div>
   </div>
@@ -32,7 +32,7 @@ layout: default
       <!-- Section Header -->
       <div class="section-header" id="latest-posts">
         <h2 class="section-title">
-          <i class="fas fa-newspaper"></i> Latest Articles
+          <i class="fas fa-newspaper" aria-hidden="true"></i> Latest Articles
         </h2>
         <p class="section-subtitle">Deep dives into TelcoCloud Infrastructure, OpenShift deployments, and Cloud-Native technologies</p>
       </div>
@@ -45,25 +45,25 @@ layout: default
           <div class="post-card-header">
             <div class="post-card-icon">
               {%- if post.title contains "OpenShift" or post.title contains "OCP" -%}
-                <i class="fas fa-cloud"></i>
+                <i class="fas fa-cloud" aria-hidden="true"></i>
               {%- elsif post.title contains "offline" or post.title contains "mirroring" -%}
-                <i class="fas fa-download"></i>
+                <i class="fas fa-download" aria-hidden="true"></i>
               {%- elsif post.title contains "node" -%}
-                <i class="fas fa-server"></i>
+                <i class="fas fa-server" aria-hidden="true"></i>
               {%- elsif post.title contains "kernel" or post.title contains "driver" -%}
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-cog" aria-hidden="true"></i>
               {%- elsif post.title contains "benchmark" or post.title contains "etcd" -%}
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
               {%- elsif post.title contains "registry" -%}
-                <i class="fas fa-box"></i>
+                <i class="fas fa-box" aria-hidden="true"></i>
               {%- else -%}
-                <i class="fas fa-file-code"></i>
+                <i class="fas fa-file-code" aria-hidden="true"></i>
               {%- endif -%}
             </div>
           </div>
           <div class="post-card-content">
             <div class="post-meta">
-              <i class="far fa-calendar"></i>
+              <i class="far fa-calendar" aria-hidden="true"></i>
               <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
             </div>
             <h3>
@@ -85,13 +85,13 @@ layout: default
         <div class="pager">
           <ul class="pagination">
           {%- if paginator.previous_page %}
-            <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page"><i class="fas fa-arrow-left"></i> Previous</a></li>
+            <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page"><i class="fas fa-arrow-left" aria-hidden="true"></i> Previous</a></li>
           {%- else %}
             <li><div class="pager-edge">•</div></li>
           {%- endif %}
             <li><div class="current-page">Page {{ paginator.page }}</div></li>
           {%- if paginator.next_page %}
-            <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">Next <i class="fas fa-arrow-right"></i></a></li>
+            <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">Next <i class="fas fa-arrow-right" aria-hidden="true"></i></a></li>
           {%- else %}
             <li><div class="pager-edge">•</div></li>
           {%- endif %}

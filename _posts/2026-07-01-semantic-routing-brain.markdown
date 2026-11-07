@@ -6,7 +6,7 @@ categories: [AI, Architecture]
 tags: [SemanticRouter, vLLM, AgentGateway, Ollama, Podman, Infrastructure]
 ---
 
-# 🧠 Beyond Proxies: Implementing a Semantic Brain for Local LLM Routing
+## 🧠 Beyond Proxies: Implementing a Semantic Brain for Local LLM Routing
 
 *In our previous guide, we built a high-performance, observable inference station powered by Ollama and Podman. But as your AI toolkit grows—adding local coding models, general la-model sidecars, and frontier cloud APIs—you encounter the 'Routing Dilemma': How do you ensure every prompt reaches the most efficient model without manually writing thousands of regex rules?*
 

@@ -6,7 +6,7 @@ categories: [AI, Architecture]
 tags: [Ollama, Podman, Prometheus, Observability, LocalLLM, Infrastructure]
 ---
 
-# 📊 Observability-Driven LLM Infrastructure: Scaling Ollama with Podman & Prometheus
+## 📊 Observability-Driven LLM Infrastructure: Scaling Ollama with Podman & Prometheus
 
 *Pull up a chair. Clear the terminal. Most people treat local LLMs as a 'set-and-forget' binary—they run a container, chat with a model, and call it a day. But in an engineering context, that is a liability. If you cannot measure your inference latency, monitor your VRAM pressure, or track request throughput, you aren't running a service; you're running a hobby.*
 
@@ -18,7 +18,7 @@ tags: [Ollama, Podman, Prometheus, Observability, LocalLLM, Infrastructure]
 
 To understand how these components interact, refer to the system architecture diagram below. The flow begins with the user request, passing through the metrics proxy for latency tracking, hitting the optimized Ollama engine for inference, while the exporter continuously scrapes internal state for Prometheus.
 
-![Ollama Observability Architecture](../assets/images/ollama-observability-arch.png)
+![Ollama Observability Architecture](/assets/images/ollama-observability-arch.png)
 
 ---
 

@@ -55,20 +55,24 @@ bundle exec jekyll build
 
 ```
 .
+├── .github/workflows/jekyll.yml  # GitHub Pages Actions build & deploy
 ├── _config.yml              # Site configuration
-├── _includes/               # Custom includes (header, footer, social)
+├── _includes/               # Includes (head, header, footer, social)
 ├── _layouts/                # Page layouts (default, home, post, page)
 ├── _posts/                  # Blog posts in Markdown
 ├── _sass/                   # SCSS stylesheets
 │   └── minima/             # Theme SCSS files
 ├── assets/
-│   ├── css/
-│   │   └── custom.css      # Custom CSS enhancements
+│   ├── css/custom.css      # Custom CSS enhancements
+│   ├── js/main.js          # Deferred site behaviors (theme, scroll UI, code copy)
+│   ├── favicon.svg | favicon.ico | apple-touch-icon.png
 │   ├── images/             # Image assets
+│   ├── config-files/       # Example manifests
 │   └── binaries/           # Binary files
+├── ansible-wireguard-p2p/   # WireGuard P2P reference playbook (published to the site)
 ├── about.markdown          # About page
 ├── index.markdown          # Homepage
-└── 404.html               # Custom 404 page
+└── 404.html                # Custom 404 page
 ```
 
 ## 🎯 Key Features
@@ -116,7 +120,18 @@ Edit `/apps/midu16.github.io/_sass/minima.scss` to change the color scheme:
 
 ## 🌐 Deployment
 
-This site is automatically deployed via GitHub Pages when you push to the `main` branch.
+The site deploys automatically through GitHub Actions (`.github/workflows/jekyll.yml`)
+on every push to `main`. The Pages source must be set to **GitHub Actions** in
+repository settings (the workflow enables this on first run).
+
+### Accessibility & performance rules
+
+- One `<h1>` per page (post content headings start at `##`)
+- Decorative icons get `aria-hidden="true"`
+- Skip link, focus-visible outlines and scroll-padding are wired for keyboard users
+- Mermaid loads only on pages that embed diagrams; Font Awesome is non-blocking
+- Images benefit from `loading="lazy"` / `decoding="async"` automatically
+- Content is constrained to a 52 rem reading column; tables and code scroll in place
 
 ## 📄 License
 

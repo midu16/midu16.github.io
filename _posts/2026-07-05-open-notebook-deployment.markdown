@@ -6,7 +6,7 @@ categories: [Architecture, AI]
 tags: [OpenNotebook, SurrealDB, Podman, SelfHosting, Obsidian, KnowledgeManagement]
 ---
 
-# Building a Self-Hosted AI Ingestion Engine: Deploying Open Notebook with Podman
+## Building a Self-Hosted AI Ingestion Engine: Deploying Open Notebook with Podman
 
 **Audience:** Staff Engineers & Systems Architects | **Evidence level:** Implementation Reference | **Versions:** v1-latest (Containerized)
 

@@ -243,11 +243,11 @@ Check [more documentation on NMStateOperator for Openshiftv4.10][nmstateoperator
 
 The NMStateOperator status from the `web-console`
 
-![NMStateOperator Status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-22 Installed Operators · Red Hat OpenShift Container Platform.png)
+![NMStateOperator Status from web-console](/assets/images/nmstate-installed-operators.png)
 
 The NMStateOperator pods state from the `web-console`
 
-![NMStateOperator pods status from web-console](/assets/images/Screenshot 2022-09-14 at 17-18-57 Pods · Red Hat OpenShift Container Platform.png)
+![NMStateOperator pods status from web-console](/assets/images/nmstate-pods.png)
 
 - Make sure that all the available worker nodes has the same NIC installed:
 {% highlight bash %}

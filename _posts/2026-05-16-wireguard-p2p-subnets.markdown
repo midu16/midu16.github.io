@@ -9,7 +9,7 @@ In modern distributed systems, we often face the challenge of maintaining a flat
 
 In this post, we will explore how to use WireGuard's Peer-to-lar (P2P) capabilities to establish a secure, encrypted tunnel that expands a single virtual subnet across two different physical machines.
 
-# The Deep Dive: WireGuard as a Network Overlay
+## The Deep Dive: WireGuard as a Network Overlay
 
 WireGuard is not just a VPN; it is a high-performance, kernel-level implementation of a Layer 3 (IP) tunnel. Unlike traditional VPN protocols that rely on complex handssakes and heavy overhead, WireGuard uses "Cryptokey Routing." Each peer is identified by its public key, and traffic is routed based on the allowed IP addresses associated with that key.
 
@@ -17,8 +17,7 @@ By configuring two hosts with a shared virtual subnet (e.g., `10.0.0.0/24`) and 
 
 The magic happens when we extend this to containers. By configuring our container runtime (like Podman or Docker) to route traffic for this specific subnet through the host's WireGuard interface, we achieve true pod-to-pod communication across physical boundaries without needing complex SDN (Software Defined Networking) controllers like BGP or VXLAN.
 
-# The Architecture
-
+## The Architecture
 Our setup consists of two physical hosts:
 
 1. **Host A (The Origin)**:
@@ -86,13 +85,12 @@ flowchart TD
     EthA <==> Tunnel <==> EthB
 ```
 
-# Step-by-Step Demo
-
+## Step-by-Step Demo
 To make this setup repeatable and scalable, I have created an Ansible playbook that automates the entire process, from key generation to container network configuration.
 
 ### Automation with Ansible
 
-The `ansible-wireguard-p2P` project provides a structured way to deploy this architecture. You can find the repository in the [ansible-wireguard-p2p](./ansible-wireguard-p2p) directory of this repo.
+The `ansible-wireguard-p2P` project provides a structured way to deploy this architecture. You can find the repository in the [ansible-wireguard-p2p](/ansible-wireguard-p2p/) directory of this repo.
 
 The project structure is as follows:
 ```text
@@ -217,8 +215,7 @@ podman exec pod-b ping -c 4 10.0.0.10
 
 If you see successful replies, you have successfully expanded your virtual subnet across two physical machines using a WireGuard P2P tunnel!
 
-# High Availability (HA) and Scaling
-
+## High Availability (HA) and Scaling
 While the P2P approach is excellent for small clusters, scaling to a large-scale production environment (e.g., an HA OVN cluster) requires a shift in architecture.
 
 ### Scaling to Many Nodes
@@ -356,6 +353,5 @@ To achieve a highly available gateway setup manually, follow these steps:
 
 This architecture allows you to maintain a single, unified, and encrypted L3 overlay across geographically dispersed OVN clusters, providing true multi-region connectivity.
 
-# Conclusion
-
+## Conclusion
 By leveraging WireGuard's lightweight and secure P2P architecture, we've eliminated the need for complex, centralized SDN controllers to achieve pod-to-pod connectivity across physical boundaries. This approach is highly scalable, easy to audit, and provides a robust foundation for edge computing and distributed cloud architectures.

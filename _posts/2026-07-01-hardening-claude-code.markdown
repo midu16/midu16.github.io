@@ -6,7 +6,7 @@ categories: [Security, Architecture]
 tags: [ClaudeCode, LinuxHardening, SELinux, Podman, ZeroTrust]
 ---
 
-# Mitigating Agentic Risk: An Enterprise Hardening Blueprint for CLI AI Agents
+## Mitigating Agentic Risk: An Enterprise Hardening Blueprint for CLI AI Agents
 
 **Audience:** Staff Engineers & Security Architects | **Evidence level:** Architectural | **Versions:** v1.1 (Hardened)
 
